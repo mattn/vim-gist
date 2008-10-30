@@ -1,3 +1,19 @@
+"=============================================================================
+" File: gist.vim
+" Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
+" Last Change: Wed, 08 Oct 2008
+" Version: 0.1
+" Usage:
+"   :Gist
+"     post whole text to gist.
+"
+"   :'<,'>Gist
+"     post selected text to gist.
+
+if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
+  finish
+endif
+
 if !executable("grep")
   echoerr "Gist: require 'grep' command"
   finish
