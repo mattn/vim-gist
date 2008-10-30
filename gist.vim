@@ -87,6 +87,7 @@ function! Gist(line1, line2)
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = "http://gist.github.com/gists"
   let res = system("curl -i -d @".quote.file.quote." ".url)
+  call delete(file)
   let res = matchstr(split(res, "\n"), "^Location: ")
   let res = substitute(res, "^.*: ", "", "")
   echo "done: ".res
