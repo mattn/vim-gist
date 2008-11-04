@@ -21,12 +21,14 @@
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
   finish
 endif
+"let g:loaded_gist_vim = 1
 
-if !executable("grep")
-  echoerr "Gist: require 'grep' command"
+if (!exists('g:github_user') || !exists('g:github_token')) && !executable('git')
+  echoerr "Gist: require 'git' command"
   finish
 endif
-if !executable("curl")
+
+if !executable('curl')
   echoerr "Gist: require 'curl' command"
   finish
 endif
@@ -69,34 +71,41 @@ endfunction
 
 function! Gist(line1, line2, ...)
   let opt = (a:0 > 0) ? substitute(a:1, ' ', '', 'g') : ''
-  let private = "off"
-  let gistid = ""
+  let private = 'off'
+  let gistid = ''
   if opt =~ '-p\|--private'
-    let private = "on"
+    let private = 'on'
   elseif opt =~ '^\w\+$'
-  let gistid = opt
+    let gistid = opt
   elseif len(opt) > 0
-  echoerr "Invalid arguments"
-  return
+    echoerr 'Invalid arguments'
+    return
   endif
   if len(gistid) > 0
-    let url = "http://gist.github.com/".gistid.".txt"
-	exec "silent split gist:"gistid
-	exec ":0r! curl -s " url
+    let url = 'http://gist.github.com/'.gistid.'.txt'
+	exec 'silent split gist:'gistid
+	exec ':0r! curl -s ' url
+	setlocal nomodified
 	normal! gg
   else
-    let user = substitute(system("git config --global github.user"), "\n", "", "")
-    let token = substitute(system("git config --global github.token"), "\n", "", "")
+    if exists('g:github_user')
+      let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
+    endif
+    if exists('g:github_token')
+      let g:github_token = substitute(system('git config --global github.token'), "\n", '', '')
+    endif
+    let user = g:github_user
+    let token = g:github_token
     let query = printf(join([
-      \ "file_ext[gistfile1]=%s",
-      \ "file_name[gistfile1]=%s",
-      \ "file_contents[gistfile1]=%s",
-      \ "login=%s",
-      \ "token=%s",
-      \ "private=%s",
-      \ ], "&"),
-      \ s:encodeURIComponent(""),
-      \ s:encodeURIComponent("test"),
+      \ 'file_ext[gistfile1]=%s',
+      \ 'file_name[gistfile1]=%s',
+      \ 'file_contents[gistfile1]=%s',
+      \ 'login=%s',
+      \ 'token=%s',
+      \ 'private=%s',
+      \ ], '&'),
+      \ s:encodeURIComponent(''),
+      \ s:encodeURIComponent(''),
       \ s:encodeURIComponent(join(getline(a:line1, a:line2), "\n")),
       \ s:encodeURIComponent(user),
       \ s:encodeURIComponent(token),
@@ -109,12 +118,12 @@ function! Gist(line1, line2, ...)
     echon " Posting it to gist... "
     silent! put! =query
     let quote = &shellxquote == '"' ?  "'" : '"'
-    let url = "http://gist.github.com/gists"
-    let res = system("curl -i -d @".quote.file.quote." ".url)
+    let url = 'http://gist.github.com/gists'
+    let res = system('curl -i -d @'.quote.file.quote.' '.url)
     call delete(file)
-    let res = matchstr(split(res, "\n"), "^Location: ")
-    let res = substitute(res, "^.*: ", "", "")
-    echo "done: ".res
+    let res = matchstr(split(res, "\n"), '^Location: ')
+    let res = substitute(res, '^.*: ', '', '')
+    echo 'done: '.res
   endif
 endfunction
 
