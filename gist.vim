@@ -71,7 +71,7 @@ endfunction
 
 function! Gist(line1, line2, ...)
   let opt = (a:0 > 0) ? substitute(a:1, ' ', '', 'g') : ''
-  let private = 'off'
+  let private = ''
   let gistid = ''
   if opt =~ '-p\|--private'
     let private = 'on'
@@ -99,24 +99,27 @@ function! Gist(line1, line2, ...)
 	let ext = expand('%:e')
 	let ext = len(ext) ? '.'.ext : ''
 	let name = bufname('%')
-    let query = printf(join([
+    let query = [
       \ 'file_ext[gistfile1]=%s',
       \ 'file_name[gistfile1]=%s',
       \ 'file_contents[gistfile1]=%s',
       \ 'login=%s',
       \ 'token=%s',
-      \ 'private=%s',
-      \ ], '&'),
+      \ ]
+	if len(private)
+	  call add(query, 'private=on')
+    endif
+    let squery = printf(join(query, '&'),
       \ s:encodeURIComponent(ext),
       \ s:encodeURIComponent(name),
       \ s:encodeURIComponent(join(getline(a:line1, a:line2), "\n")),
       \ s:encodeURIComponent(user),
-      \ s:encodeURIComponent(token),
-      \ s:encodeURIComponent(private))
+      \ s:encodeURIComponent(token))
+    unlet query
 
     let file = tempname()
     exec 'redir! > ' . file 
-    silent echo query
+    silent echo squery
     redir END
     echon " Posting it to gist... "
     let quote = &shellxquote == '"' ?  "'" : '"'
