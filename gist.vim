@@ -84,10 +84,10 @@ function! Gist(line1, line2, ...)
   endif
   if len(gistid) > 0
     let url = 'http://gist.github.com/'.gistid.'.txt'
-	exec 'silent split gist:'gistid
-	exec ':0r! curl -s ' url
-	setlocal nomodified
-	normal! gg
+    exec 'silent split gist:'gistid
+    exec ':0r! curl -s ' url
+    setlocal nomodified
+    normal! gg
   else
     if !exists('g:github_user')
       let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
@@ -97,9 +97,9 @@ function! Gist(line1, line2, ...)
     endif
     let user = g:github_user
     let token = g:github_token
-	let ext = expand('%:e')
-	let ext = len(ext) ? '.'.ext : ''
-	let name = bufname('%')
+    let ext = expand('%:e')
+    let ext = len(ext) ? '.'.ext : ''
+    let name = bufname('%')
     let query = [
       \ 'file_ext[gistfile1]=%s',
       \ 'file_name[gistfile1]=%s',
@@ -107,8 +107,8 @@ function! Gist(line1, line2, ...)
       \ 'login=%s',
       \ 'token=%s',
       \ ]
-	if len(private)
-	  call add(query, 'private=on')
+    if len(private)
+      call add(query, 'private=on')
     endif
     let squery = printf(join(query, '&'),
       \ s:encodeURIComponent(ext),
