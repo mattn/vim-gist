@@ -21,7 +21,7 @@
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
   finish
 endif
-"let g:loaded_gist_vim = 1
+let g:loaded_gist_vim = 1
 
 if (!exists('g:github_user') || !exists('g:github_token')) && !executable('git')
   echoerr "Gist: require 'git' command"
@@ -88,14 +88,17 @@ function! Gist(line1, line2, ...)
 	setlocal nomodified
 	normal! gg
   else
-    if exists('g:github_user')
+    if !exists('g:github_user')
       let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
     endif
-    if exists('g:github_token')
+    if !exists('g:github_token')
       let g:github_token = substitute(system('git config --global github.token'), "\n", '', '')
     endif
     let user = g:github_user
     let token = g:github_token
+	let ext = expand('%:e')
+	let ext = len(ext) ? '.'.ext : ''
+	let name = bufname('%')
     let query = printf(join([
       \ 'file_ext[gistfile1]=%s',
       \ 'file_name[gistfile1]=%s',
@@ -104,8 +107,8 @@ function! Gist(line1, line2, ...)
       \ 'token=%s',
       \ 'private=%s',
       \ ], '&'),
-      \ s:encodeURIComponent(''),
-      \ s:encodeURIComponent(''),
+      \ s:encodeURIComponent(ext),
+      \ s:encodeURIComponent(name),
       \ s:encodeURIComponent(join(getline(a:line1, a:line2), "\n")),
       \ s:encodeURIComponent(user),
       \ s:encodeURIComponent(token),
@@ -116,7 +119,6 @@ function! Gist(line1, line2, ...)
     silent echo query
     redir END
     echon " Posting it to gist... "
-    silent! put! =query
     let quote = &shellxquote == '"' ?  "'" : '"'
     let url = 'http://gist.github.com/gists'
     let res = system('curl -i -d @'.quote.file.quote.' '.url)
