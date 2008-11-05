@@ -20,7 +20,7 @@
 "
 
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
-  "finish
+  finish
 endif
 let g:loaded_gist_vim = 1
 
@@ -103,7 +103,7 @@ function! s:GistGet(user, token, gistid)
   normal! gg
 endfunction
 
-function! s:GistPut(user, token, private)
+function! s:GistPut(user, token, content, private)
   let ext = expand('%:e')
   let ext = len(ext) ? '.'.ext : ''
   let name = bufname('%')
@@ -120,7 +120,7 @@ function! s:GistPut(user, token, private)
   let squery = printf(join(query, '&'),
     \ s:encodeURIComponent(ext),
     \ s:encodeURIComponent(name),
-    \ s:encodeURIComponent(join(getline(a:line1, a:line2), "\n")),
+    \ s:encodeURIComponent(a:content),
     \ s:encodeURIComponent(a:user),
     \ s:encodeURIComponent(a:token))
   unlet query
@@ -167,9 +167,10 @@ function! Gist(line1, line2, ...)
   if len(gistls) > 0
     call s:GistList(g:github_user, g:github_token, gistls)
   elseif len(gistid) > 0
-    call s:GistGet(g:github_user, g:github_token, gidtid)
+    call s:GistGet(g:github_user, g:github_token, gistid)
   else
-    call s:GistPut(g:github_user, g:github_token, private)
+    let content = join(getline(a:line1, a:line2), "\n")
+    call s:GistPut(g:github_user, g:github_token, content, private)
   endif
 endfunction
 
