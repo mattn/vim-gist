@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: Wed, 08 Oct 2008
-" Version: 0.1
+" Version: 0.2
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 " Usage:
 "
