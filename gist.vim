@@ -16,7 +16,13 @@
 "     post whole text to gist with private.
 "
 "   :Gist XXXXX
-"     edit gist XXXXX
+"     edit gist XXXXX.
+"
+"   :Gist -l
+"     list gists from mine.
+"
+"   :Gist -la
+"     list gists from all.
 "
 
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
@@ -85,6 +91,7 @@ function! s:GistList(user, token, gistls)
   silent! %s/<div[^>]*>/\r  /g
   silent! %s/<\/pre>/\r/g
   silent! %s/<[^>]\+>//g
+  silent! %s/\r//g
   silent! %s/&nbsp;/ /g
   silent! %s/&quot;/"/g
   silent! %s/&amp;/\&/g
@@ -92,6 +99,7 @@ function! s:GistList(user, token, gistls)
   silent! %s/&lt;/</g
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
   setlocal nomodified
+  syntax match SpecialKey /^gist: /he=e-2
   normal! gg
 endfunction
 
