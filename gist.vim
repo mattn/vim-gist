@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: Wed, 08 Oct 2008
-" Version: 0.3
+" Version: 0.4
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 " Usage:
 "
@@ -117,7 +117,7 @@ endfunction
 function! s:GistPut(user, token, content, private)
   let ext = expand('%:e')
   let ext = len(ext) ? '.'.ext : ''
-  let name = bufname('%')
+  let name = expand('%:t')
   let query = [
     \ 'file_ext[gistfile1]=%s',
     \ 'file_name[gistfile1]=%s',
