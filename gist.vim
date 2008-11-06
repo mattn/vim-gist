@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: Wed, 08 Oct 2008
-" Version: 0.2
+" Version: 0.3
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 " Usage:
 "
@@ -20,6 +20,9 @@
 "
 "   :Gist -l
 "     list gists from mine.
+"
+"   :Gist -l mattn
+"     list gists from mattn.
 "
 "   :Gist -la
 "     list gists from all.
@@ -77,13 +80,13 @@ function! s:strpart2(src, start, ...)
 endfunction
 
 function! s:GistList(user, token, gistls)
-  if a:gistls == 'all'
+  if a:gistls == '-all'
     let url = 'http://gist.github.com/gists'
   else
-    let url = 'http://gist.github.com/'.a:user
+    let url = 'http://gist.github.com/'.a:gistls
   endif
-  exec 'silent split gist:mine'
-  exec ':0r! curl -s ' url
+  exec 'silent split gist:'.a:gistls
+  exec 'silent 0r! curl -s ' url
   silent! %s/>/>\r/g
   silent! %s/</\r</g
   silent! %g/<pre/,/<\/pre/join!
@@ -106,7 +109,7 @@ endfunction
 function! s:GistGet(user, token, gistid)
   let url = 'http://gist.github.com/'.a:gistid.'.txt'
   exec 'silent split gist:'a:gistid
-  exec ':0r! curl -s ' url
+  exec 'silent 0r! curl -s ' url
   setlocal nomodified
   normal! gg
 endfunction
@@ -152,10 +155,14 @@ function! Gist(line1, line2, ...)
   let private = ''
   let gistid = ''
   let gistls = ''
-  if opt =~ '-la\|--listall'
-	let gistls = 'all'
-  elseif opt =~ '-l\|--list'
-	let gistls = 'mine'
+  let listmx = '^\(-l\|--list\)\s*\(\w\+\)\?$'
+  if opt =~ '^\(-la\|--listall\)'
+    let gistls = '-all'
+  elseif opt =~ listmx
+    let gistls = substitute(opt, listmx, '\2', '')
+    if len(gistls) == 0
+      let gistls = 'mine'
+    endif
   elseif opt =~ '-p\|--private'
     let private = 'on'
   elseif opt =~ '^\w\+$'
