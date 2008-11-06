@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: Wed, 08 Oct 2008
-" Version: 0.4
+" Version: 0.5
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 " Usage:
 "
@@ -151,6 +151,13 @@ function! s:GistPut(user, token, content, private)
 endfunction
 
 function! Gist(line1, line2, ...)
+  if !exists('g:github_user')
+    let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
+  endif
+  if !exists('g:github_token')
+    let g:github_token = substitute(system('git config --global github.token'), "\n", '', '')
+  endif
+
   let opt = (a:0 > 0) ? substitute(a:1, ' ', '', 'g') : ''
   let private = ''
   let gistid = ''
@@ -161,7 +168,7 @@ function! Gist(line1, line2, ...)
   elseif opt =~ listmx
     let gistls = substitute(opt, listmx, '\2', '')
     if len(gistls) == 0
-      let gistls = 'mine'
+      let gistls = g:github_user
     endif
   elseif opt =~ '-p\|--private'
     let private = 'on'
@@ -170,13 +177,6 @@ function! Gist(line1, line2, ...)
   elseif len(opt) > 0
     echoerr 'Invalid arguments'
     return
-  endif
-
-  if !exists('g:github_user')
-    let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
-  endif
-  if !exists('g:github_token')
-    let g:github_token = substitute(system('git config --global github.token'), "\n", '', '')
   endif
 
   if len(gistls) > 0
