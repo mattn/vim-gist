@@ -43,40 +43,33 @@ if !executable('curl')
   finish
 endif
 
-function! s:encodeURIComponent(str)
-  let to_enc = 'utf8'
-  let t = ''
-  let s = iconv(a:str, &enc, to_enc)
-  let save_enc = &enc
-  let &enc = to_enc
-  let i = 0
-  let c = s:strpart2(s, i, 1)
-  while c != ''
-    if c =~# '[0-9A-Za-z-._~!''()*]'
-      let t = t . c
-    elseif c =~# '[:cntrl:]'
-    else
-      let n = strlen(c)
-      let j = 0
-      while j < n
-        let t = t . printf('%%%02X', char2nr(strpart(c, j, 1)))
-        let j = j + 1
-      endwhile
-    endif
-    let i = i + 1
-    let c = s:strpart2(s, i, 1)
+function! s:nr2hex(nr)
+  let n = a:nr
+  let r = ""
+  while n
+    let r = '0123456789ABCDEF'[n % 16] . r
+    let n = n / 16
   endwhile
-  let &enc = save_enc
-  let t = iconv(t, to_enc, &enc)
-  return t
+  return r
 endfunction
 
-function! s:strpart2(src, start, ...)
-  let len = exists('a:1') ? a:1 : 0
-  let pat = ''
-  let pat = pat . '^.\{' . a:start . '}\zs.'
-  let pat = pat . (len > 0 ? '\{' . len . '}' : '*' ) . '\ze'
-  return matchstr(a:src, pat)
+function! s:encodeURIComponent(instr)
+  let instr = iconv(a:instr, &enc, "utf-8")
+  let len = strlen(instr)
+  let i = 0
+  let outstr = ''
+  while i < len
+    let ch = instr[i]
+    if ch =~# '[0-9A-Za-z-._~!''()*]'
+      let outstr = outstr . ch
+    elseif ch == ' '
+      let outstr = outstr . '+'
+    else
+      let outstr = outstr . '%' . substitute('0' . s:nr2hex(char2nr(ch)), '^.*\(..\)$', '\1', '')
+    endif
+    let i = i + 1
+  endwhile
+  return outstr
 endfunction
 
 function! s:GistList(user, token, gistls)
@@ -103,6 +96,7 @@ function! s:GistList(user, token, gistls)
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
   setlocal nomodified
   syntax match SpecialKey /^gist: /he=e-2
+  exec 'nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>'
   normal! gg
 endfunction
 
@@ -112,6 +106,15 @@ function! s:GistGet(user, token, gistid)
   exec 'silent 0r! curl -s ' url
   setlocal nomodified
   normal! gg
+endfunction
+
+function! s:GistListAction()
+  let line = getline('.')
+  let mx = '^gist: \(\w\+\)$'
+  if line =~# mx
+    let gistid = substitute(line, mx, '\1', '')
+    call s:GistGet(g:github_user, g:github_token, gistid)
+  endif
 endfunction
 
 function! s:GistPut(user, token, content, private)
