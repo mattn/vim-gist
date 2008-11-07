@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: Wed, 08 Oct 2008
-" Version: 0.5
+" Last Change: 07-Nov-2008. Jan 2008
+" Version: 0.6
 " GetLatestVimScripts: 2423 1 gist.vim
 " Usage:
 "
