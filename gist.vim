@@ -3,7 +3,6 @@
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 07-Nov-2008. Jan 2008
 " Version: 0.7
-" GetLatestVimScripts: 2423 1 gist.vim
 " Usage:
 "
 "   :Gist
@@ -27,6 +26,7 @@
 "   :Gist -la
 "     list gists from all.
 "
+" GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
   finish
