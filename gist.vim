@@ -3,7 +3,7 @@
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: Wed, 08 Oct 2008
 " Version: 0.5
-" GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
+" GetLatestVimScripts: 2423 1 gist.vim
 " Usage:
 "
 "   :Gist
