@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 10-Nov-2008. Jan 2008
+" Last Change: 12-Nov-2008. Jan 2008
 " Version: 0.8
 " Usage:
 "
@@ -79,7 +79,7 @@ function! s:GistList(user, token, gistls)
     let url = 'http://gist.github.com/'.a:gistls
   endif
   exec 'silent split gist:'.a:gistls
-  exec 'silent 0r! curl -s ' url
+  exec 'silent 0r! curl -s '.url
   silent! %s/>/>\r/g
   silent! %s/</\r</g
   silent! %g/<pre/,/<\/pre/join!
@@ -103,7 +103,7 @@ endfunction
 function! s:GistGet(user, token, gistid)
   let url = 'http://gist.github.com/'.a:gistid.'.txt'
   exec 'silent split gist:'.a:gistid
-  exec 'silent 0r! curl -s ' url
+  exec 'silent 0r! curl -s '.url
   setlocal nomodified
   normal! gg
 endfunction
@@ -140,7 +140,7 @@ function! s:GistPut(user, token, content, private)
   unlet query
 
   let file = tempname()
-  exec 'redir! > ' . file 
+  exec 'redir! > '.file 
   silent echo squery
   redir END
   echon " Posting it to gist... "
