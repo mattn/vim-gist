@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 12-Nov-2008. Jan 2008
-" Version: 0.8
+" Last Change: 13-Nov-2008. Jan 2008
+" Version: 0.9
 " Usage:
 "
 "   :Gist
@@ -106,6 +106,9 @@ function! s:GistGet(user, token, gistid)
   exec 'silent 0r! curl -s '.url
   setlocal nomodified
   normal! gg
+  if exists('g:gist_clip_command')
+    exec 'silent w !'.g:gist_clip_command
+  endif
 endfunction
 
 function! s:GistListAction()
