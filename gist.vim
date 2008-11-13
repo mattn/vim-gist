@@ -26,6 +26,18 @@
 "   :Gist -la
 "     list gists from all.
 "
+" Tips:
+"   if set g:gist_clip_command, gist.vim will copy the gist code.
+"
+"   # mac
+"   let g:gist_clip_command = 'pbcopy'
+"
+"   # linux
+"   let g:gist_clip_command = 'xclip -selection clipboard'
+"
+"   # others(cygwin?)
+"   let g:gist_clip_command = 'putclip'
+"
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
