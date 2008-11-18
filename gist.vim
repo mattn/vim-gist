@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 13-Nov-2008. Jan 2008
-" Version: 0.9
+" Last Change: 18-Nov-2008. Jan 2008
+" Version: 1.0
 " Usage:
 "
 "   :Gist
@@ -180,7 +180,7 @@ function! Gist(line1, line2, ...)
   let private = ''
   let gistid = ''
   let gistls = ''
-  let listmx = '^\(-l\|--list\)\s*\(\w\+\)\?$'
+  let listmx = '^\(-l\|--list\)\s*\([^\s]\+\)\?$'
   if opt =~ '^\(-la\|--listall\)'
     let gistls = '-all'
   elseif opt =~ listmx
