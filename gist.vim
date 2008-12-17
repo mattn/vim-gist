@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 18-Nov-2008. Jan 2008
-" Version: 1.0
+" Last Change: 17-Dec-2008. Jan 2008
+" Version: 1.1
 " Usage:
 "
 "   :Gist
@@ -115,8 +115,10 @@ endfunction
 function! s:GistGet(user, token, gistid)
   let url = 'http://gist.github.com/'.a:gistid.'.txt'
   exec 'silent split gist:'.a:gistid
+  filetype detect
   exec 'silent 0r! curl -s '.url
   setlocal nomodified
+  doau StdinReadPost <buffer>
   normal! gg
   if exists('g:gist_clip_command')
     exec 'silent w !'.g:gist_clip_command
