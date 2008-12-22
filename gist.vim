@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 19-Dec-2008. Jan 2008
-" Version: 1.2
+" Last Change: 22-Dec-2008. Jan 2008
+" Version: 1.3
 " Usage:
 "
 "   :Gist
@@ -124,8 +124,12 @@ function! s:GistDetectFiletype(gistid)
   let url = 'http://gist.github.com/'.a:gistid
   let res = system('curl -s '.url)
   let res = substitute(res, '^.*<div class="meta">[\r\n ]*<div class="info">[\r\n ]*<span>\([^>]\+\)</span>.*$', '\1', '')
-  let res = substitute(res, '.*\.[^\.]+$', '\1', '')
-  silent! exec "doau BufRead *.".res
+  let res = substitute(res, '.*\(\.[^\.]+\)$', '\1', '')
+  if res =~ '^\.'
+    silent! exec "doau BufRead *".res
+  else
+    silent! exec "setlocal ft=".tolower(res)
+  endif
 endfunction
 
 function! s:GistGet(user, token, gistid)
@@ -136,7 +140,7 @@ function! s:GistGet(user, token, gistid)
   setlocal nomodified
   doau StdinReadPost <buffer>
   normal! gg
-  if g:gist_detect_filetype
+  if &ft != '' && g:gist_detect_filetype
     call s:GistDetectFiletype(a:gistid)
   endif
   if exists('g:gist_clip_command')
