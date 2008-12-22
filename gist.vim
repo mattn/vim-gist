@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 22-Dec-2008. Jan 2008
-" Version: 1.3
+" Version: 1.5
 " Usage:
 "
 "   :Gist
@@ -40,7 +40,11 @@
 "
 "   * if you want to detect filetype from gist's filename...
 "
+"     # detect filetype if vim failed auto-detection.
 "     let g:gist_detect_filetype = 1
+"
+"     # detect filetype always.
+"     let g:gist_detect_filetype = 2
 "
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 
@@ -124,7 +128,7 @@ function! s:GistDetectFiletype(gistid)
   let url = 'http://gist.github.com/'.a:gistid
   let res = system('curl -s '.url)
   let res = substitute(res, '^.*<div class="meta">[\r\n ]*<div class="info">[\r\n ]*<span>\([^>]\+\)</span>.*$', '\1', '')
-  let res = substitute(res, '.*\(\.[^\.]+\)$', '\1', '')
+  let res = substitute(res, '.*\(\.[^\.]\+\)$', '\1', '')
   if res =~ '^\.'
     silent! exec "doau BufRead *".res
   else
@@ -140,7 +144,7 @@ function! s:GistGet(user, token, gistid)
   setlocal nomodified
   doau StdinReadPost <buffer>
   normal! gg
-  if &ft == '' && g:gist_detect_filetype
+  if (&ft == '' && g:gist_detect_filetype == 1) || g:gist_detect_filetype == 2
     call s:GistDetectFiletype(a:gistid)
   endif
   if exists('g:gist_clip_command')
