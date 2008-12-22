@@ -140,7 +140,7 @@ function! s:GistGet(user, token, gistid)
   setlocal nomodified
   doau StdinReadPost <buffer>
   normal! gg
-  if &ft != '' && g:gist_detect_filetype
+  if &ft == '' && g:gist_detect_filetype
     call s:GistDetectFiletype(a:gistid)
   endif
   if exists('g:gist_clip_command')
