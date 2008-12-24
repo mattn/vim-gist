@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 22-Dec-2008. Jan 2008
-" Version: 1.5
+" Last Change: 24-Dec-2008. Jan 2008
+" Version: 1.6
 " Usage:
 "
 "   :Gist
@@ -107,9 +107,12 @@ function! s:GistList(user, token, gistls)
   silent! %s/>/>\r/g
   silent! %s/</\r</g
   silent! %g/<pre/,/<\/pre/join!
-  silent! %v/^\(gist:\|<pre>\)/d _
+  silent! %g/<span class="date"/,/<\/span/join
+  silent! %g/^<span class="date"/s/> */>/g
+  silent! %v/^\(gist:\|<pre>\|<span class="date">\)/d _
   silent! %s/<div[^>]*>/\r  /g
   silent! %s/<\/pre>/\r/g
+  silent! %g/^gist:/,/<span class="date"/join
   silent! %s/<[^>]\+>//g
   silent! %s/\r//g
   silent! %s/&nbsp;/ /g
@@ -154,7 +157,7 @@ endfunction
 
 function! s:GistListAction()
   let line = getline('.')
-  let mx = '^gist: \(\w\+\)$'
+  let mx = '^gist: \(\w\+\) .*'
   if line =~# mx
     let gistid = substitute(line, mx, '\1', '')
     call s:GistGet(g:github_user, g:github_token, gistid)
