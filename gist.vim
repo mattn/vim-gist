@@ -17,6 +17,9 @@
 "   :Gist XXXXX
 "     edit gist XXXXX.
 "
+"   :Gist -c XXXXX.
+"     get gist XXXXX and put to clipboard.
+"  
 "   :Gist -l
 "     list gists from mine.
 "
@@ -27,7 +30,8 @@
 "     list gists from all.
 "
 " Tips:
-"   * if set g:gist_clip_command, gist.vim will copy the gist code.
+"   * if set g:gist_clip_command, gist.vim will copy the gist code
+"       with option '-c'.
 "
 "     # mac
 "     let g:gist_clip_command = 'pbcopy'
