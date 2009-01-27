@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 23-Jan-2009. Jan 2008
-" Version: 1.7
+" Last Change: 27-Jan-2009. Jan 2008
+" Version: 1.8
 " Usage:
 "
 "   :Gist
@@ -50,6 +50,20 @@
 "     # detect filetype always.
 "     let g:gist_detect_filetype = 2
 "
+"   * if you want to open browser after the post...
+"
+"     let g:gist_open_browser_after_post = 1
+"
+"   * if you want to change the browser...
+"
+"     let g:gist_browser_command = 'w3m %URL%'
+"
+"       or
+"
+"     let g:gist_browser_command = 'opera %URL% &'
+"
+"     on windows, should work with your setting.
+"
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
@@ -65,6 +79,18 @@ endif
 if !executable('curl')
   echoerr "Gist: require 'curl' command"
   finish
+endif
+
+if !exists('g:gist_open_browser_after_post')
+  let g:gist_open_browser_after_post = 0
+endif
+
+if !exists('g:gist_browser_command')
+  if has('win32')
+    let g:gist_browser_command = "!start rundll32 url.dll,FileProtocolHandler %URL%"
+  else
+    let g:gist_browser_command = "firefox %URL% &"
+  endif
 endif
 
 if !exists('g:gist_detect_filetype')
@@ -206,6 +232,7 @@ function! s:GistPut(user, token, content, private)
   let res = matchstr(split(res, "\n"), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
   echo 'done: '.res
+  return res
 endfunction
 
 function! Gist(line1, line2, ...)
@@ -240,7 +267,7 @@ function! Gist(line1, line2, ...)
     elseif len(arg) > 0
       echoerr 'Invalid arguments'
       unlet args
-      return
+      return 0
     endif
   endfor
   unlet args
@@ -255,8 +282,17 @@ function! Gist(line1, line2, ...)
     call s:GistGet(g:github_user, g:github_token, gistid, clipboard)
   else
     let content = join(getline(a:line1, a:line2), "\n")
-    call s:GistPut(g:github_user, g:github_token, content, private)
+    let url = s:GistPut(g:github_user, g:github_token, content, private)
+    if len(url) > 0 && g:gist_open_browser_after_post
+      let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
+      if cmd =~ '^!'
+        silent! exec  cmd
+      else
+        call system(cmd)
+      endif
+    endif
   endif
+  return 1
 endfunction
 
 command! -nargs=? -range=% Gist :call Gist(<line1>, <line2>, <f-args>)

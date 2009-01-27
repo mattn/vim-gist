@@ -2,7 +2,7 @@ script_name: Gist.vim
 script_id: '2423'
 script_type: utility
 script_package: gist.vim
-script_version: '1.7'
+script_version: '1.8'
 required_vim_version: '7.0'
 summary: vimscript for gist
 
@@ -49,6 +49,20 @@ detailed_description: |
 
       let g:gist_detect_filetype = 1
 
+    if you want to open browser after the post...
+
+      let g:gist_open_browser_after_post = 1
+
+    if you want to change the browser...
+
+      let g:gist_browser_command = 'w3m %URL%'
+
+        or
+
+      let g:gist_browser_command = 'opera %URL% &'
+
+      on windows, should work with your setting.
+
   Require:
     curl, and if you want to use profile of git, it require git command.
 
@@ -56,6 +70,9 @@ install_details: |
   copy it to your plugin directory.
 
 versions:
+- '1.8': |
+   This is an upgrade for Gist.vim: added new option g:gist_open_browser_after_post/g:gist_browser_command to open posted gist.
+
 - '1.7': |
    This is an upgrade for Gist.vim: now changed argument for putting clipboard as ':Gist -c XXXXX'.
 
