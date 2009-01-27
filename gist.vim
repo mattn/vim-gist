@@ -3,6 +3,7 @@
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 27-Jan-2009. Jan 2008
 " Version: 1.8
+" WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
 "   :Gist
