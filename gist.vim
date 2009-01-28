@@ -232,7 +232,7 @@ function! s:GistEdit(user, token, content, gistid)
   let url = 'http://gist.github.com/gists/'.a:gistid
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
   call delete(file)
-  let res = matchstr(split(res, "\n"), '^Location: ')
+  let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
   if len(res) > 0
     echo 'done: '.res
@@ -273,7 +273,7 @@ function! s:GistPut(user, token, content, private)
   let url = 'http://gist.github.com/gists'
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
   call delete(file)
-  let res = matchstr(split(res, "\n"), '^Location: ')
+  let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
   echo 'done: '.res
   return res
