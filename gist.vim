@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 30-Jan-2009. Jan 2008
-" Version: 1.9
+" Version: 2.0
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -77,7 +77,7 @@
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
-  finish
+  "finish
 endif
 let g:loaded_gist_vim = 1
 
@@ -326,22 +326,23 @@ function! Gist(line1, line2, ...)
 
   let args = (a:0 > 0) ? split(a:1, ' ') : []
   for arg in args
-    if arg =~ '^\(-la\|--listall\)'
+    if arg =~ '^\(-la\|--listall\)$'
       let gistls = '-all'
-    elseif arg =~ listmx
-      let gistls = substitute(arg, listmx, '\2', '')
-      if len(gistls) == 0
-        let gistls = g:github_user
-      endif
-    elseif arg =~ '-p\|--private'
+    elseif arg =~ '^\(-l\|--list\)$'
+      let gistls = g:github_user
+    elseif arg =~ '^\(-p\|--private\)$'
       let private = 1
-    elseif arg =~ '-c\|--clipboard'
+    elseif arg =~ '^\(-c\|--clipboard\)$'
       let clipboard = 1
-    elseif arg =~ '-e\|--edit' && bufname =~ bufnamemx
+    elseif arg =~ '^\(-e\|--edit\)$' && bufname =~ bufnamemx
       let editpost = 1
       let gistid = substitute(bufname, bufnamemx, '\1', '')
-    elseif arg =~ '^\w\+$'
-      let gistid = arg
+    elseif arg =~ '^[0-9A-Za-z\-_]\+$'
+      if len(gistls) > 0
+        let gistls = arg
+      else
+        let gistid = arg
+      endif
     elseif len(arg) > 0
       echoerr 'Invalid arguments'
       unlet args
