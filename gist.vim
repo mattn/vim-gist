@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 27-Jan-2009. Jan 2008
-" Version: 1.8
+" Last Change: 30-Jan-2009. Jan 2008
+" Version: 1.9
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -14,6 +14,9 @@
 "
 "   :Gist -p
 "     post whole text to gist with private.
+"
+"   :Gist -e
+"     edit the gist. (shoud be work on gist buffer)
 "
 "   :Gist XXXXX
 "     edit gist XXXXX.
@@ -64,6 +67,12 @@
 "     let g:gist_browser_command = 'opera %URL% &'
 "
 "     on windows, should work with your setting.
+"
+" Thanks:
+"   MATSUU Takuto: 
+"     removed carriage return
+"     gist_browser_command enhancement
+"     edit support
 "
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 
@@ -162,6 +171,17 @@ function! s:GistList(user, token, gistls)
   normal! gg
 endfunction
 
+function! s:GistGetFileName(gistid)
+  let url = 'http://gist.github.com/'.a:gistid
+  let res = system('curl -s '.url)
+  let res = substitute(res, '^.*<a href="/raw/[^"]\+/\([^"]\+\)".*$', '\1', '')
+  if res =~ '/'
+    return ''
+  else
+    return res
+  endif
+endfunction
+
 function! s:GistDetectFiletype(gistid)
   let url = 'http://gist.github.com/'.a:gistid
   let res = system('curl -s '.url)
@@ -178,6 +198,7 @@ function! s:GistGet(user, token, gistid, clipboard)
   let url = 'http://gist.github.com/'.a:gistid.'.txt'
   exec 'silent split gist:'.a:gistid
   filetype detect
+  exec '%d _'
   exec 'silent 0r! curl -s '.url
   setlocal nomodified
   doau StdinReadPost <buffer>
@@ -203,10 +224,13 @@ function! s:GistListAction()
   endif
 endfunction
 
-function! s:GistEdit(user, token, content, gistid)
-  let ext = expand('%:e')
-  let ext = len(ext) ? '.'.ext : ''
-  let name = expand('%:t')
+function! s:GistUpdate(user, token, content, gistid)
+  let name = s:GistGetFileName(a:gistid)
+  let namemx = '^[^.]\+\(.\+\)$'
+  let ext = ''
+  if name =~ namemx
+    let ext = substitute(name, namemx, '\1', '')
+  endif
   let query = [
     \ '_method=put',
     \ 'file_ext[gistfile1%s]=%s',
@@ -227,14 +251,14 @@ function! s:GistEdit(user, token, content, gistid)
   exec 'redir! > '.file 
   silent echo squery
   redir END
-  echon " Posting it to gist... "
+  echon " Updating it to gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/gists/'.a:gistid
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0
+  if len(res) > 0 && res != 'http://gist.github.com/gists' 
     echo 'done: '.res
   else
     echoerr 'Edit failed'
@@ -242,7 +266,7 @@ function! s:GistEdit(user, token, content, gistid)
   return res
 endfunction
 
-function! s:GistPut(user, token, content, private)
+function! s:GistPost(user, token, content, private)
   let ext = expand('%:e')
   let ext = len(ext) ? '.'.ext : ''
   let name = expand('%:t')
@@ -275,7 +299,11 @@ function! s:GistPut(user, token, content, private)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  echo 'done: '.res
+  if len(res) > 0 && res != 'http://gist.github.com/gists' 
+    echo 'done: '.res
+  else
+    echoerr 'Post failed'
+  endif
   return res
 endfunction
 
@@ -287,15 +315,17 @@ function! Gist(line1, line2, ...)
     let g:github_token = substitute(system('git config --global github.token'), "\n", '', '')
   endif
 
+  let bufname = bufname("%")
   let gistid = ''
   let gistls = ''
   let private = 0
   let clipboard = 0
   let editpost = 0
+  let listmx = '^\(-l\|--list\)\s*\([^\s]\+\)\?$'
+  let bufnamemx = '^gist:\(\d\+\)$'
 
   let args = (a:0 > 0) ? split(a:1, ' ') : []
   for arg in args
-    let listmx = '^\(-l\|--list\)\s*\([^\s]\+\)\?$'
     if arg =~ '^\(-la\|--listall\)'
       let gistls = '-all'
     elseif arg =~ listmx
@@ -305,12 +335,13 @@ function! Gist(line1, line2, ...)
       endif
     elseif arg =~ '-p\|--private'
       let private = 1
-    elseif arg =~ '^\w\+$'
-      let gistid = arg
     elseif arg =~ '-c\|--clipboard'
       let clipboard = 1
-    elseif arg =~ '-e\|--edit'
+    elseif arg =~ '-e\|--edit' && bufname =~ bufnamemx
       let editpost = 1
+      let gistid = substitute(bufname, bufnamemx, '\1', '')
+    elseif arg =~ '^\w\+$'
+      let gistid = arg
     elseif len(arg) > 0
       echoerr 'Invalid arguments'
       unlet args
@@ -326,17 +357,14 @@ function! Gist(line1, line2, ...)
 
   if len(gistls) > 0
     call s:GistList(g:github_user, g:github_token, gistls)
-  elseif len(gistid) > 0
+  elseif len(gistid) > 0 && editpost == 0
     call s:GistGet(g:github_user, g:github_token, gistid, clipboard)
   else
     let content = join(getline(a:line1, a:line2), "\n")
-    let bufname = bufname("%")
-    let mx = '^gist:\(\d\+\)$'
-    if bufname =~# mx && editpost == 1
-      let gistid = substitute(bufname, mx, '\1', '')
-      let url = s:GistEdit(g:github_user, g:github_token, content, gistid)
+    if editpost == 1
+      let url = s:GistUpdate(g:github_user, g:github_token, content, gistid)
     else
-      let url = s:GistPut(g:github_user, g:github_token, content, private)
+      let url = s:GistPost(g:github_user, g:github_token, content, private)
     endif
     if len(url) > 0 && g:gist_open_browser_after_post
       let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')

@@ -2,7 +2,7 @@ script_name: Gist.vim
 script_id: '2423'
 script_type: utility
 script_package: gist.vim
-script_version: '1.8'
+script_version: '1.9'
 required_vim_version: '7.0'
 summary: vimscript for gist
 
@@ -20,6 +20,9 @@ detailed_description: |
     :Gist -p
       post whole text to gist with private.
   
+    :Gist -e
+      edit the gist. (shoud be work on gist buffer)
+
     :Gist XXXXX
       get gist XXXXX.
   
@@ -70,6 +73,9 @@ install_details: |
   copy it to your plugin directory.
 
 versions:
+- '1.9': |
+   This is an upgrade for Gist.vim: added support editing the gist. and bits bug fix.
+
 - '1.8': |
    This is an upgrade for Gist.vim: added new option g:gist_open_browser_after_post/g:gist_browser_command to open posted gist.
 
