@@ -2,7 +2,7 @@ script_name: Gist.vim
 script_id: '2423'
 script_type: utility
 script_package: gist.vim
-script_version: '1.9'
+script_version: '2.0'
 required_vim_version: '7.0'
 summary: vimscript for gist
 
@@ -73,6 +73,9 @@ install_details: |
   copy it to your plugin directory.
 
 versions:
+- '2.0': |
+   This is an upgrade for Gist.vim: bugfix for listing gists in specified user. 
+
 - '1.9': |
    This is an upgrade for Gist.vim: added support editing the gist. and bits bug fix.
 
