@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 30-Jan-2009. Jan 2008
-" Version: 2.0
+" Last Change: 10-Feb-2009. Jan 2008
+" Version: 2.1
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -17,6 +17,9 @@
 "
 "   :Gist -e
 "     edit the gist. (shoud be work on gist buffer)
+"
+"   :Gist -e foo.js
+"     edit the gist with name 'foo.js'. (shoud be work on gist buffer)
 "
 "   :Gist XXXXX
 "     edit gist XXXXX.
@@ -224,8 +227,12 @@ function! s:GistListAction()
   endif
 endfunction
 
-function! s:GistUpdate(user, token, content, gistid)
-  let name = s:GistGetFileName(a:gistid)
+function! s:GistUpdate(user, token, content, gistid, gistnm)
+  if len(a:gistnm) == 0
+    let name = s:GistGetFileName(a:gistid)
+  else
+    let name = a:gistnm
+  endif
   let namemx = '^[^.]\+\(.\+\)$'
   let ext = ''
   if name =~ namemx
@@ -318,6 +325,7 @@ function! Gist(line1, line2, ...)
   let bufname = bufname("%")
   let gistid = ''
   let gistls = ''
+  let gistnm = ''
   let private = 0
   let clipboard = 0
   let editpost = 0
@@ -337,8 +345,10 @@ function! Gist(line1, line2, ...)
     elseif arg =~ '^\(-e\|--edit\)$' && bufname =~ bufnamemx
       let editpost = 1
       let gistid = substitute(bufname, bufnamemx, '\1', '')
-    elseif arg =~ '^[0-9A-Za-z\-_]\+$'
-      if len(gistls) > 0
+    elseif len(gistls) > 0 && len(gistnm) == 0
+      if editpost == 1
+        let gistnm = arg
+      elseif len(gistls) > 0
         let gistls = arg
       else
         let gistid = arg
@@ -352,6 +362,7 @@ function! Gist(line1, line2, ...)
   unlet args
   "echo "gistid=".gistid
   "echo "gistls=".gistls
+  "echo "gistnm=".gistnm
   "echo "private=".private
   "echo "clipboard=".clipboard
   "echo "editpost=".editpost
@@ -363,7 +374,7 @@ function! Gist(line1, line2, ...)
   else
     let content = join(getline(a:line1, a:line2), "\n")
     if editpost == 1
-      let url = s:GistUpdate(g:github_user, g:github_token, content, gistid)
+      let url = s:GistUpdate(g:github_user, g:github_token, content, gistid, gistnm)
     else
       let url = s:GistPost(g:github_user, g:github_token, content, private)
     endif
