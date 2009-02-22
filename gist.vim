@@ -281,9 +281,15 @@ function! s:GistPost(user, token, content, private)
     \ 'file_ext[gistfile1]=%s',
     \ 'file_name[gistfile1]=%s',
     \ 'file_contents[gistfile1]=%s',
-    \ 'login=%s',
-    \ 'token=%s',
     \ ]
+
+  if len(a:user) > 0 && len(a:token) > 0
+    call add(query, 'login=%s')
+    call add(query, 'token=%s')
+  else
+    call add(query, '%.0s%.0s')
+  endif
+
   if a:private
     call add(query, 'private=on')
   endif
