@@ -15,6 +15,9 @@
 "   :Gist -p
 "     post whole text to gist with private.
 "
+"   :Gist -a
+"     post whole text to gist with anonymous.
+"
 "   :Gist -e
 "     edit the gist. (shoud be work on gist buffer)
 "
