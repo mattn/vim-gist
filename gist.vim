@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 10-Feb-2009. Jan 2008
+" Last Change: 23-Feb-2009. Jan 2008
 " Version: 2.1
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -329,6 +329,8 @@ function! Gist(line1, line2, ...)
   endif
 
   let bufname = bufname("%")
+  let user = g:github_user
+  let token = g:github_token
   let gistid = ''
   let gistls = ''
   let gistnm = ''
@@ -346,6 +348,9 @@ function! Gist(line1, line2, ...)
       let gistls = g:github_user
     elseif arg =~ '^\(-p\|--private\)$'
       let private = 1
+    elseif arg =~ '^\(-a\|--anonymous\)$'
+      let user = ''
+      let token = ''
     elseif arg =~ '^\(-c\|--clipboard\)$'
       let clipboard = 1
     elseif arg =~ '^\(-e\|--edit\)$' && bufname =~ bufnamemx
@@ -374,15 +379,15 @@ function! Gist(line1, line2, ...)
   "echo "editpost=".editpost
 
   if len(gistls) > 0
-    call s:GistList(g:github_user, g:github_token, gistls)
+    call s:GistList(user, token, gistls)
   elseif len(gistid) > 0 && editpost == 0
-    call s:GistGet(g:github_user, g:github_token, gistid, clipboard)
+    call s:GistGet(user, token, gistid, clipboard)
   else
     let content = join(getline(a:line1, a:line2), "\n")
     if editpost == 1
-      let url = s:GistUpdate(g:github_user, g:github_token, content, gistid, gistnm)
+      let url = s:GistUpdate(user, token, content, gistid, gistnm)
     else
-      let url = s:GistPost(g:github_user, g:github_token, content, private)
+      let url = s:GistPost(user, token, content, private)
     endif
     if len(url) > 0 && g:gist_open_browser_after_post
       let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
