@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 23-Feb-2009. Jan 2008
-" Version: 2.1
+" Last Change: 13-Mar-2009. Jan 2008
+" Version: 2.2
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -171,6 +171,7 @@ function! s:GistList(user, token, gistls)
   silent! %s/&gt;/>/g
   silent! %s/&lt;/</g
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
+  setlocal buftype=nofile bufhidden=hide noswapfile 
   setlocal nomodified
   syntax match SpecialKey /^gist: /he=e-2
   exec 'nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>'
@@ -206,6 +207,7 @@ function! s:GistGet(user, token, gistid, clipboard)
   filetype detect
   exec '%d _'
   exec 'silent 0r! curl -s '.url
+  setlocal buftype=acwrite bufhidden=delete noswapfile 
   setlocal nomodified
   doau StdinReadPost <buffer>
   normal! gg
@@ -219,6 +221,7 @@ function! s:GistGet(user, token, gistid, clipboard)
       normal! ggVG"+y
     endif
   endif
+  au BufWriteCmd <buffer> Gist -e
 endfunction
 
 function! s:GistListAction()
@@ -269,6 +272,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
   if len(res) > 0 && res != 'http://gist.github.com/gists' 
+    setlocal nomodified
     echo 'done: '.res
   else
     echoerr 'Edit failed'
