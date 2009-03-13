@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 13-Mar-2009. Jan 2008
-" Version: 2.2
+" Version: 2.3
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -20,6 +20,7 @@
 "
 "   :Gist -e
 "     edit the gist. (shoud be work on gist buffer)
+"     you can update the gist with :w command on gist buffer.
 "
 "   :Gist -e foo.js
 "     edit the gist with name 'foo.js'. (shoud be work on gist buffer)

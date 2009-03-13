@@ -25,6 +25,7 @@ detailed_description: |
 
     :Gist -e
       edit the gist. (shoud be work on gist buffer)
+      you can update the gist with :w command on gist buffer.
 
     :Gist -e foo.js
       edit the gist with name 'foo.js'. (shoud be work on gist buffer)
@@ -79,6 +80,9 @@ install_details: |
   copy it to your plugin directory.
 
 versions:
+- '2.3': |
+   This is an upgrade for Gist.vim: added :w BufWriteCmd for GistUpdate.
+
 - '2.2': |
    This is an upgrade for Gist.vim: fixed a bug for anonymous post. and new option '-a' for anonymous post.
 
