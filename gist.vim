@@ -335,6 +335,15 @@ function! Gist(line1, line2, ...)
   if !exists('g:github_token')
     let g:github_token = substitute(system('git config --global github.token'), "\n", '', '')
   endif
+  if strlen(g:github_user) == 0 || strlen(g:github_token) == 0
+    echoerr "You have no setting for github."
+    echohl WarningMsg
+    echo "git config --global github.user  your-name"
+    echo "git config --global github.token your-token"
+    echo "or set g:github_user and g:github_token in your vimrc"
+    echohl None
+    return 0
+  end
 
   let bufname = bufname("%")
   let user = g:github_user
