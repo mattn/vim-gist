@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 03-Jun-2009.
-" Version: 2.4
+" Last Change: 04-Jun-2009.
+" Version: 2.5
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -153,7 +153,16 @@ function! s:GistList(user, token, gistls)
   else
     let url = 'http://gist.github.com/'.a:gistls
   endif
-  exec 'silent split gist:'.a:gistls
+  let winnum = bufwinnr(bufnr('gist:'.a:gistls))
+  if winnum != -1
+    if winnum != bufwinnr('%')
+      exe "normal \<c-w>".winnum."w"
+    endif
+    setlocal modifiable
+    silent %d _
+  else
+    exec 'silent split gist:'.a:gistls
+  endif
   exec 'silent 0r! curl -s '.url
   silent! %s/>/>\r/g
   silent! %s/</\r</g
@@ -204,7 +213,16 @@ endfunction
 
 function! s:GistGet(user, token, gistid, clipboard)
   let url = 'http://gist.github.com/'.a:gistid.'.txt'
-  exec 'silent split gist:'.a:gistid
+  let winnum = bufwinnr(bufnr('gist:'.a:gistid))
+  if winnum != -1
+    if winnum != bufwinnr('%')
+      exe "normal \<c-w>".winnum."w"
+    endif
+    setlocal modifiable
+    silent %d _
+  else
+    exec 'silent split gist:'.a:gistid
+  endif
   filetype detect
   exec '%d _'
   exec 'silent 0r! curl -s '.url
