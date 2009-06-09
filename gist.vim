@@ -181,9 +181,10 @@ function! s:GistList(user, token, gistls)
   silent! %s/&gt;/>/g
   silent! %s/&lt;/</g
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
+  silent! %g/^gist: /s/ //g
   setlocal buftype=nofile bufhidden=hide noswapfile 
   setlocal nomodified
-  syntax match SpecialKey /^gist: /he=e-2
+  syntax match SpecialKey /^gist:/he=e-1
   exec 'nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>'
   normal! gg
 endfunction
@@ -245,7 +246,7 @@ endfunction
 
 function! s:GistListAction()
   let line = getline('.')
-  let mx = '^gist: \(\w\+\).*'
+  let mx = '^gist:\(\w\+\).*'
   if line =~# mx
     let gistid = substitute(line, mx, '\1', '')
     call s:GistGet(g:github_user, g:github_token, gistid, 0)
