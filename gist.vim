@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 04-Jun-2009.
+" Last Change: 09-Jun-2009.
 " Version: 2.5
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -392,7 +392,7 @@ function! Gist(line1, line2, ...)
     elseif arg =~ '^\(-e\|--edit\)$' && bufname =~ bufnamemx
       let editpost = 1
       let gistid = substitute(bufname, bufnamemx, '\1', '')
-    elseif len(gistls) > 0 && len(gistnm) == 0
+    elseif len(gistnm) == 0
       if editpost == 1
         let gistnm = arg
       elseif len(gistls) > 0
