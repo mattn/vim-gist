@@ -74,7 +74,8 @@ detailed_description: |
       on windows, should work with your setting.
 
   Require:
-    curl, and if you want to use profile of git, it require git command.
+    curl command (http://curl.haxx.se/)
+    and if you want to use profile of git, it require git command.
 
 install_details: |
   copy it to your plugin directory.
