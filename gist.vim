@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 09-Jun-2009.
+" Last Change: 03-Jul-2009.
 " Version: 2.6
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -212,6 +212,14 @@ function! s:GistDetectFiletype(gistid)
   endif
 endfunction
 
+function! s:GistWrite(fname)
+  if a:fname == expand("%:p")
+    Gist -e
+  else
+    exe "w".(v:cmdbang ? "!" : "")." ".fnameescape(v:cmdarg)." ".fnameescape(a:fname)
+  endif
+endfunction
+
 function! s:GistGet(user, token, gistid, clipboard)
   let url = 'http://gist.github.com/'.a:gistid.'.txt'
   let winnum = bufwinnr(bufnr('gist:'.a:gistid))
@@ -241,7 +249,7 @@ function! s:GistGet(user, token, gistid, clipboard)
       normal! ggVG"+y
     endif
   endif
-  au BufWriteCmd <buffer> Gist -e
+  au BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
 endfunction
 
 function! s:GistListAction()
