@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 03-Jul-2009.
-" Version: 2.6
+" Version: 2.7
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
