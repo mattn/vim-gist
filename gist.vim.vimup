@@ -2,7 +2,7 @@ script_name: Gist.vim
 script_id: '2423'
 script_type: utility
 script_package: gist.vim
-script_version: '2.7'
+script_version: '2.8'
 required_vim_version: '7.0'
 summary: vimscript for gist
 
@@ -22,6 +22,9 @@ detailed_description: |
 
     :Gist -a
       post whole text to gist with anonymous.
+
+    :Gist -m
+      post multi buffer to gist.
 
     :Gist -e
       edit the gist. (shoud be work on gist buffer)
@@ -81,6 +84,9 @@ install_details: |
   copy it to your plugin directory.
 
 versions:
+- '2.8': |
+   This is an upgrade for Gist.vim: be able to post multi buffer. currently updating or showing not supported.
+
 - '2.7': |
    This is an upgrade for Gist.vim: be able to write the gist to local file with ':w foo.txt'.
 
