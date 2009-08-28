@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 03-Jul-2009.
+" Last Change: 28-Aug-2009.
 " Version: 2.7
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -17,6 +17,9 @@
 "
 "   :Gist -a
 "     post whole text to gist with anonymous.
+"
+"   :Gist -m
+"     post multi buffer to gist.
 "
 "   :Gist -e
 "     edit the gist. (shoud be work on gist buffer)
@@ -347,7 +350,69 @@ function! s:GistPost(user, token, content, private)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res != 'http://gist.github.com/gists' 
+  if len(res) > 0 && res =~ '^http:\/\/gist\.github\.com\/\d' 
+    echo 'done: '.res
+  else
+    echoerr 'Post failed'
+  endif
+  return res
+endfunction
+
+function! s:GistPostBuffers(user, token, private)
+  let bufnrs = range(1, last_buffer_nr())
+  let bn = bufnr('%')
+  let query = []
+  if len(a:user) > 0 && len(a:token) > 0
+    call add(query, 'login=%s')
+    call add(query, 'token=%s')
+  else
+    call add(query, '%.0s%.0s')
+  endif
+  if a:private
+    call add(query, 'private=on')
+  endif
+  let squery = printf(join(query, "&"),
+    \ s:encodeURIComponent(a:user),
+    \ s:encodeURIComponent(a:token)) . '&'
+
+  let query = [
+    \ 'file_ext[gistfile]=%s',
+    \ 'file_name[gistfile]=%s',
+    \ 'file_contents[gistfile]=%s',
+    \ ]
+  let format = join(query, "&") . '&'
+
+  let index = 1
+  for bufnr in bufnrs
+    if buflisted(bufnr) == 0
+      continue
+    endif
+    echo "Creating gist content".index."... "
+    silent! exec "buffer! ".bufnr
+    let content = join(getline(1, line('$')), "\n")
+    let ext = expand('%:e')
+    let ext = len(ext) ? '.'.ext : ''
+    let name = expand('%:t')
+    let squery .= printf(substitute(format, 'gistfile', 'gistfile'.index, 'g'),
+      \ s:encodeURIComponent(ext),
+      \ s:encodeURIComponent(name),
+      \ s:encodeURIComponent(content))
+    let index = index + 1
+  endfor
+  silent! exec "buffer! ".bn
+
+  let file = tempname()
+  exec 'redir! > '.file 
+  silent echo squery
+  redir END
+  echo "Posting it to gist... "
+  let quote = &shellxquote == '"' ?  "'" : '"'
+  let url = 'http://gist.github.com/gists'
+  let res = system('curl -i -d @'.quote.file.quote.' '.url)
+  call delete(file)
+  let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
+  let res = substitute(res, '^.*: ', '', '')
+  if len(res) > 0 && res =~ '^http:\/\/gist\.github\.com\/\d' 
     echo 'done: '.res
   else
     echoerr 'Post failed'
@@ -379,6 +444,7 @@ function! Gist(line1, line2, ...)
   let gistls = ''
   let gistnm = ''
   let private = 0
+  let multibuffer = 0
   let clipboard = 0
   let editpost = 0
   let listmx = '^\(-l\|--list\)\s*\([^\s]\+\)\?$'
@@ -390,6 +456,8 @@ function! Gist(line1, line2, ...)
       let gistls = '-all'
     elseif arg =~ '^\(-l\|--list\)$'
       let gistls = g:github_user
+    elseif arg =~ '^\(-m\|--multibuffer\)$'
+      let multibuffer = 1
     elseif arg =~ '^\(-p\|--private\)$'
       let private = 1
     elseif arg =~ '^\(-a\|--anonymous\)$'
@@ -427,18 +495,22 @@ function! Gist(line1, line2, ...)
   elseif len(gistid) > 0 && editpost == 0
     call s:GistGet(user, token, gistid, clipboard)
   else
-    let content = join(getline(a:line1, a:line2), "\n")
-    if editpost == 1
-      let url = s:GistUpdate(user, token, content, gistid, gistnm)
+    if multibuffer == 1
+      let url = s:GistPostBuffers(user, token, private)
     else
-      let url = s:GistPost(user, token, content, private)
-    endif
-    if len(url) > 0 && g:gist_open_browser_after_post
-      let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
-      if cmd =~ '^!'
-        silent! exec  cmd
+      let content = join(getline(a:line1, a:line2), "\n")
+      if editpost == 1
+        let url = s:GistUpdate(user, token, content, gistid, gistnm)
       else
-        call system(cmd)
+        let url = s:GistPost(user, token, content, private)
+      endif
+      if len(url) > 0 && g:gist_open_browser_after_post
+        let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
+        if cmd =~ '^!'
+          silent! exec  cmd
+        else
+          call system(cmd)
+        endif
       endif
     endif
   endif
