@@ -384,7 +384,7 @@ function! s:GistPostBuffers(user, token, private)
 
   let index = 1
   for bufnr in bufnrs
-    if buflisted(bufnr) == 0
+    if buflisted(bufnr) == 0 || bufwinnr(bufnr) == -1
       continue
     endif
     echo "Creating gist content".index."... "
