@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 28-Aug-2009.
+" Last Change: 01-Sep-2009.
 " Version: 2.8
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -24,6 +24,10 @@
 "   :Gist -e
 "     edit the gist. (shoud be work on gist buffer)
 "     you can update the gist with :w command on gist buffer.
+"
+"   :Gist -d
+"     delete the gist. (should be work on gist buffer)
+"     password authentication is needed.
 "
 "   :Gist -e foo.js
 "     edit the gist with name 'foo.js'. (shoud be work on gist buffer)
@@ -87,7 +91,7 @@
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
-  finish
+  "finish
 endif
 let g:loaded_gist_vim = 1
 
@@ -162,10 +166,10 @@ function! s:GistList(user, token, gistls)
       exe "normal \<c-w>".winnum."w"
     endif
     setlocal modifiable
-    silent %d _
   else
     exec 'silent split gist:'.a:gistls
   endif
+  silent %d _
   exec 'silent 0r! curl -s '.url
   silent! %s/>/>\r/g
   silent! %s/</\r</g
@@ -231,7 +235,6 @@ function! s:GistGet(user, token, gistid, clipboard)
       exe "normal \<c-w>".winnum."w"
     endif
     setlocal modifiable
-    silent %d _
   else
     exec 'silent split gist:'.a:gistid
   endif
@@ -304,11 +307,65 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   let res = substitute(res, '^.*: ', '', '')
   if len(res) > 0 && res != 'http://gist.github.com/gists' 
     setlocal nomodified
-    echo 'done: '.res
+    echo 'Done: '.res
   else
     echoerr 'Edit failed'
   endif
   return res
+endfunction
+
+function! s:GistGetSessionID(user, password)
+  let query = [
+    \ 'login=%s',
+    \ 'password=%s',
+    \ ]
+  let squery = printf(join(query, '&'),
+    \ s:encodeURIComponent(a:user),
+    \ s:encodeURIComponent(a:password))
+  unlet query
+
+  let file = tempname()
+  exec 'redir! > '.file 
+  silent echo squery
+  redir END
+  let quote = &shellxquote == '"' ?  "'" : '"'
+  let url = 'https://gist.github.com/session'
+  let res = system('curl -i -d @'.quote.file.quote.' '.url)
+  call delete(file)
+  let loc = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
+  let loc = substitute(res, '^.*: ', '', '')
+  if len(loc)
+    let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Set-Cookie: ')
+    let res = substitute(res, '^.*: \([^;]\+\).*$', '\1', '')
+  else
+    let res = ''
+  endif
+  return res
+endfunction
+
+function! s:GistDelete(user, token, gistid)
+  let password = inputsecret('Password:') 
+  if len(password) == 0
+    echo 'Canceled'
+    return
+  endif
+  echon "Login to gist... "
+  let cookie = s:GistGetSessionID(a:user, password)
+  if len(cookie) == 0
+    echo 'Failed'
+    return
+  endif
+  echon " Deleting gist... "
+  let quote = &shellxquote == '"' ?  "'" : '"'
+  let url = 'http://gist.github.com/delete/'.a:gistid
+  let res = system('curl -i -b '.quote.cookie.quote.' '.url)
+  let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
+  let res = substitute(res, '^.*: ', '', '')
+  if len(res) > 0 && res != 'http://gist.github.com/gists' 
+    echo 'Done: '
+  else
+    echoerr 'Delete failed'
+  endif
 endfunction
 
 function! s:GistPost(user, token, content, private)
@@ -351,7 +408,7 @@ function! s:GistPost(user, token, content, private)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
   if len(res) > 0 && res =~ '^http:\/\/gist\.github\.com\/\d' 
-    echo 'done: '.res
+    echo 'Done: '.res
   else
     echoerr 'Post failed'
   endif
@@ -413,7 +470,7 @@ function! s:GistPostBuffers(user, token, private)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
   if len(res) > 0 && res =~ '^http:\/\/gist\.github\.com\/\d' 
-    echo 'done: '.res
+    echo 'Done: '.res
   else
     echoerr 'Post failed'
   endif
@@ -446,6 +503,7 @@ function! Gist(line1, line2, ...)
   let private = 0
   let multibuffer = 0
   let clipboard = 0
+  let deletepost = 0
   let editpost = 0
   let listmx = '^\(-l\|--list\)\s*\([^\s]\+\)\?$'
   let bufnamemx = '^gist:\(\d\+\)$'
@@ -465,11 +523,14 @@ function! Gist(line1, line2, ...)
       let token = ''
     elseif arg =~ '^\(-c\|--clipboard\)$'
       let clipboard = 1
+    elseif arg =~ '^\(-d\|--delete\)$' && bufname =~ bufnamemx
+      let deletepost = 1
+      let gistid = substitute(bufname, bufnamemx, '\1', '')
     elseif arg =~ '^\(-e\|--edit\)$' && bufname =~ bufnamemx
       let editpost = 1
       let gistid = substitute(bufname, bufnamemx, '\1', '')
     elseif len(gistnm) == 0
-      if editpost == 1
+      if editpost == 1 || deletepost == 1
         let gistnm = arg
       elseif len(gistls) > 0
         let gistls = arg
@@ -489,10 +550,11 @@ function! Gist(line1, line2, ...)
   "echo "private=".private
   "echo "clipboard=".clipboard
   "echo "editpost=".editpost
+  "echo "deletepost=".deletepost
 
   if len(gistls) > 0
     call s:GistList(user, token, gistls)
-  elseif len(gistid) > 0 && editpost == 0
+  elseif len(gistid) > 0 && editpost == 0 && deletepost == 0
     call s:GistGet(user, token, gistid, clipboard)
   else
     if multibuffer == 1
@@ -501,6 +563,8 @@ function! Gist(line1, line2, ...)
       let content = join(getline(a:line1, a:line2), "\n")
       if editpost == 1
         let url = s:GistUpdate(user, token, content, gistid, gistnm)
+      elseif deletepost == 1
+        let url = s:GistDelete(user, token, gistid)
       else
         let url = s:GistPost(user, token, content, private)
       endif
@@ -518,3 +582,4 @@ function! Gist(line1, line2, ...)
 endfunction
 
 command! -nargs=? -range=% Gist :call Gist(<line1>, <line2>, <f-args>)
+" vim:set et:
