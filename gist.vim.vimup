@@ -33,6 +33,10 @@ detailed_description: |
     :Gist -e foo.js
       edit the gist with name 'foo.js'. (shoud be work on gist buffer)
 
+    :Gist -d
+      delete the gist. (should be work on gist buffer)
+      password authentication is needed.
+
     :Gist XXXXX
       get gist XXXXX.
 
@@ -85,7 +89,7 @@ install_details: |
 
 versions:
 - '2.8': |
-   This is an upgrade for Gist.vim: be able to post multi buffer. currently updating or showing not supported.
+   This is an upgrade for Gist.vim: be able to post multi buffer. currently updating or showing not supported. and ':Gist -d' delete the gist.
 
 - '2.7': |
    This is an upgrade for Gist.vim: be able to write the gist to local file with ':w foo.txt'.
