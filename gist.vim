@@ -91,7 +91,7 @@
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
-  "finish
+  finish
 endif
 let g:loaded_gist_vim = 1
 
