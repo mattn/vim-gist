@@ -386,7 +386,7 @@ function! s:GistPost(user, token, content, private)
   endif
 
   if a:private
-    call add(query, 'private=on')
+    call add(query, 'action_button=private')
   endif
   let squery = printf(join(query, '&'),
     \ s:encodeURIComponent(ext),
@@ -426,7 +426,7 @@ function! s:GistPostBuffers(user, token, private)
     call add(query, '%.0s%.0s')
   endif
   if a:private
-    call add(query, 'private=on')
+    call add(query, 'action_button=private')
   endif
   let squery = printf(join(query, "&"),
     \ s:encodeURIComponent(a:user),
