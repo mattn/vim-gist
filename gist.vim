@@ -407,7 +407,7 @@ function! s:GistPost(user, token, content, private)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res =~ '^http:\/\/gist\.github\.com\/\d' 
+  if len(res) > 0 && res =~ '^https:\/\/gist\.github\.com\/' 
     echo 'Done: '.res
   else
     echoerr 'Post failed'
