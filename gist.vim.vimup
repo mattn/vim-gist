@@ -88,6 +88,9 @@ install_details: |
   copy it to your plugin directory.
 
 versions:
+- '3.0': |
+   This is an upgrade for Gist.vim: fix for official changes(private button name was changed).
+
 - '2.9': |
    This is an upgrade for Gist.vim: fix for official changes(private button name was changed).
 
