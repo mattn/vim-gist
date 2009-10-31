@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 26-Oct-2009.
-" Version: 3.0
+" Last Change: 31-Oct-2009.
+" Version: 3.1
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -407,7 +407,7 @@ function! s:GistPost(user, token, content, private)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res =~ '^https:\/\/gist\.github\.com\/' 
+  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/' 
     echo 'Done: '.res
   else
     echoerr 'Post failed'
@@ -469,7 +469,7 @@ function! s:GistPostBuffers(user, token, private)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res =~ '^http:\/\/gist\.github\.com\/\d' 
+  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/' 
     echo 'Done: '.res
   else
     echoerr 'Post failed'
