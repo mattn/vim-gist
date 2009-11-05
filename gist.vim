@@ -326,7 +326,6 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/gists/'.a:gistid
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
-  let g:hoge = res
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
