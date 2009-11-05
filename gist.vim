@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 31-Oct-2009.
+" Last Change: 05-Nov-2009.
 " Version: 3.1
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -125,6 +125,10 @@ if !exists('g:gist_detect_filetype')
   let g:gist_detect_filetype = 0
 endif
 
+if !exists('g:gist_show_privates')
+  let g:gist_show_privates = 0
+endif
+
 function! s:nr2hex(nr)
   let n = a:nr
   let r = ""
@@ -169,8 +173,27 @@ function! s:GistList(user, token, gistls)
   else
     exec 'silent split gist:'.a:gistls
   endif
-  silent %d _
-  exec 'silent 0r! curl -s '.url
+
+  if g:gist_show_privates
+    let password = inputsecret('Password:') 
+    if len(password) == 0
+      echo 'Canceled'
+      return
+    endif
+    echon "Login to gist... "
+    let cookie = s:GistGetSessionID(a:user, password)
+    if len(cookie) == 0
+      echo 'Failed'
+      return
+    endif
+    silent %d _
+    let quote = &shellxquote == '"' ?  "'" : '"'
+    exec 'silent 0r! curl -i -b '.quote.substitute(cookie,'%','\\%','g').quote.' '.url
+  else
+    silent %d _
+    exec 'silent 0r! curl -s '.url
+  endif
+
   silent! %s/>/>\r/g
   silent! %s/</\r</g
   silent! %g/<pre/,/<\/pre/join!
@@ -189,6 +212,7 @@ function! s:GistList(user, token, gistls)
   silent! %s/&lt;/</g
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
   silent! %g/^gist: /s/ //g
+
   setlocal buftype=nofile bufhidden=hide noswapfile 
   setlocal nomodified
   syntax match SpecialKey /^gist:/he=e-1
@@ -302,10 +326,11 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/gists/'.a:gistid
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
+  let g:hoge = res
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res != 'http://gist.github.com/gists' 
+  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/' 
     setlocal nomodified
     echo 'Done: '.res
   else
@@ -358,7 +383,7 @@ function! s:GistDelete(user, token, gistid)
   echon " Deleting gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/delete/'.a:gistid
-  let res = system('curl -i -b '.quote.cookie.quote.' '.url)
+  let res = system('curl -i -b '.quote.substitute(cookie,'%','\\%','g').quote.' '.url)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
   if len(res) > 0 && res != 'http://gist.github.com/gists' 
@@ -506,14 +531,18 @@ function! Gist(line1, line2, ...)
   let deletepost = 0
   let editpost = 0
   let listmx = '^\(-l\|--list\)\s*\([^\s]\+\)\?$'
-  let bufnamemx = '^gist:\(\d\+\)$'
+  let bufnamemx = '^gist:\([0-9a-f]\+\)$'
 
   let args = (a:0 > 0) ? split(a:1, ' ') : []
   for arg in args
     if arg =~ '^\(-la\|--listall\)$'
       let gistls = '-all'
     elseif arg =~ '^\(-l\|--list\)$'
-      let gistls = g:github_user
+      if g:gist_show_privates
+        let gistls = 'mine'
+      else
+        let gistls = g:github_user
+      endif
     elseif arg =~ '^\(-m\|--multibuffer\)$'
       let multibuffer = 1
     elseif arg =~ '^\(-p\|--private\)$'
