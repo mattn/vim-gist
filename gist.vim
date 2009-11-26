@@ -217,7 +217,10 @@ function! s:GistList(user, token, gistls)
   setlocal nomodified
   syntax match SpecialKey /^gist:/he=e-1
   exec 'nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>'
-  normal! gg
+
+  cal cursor(1,1)
+  setlocal foldmethod=expr
+  setlocal foldexpr=getline(v:lnum)=~'^gist:'?'>1':'='
 endfunction
 
 function! s:GistGetFileName(gistid)
