@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 05-Nov-2009.
+" Last Change: 27-Nov-2009.
 " Version: 3.1
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -221,6 +221,7 @@ function! s:GistList(user, token, gistls)
   cal cursor(1,1)
   setlocal foldmethod=expr
   setlocal foldexpr=getline(v:lnum)=~'^gist:'?'>1':'='
+  setlocal foldtext=getline(v:foldstart)
 endfunction
 
 function! s:GistGetFileName(gistid)
