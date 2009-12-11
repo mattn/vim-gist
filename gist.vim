@@ -396,9 +396,13 @@ function! s:GistDelete(user, token, gistid)
   endif
 endfunction
 
+
 " GistPost function:
 "   Post new gist to github
-"   if there is an embedded gist url or gist id, then just update it.
+"
+"   if there is an embedded gist url or gist id in your file,
+"   it will just update it.
+"                                                   -- by c9s
 "
 "   embedded gist url format:
 "
