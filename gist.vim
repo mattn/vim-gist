@@ -428,7 +428,7 @@ function! s:GistPost(user, token, content, private)
       cal s:GistUpdate( a:user , a:token ,  a:content , gistid , '' )
       return
     elseif l =~ '\<Gist:'
-      let gistid = matchstr( l , '\(GistID:\s*http://gist.github.com/\)\@<=[0-9]\+')
+      let gistid = matchstr( l , '\(Gist:\s*http://gist.github.com/\)\@<=[0-9]\+')
 
       if strlen(gistid) == 0
         echohl WarningMsg | echo "GistID error" | echohl None
