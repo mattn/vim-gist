@@ -397,9 +397,23 @@ function! s:GistDelete(user, token, gistid)
 endfunction
 
 function! s:GistPost(user, token, content, private)
+
+  " find GistID: in content , then we should just update
+  for l in split( a:content , "\n" )
+    if l =~ 'GistID:'
+      let gistid = matchstr( l , '\(GistID:\s*\)\@<=[0-9]\+')
+      if strlen(gistid) == 0 
+
+      endif
+      cal s:GistUpdate( a:user , a:token ,  a:content , gistid , '' )
+      return
+    endif
+  endfor
+
   let ext = expand('%:e')
   let ext = len(ext) ? '.'.ext : ''
   let name = expand('%:t')
+
   let query = [
     \ 'file_ext[gistfile1]=%s',
     \ 'file_name[gistfile1]=%s',
