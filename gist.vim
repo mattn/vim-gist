@@ -558,9 +558,15 @@ endfunction
 function! Gist(line1, line2, ...)
   if !exists('g:github_user')
     let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
+    if strlen(g:github_user) == 0
+      let g:github_user = $GITHUB_USER
+    end 
   endif
   if !exists('g:github_token')
     let g:github_token = substitute(system('git config --global github.token'), "\n", '', '')
+    if strlen(g:github_token) == 0
+      let g:github_token = $GITHUB_TOKEN
+    end
   endif
   if strlen(g:github_user) == 0 || strlen(g:github_token) == 0
     echoerr "You have no setting for github."
@@ -568,6 +574,7 @@ function! Gist(line1, line2, ...)
     echo "git config --global github.user  your-name"
     echo "git config --global github.token your-token"
     echo "or set g:github_user and g:github_token in your vimrc"
+    echo "or set shell env vars GITHUB_USER and GITHUB_TOKEN"
     echohl None
     return 0
   end
