@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 27-Nov-2009.
+" Last Change: 03-Feb-2010.
 " Version: 3.1
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -89,6 +89,7 @@
 "     edit support
 "
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
+" Script type: plugin
 
 if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
   finish
