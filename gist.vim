@@ -646,7 +646,6 @@ function! Gist(line1, line2, ...)
       else
         let url = s:GistPost(user, token, content, private)
       endif
-      let @+ = url
       if len(url) > 0 && g:gist_open_browser_after_post
         let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
         if cmd =~ '^!'
@@ -656,6 +655,7 @@ function! Gist(line1, line2, ...)
         endif
       endif
     endif
+    let @+ = url
   endif
   return 1
 endfunction
