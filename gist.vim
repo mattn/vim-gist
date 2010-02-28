@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 03-Feb-2010.
+" Last Change: 28-Feb-2010.
 " Version: 3.1
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -108,6 +108,10 @@ endif
 
 if !exists('g:gist_open_browser_after_post')
   let g:gist_open_browser_after_post = 0
+endif
+
+if !exists('g:gist_put_url_to_clipboard_after_post')
+  let g:gist_put_url_to_clipboard_after_post = 1
 endif
 
 if !exists('g:gist_browser_command')
@@ -655,7 +659,9 @@ function! Gist(line1, line2, ...)
         endif
       endif
     endif
-    let @+ = url
+    if g:gist_put_url_to_clipboard_after_post == 1
+      let @+ = url
+    endif
   endif
   return 1
 endfunction
