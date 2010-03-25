@@ -288,7 +288,7 @@ function! s:GistGet(user, token, gistid, clipboard)
       normal! ggVG"+y
     endif
   endif
-  au BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
+  au! BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
 endfunction
 
 function! s:GistListAction()
