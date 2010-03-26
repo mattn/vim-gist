@@ -37,7 +37,7 @@
 "
 "   :Gist -c XXXXX.
 "     get gist XXXXX and put to clipboard.
-"  
+"
 "   :Gist -l
 "     list gists from mine.
 "
@@ -83,7 +83,7 @@
 "     on windows, should work with your setting.
 "
 " Thanks:
-"   MATSUU Takuto: 
+"   MATSUU Takuto:
 "     removed carriage return
 "     gist_browser_command enhancement
 "     edit support
@@ -180,7 +180,7 @@ function! s:GistList(user, token, gistls)
   endif
 
   if g:gist_show_privates
-    let password = inputsecret('Password:') 
+    let password = inputsecret('Password:')
     if len(password) == 0
       echo 'Canceled'
       return
@@ -218,7 +218,7 @@ function! s:GistList(user, token, gistls)
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
   silent! %g/^gist: /s/ //g
 
-  setlocal buftype=nofile bufhidden=hide noswapfile 
+  setlocal buftype=nofile bufhidden=hide noswapfile
   setlocal nomodified
   syntax match SpecialKey /^gist:/he=e-1
   exec 'nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>'
@@ -275,7 +275,7 @@ function! s:GistGet(user, token, gistid, clipboard)
   silent %d _
   exec 'silent 0r! curl -s '.url
   normal! Gd_
-  setlocal buftype=acwrite bufhidden=delete noswapfile 
+  setlocal buftype=acwrite bufhidden=delete noswapfile
   setlocal nomodified
   doau StdinReadPost <buffer>
   if (&ft == '' && g:gist_detect_filetype == 1) || g:gist_detect_filetype == 2
@@ -329,7 +329,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   unlet query
 
   let file = tempname()
-  exec 'redir! > '.file 
+  exec 'redir! > '.file
   silent echo squery
   redir END
   echon " Updating it to gist... "
@@ -339,7 +339,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/' 
+  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     setlocal nomodified
     echo 'Done: '.res
   else
@@ -359,7 +359,7 @@ function! s:GistGetSessionID(user, password)
   unlet query
 
   let file = tempname()
-  exec 'redir! > '.file 
+  exec 'redir! > '.file
   silent echo squery
   redir END
   let quote = &shellxquote == '"' ?  "'" : '"'
@@ -378,7 +378,7 @@ function! s:GistGetSessionID(user, password)
 endfunction
 
 function! s:GistDelete(user, token, gistid)
-  let password = inputsecret('Password:') 
+  let password = inputsecret('Password:')
   if len(password) == 0
     echo 'Canceled'
     return
@@ -395,7 +395,7 @@ function! s:GistDelete(user, token, gistid)
   let res = system('curl -i -b '.quote.substitute(cookie,'%','\\%','g').quote.' '.url)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res != 'http://gist.github.com/gists' 
+  if len(res) > 0 && res != 'http://gist.github.com/gists'
     echo 'Done: '
   else
     echoerr 'Delete failed'
@@ -476,7 +476,7 @@ function! s:GistPost(user, token, content, private)
   unlet query
 
   let file = tempname()
-  exec 'redir! > '.file 
+  exec 'redir! > '.file
   silent echo squery
   redir END
   echon " Posting it to gist... "
@@ -486,7 +486,7 @@ function! s:GistPost(user, token, content, private)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/' 
+  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     echo 'Done: '.res
   else
     echoerr 'Post failed'
@@ -538,7 +538,7 @@ function! s:GistPostBuffers(user, token, private)
   silent! exec "buffer! ".bn
 
   let file = tempname()
-  exec 'redir! > '.file 
+  exec 'redir! > '.file
   silent echo squery
   redir END
   echo "Posting it to gist... "
@@ -548,7 +548,7 @@ function! s:GistPostBuffers(user, token, private)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/' 
+  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     echo 'Done: '.res
   else
     echoerr 'Post failed'
@@ -561,7 +561,7 @@ function! Gist(line1, line2, ...)
     let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
     if strlen(g:github_user) == 0
       let g:github_user = $GITHUB_USER
-    end 
+    end
   endif
   if !exists('g:github_token')
     let g:github_token = substitute(system('git config --global github.token'), "\n", '', '')
