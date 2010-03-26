@@ -668,7 +668,11 @@ function! Gist(line1, line2, ...)
       endif
     endif
     if g:gist_put_url_to_clipboard_after_post == 1
-      let @+ = url
+      if has('unix') && !has('xterm_clipboard')
+        let @" = url
+      else
+        let @+ = url
+      endif
     endif
   endif
   return 1
