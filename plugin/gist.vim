@@ -274,6 +274,7 @@ function! s:GistGet(user, token, gistid, clipboard)
   filetype detect
   exec '%d _'
   exec 'silent 0r! curl -s '.url
+  normal! Gd_
   setlocal buftype=acwrite bufhidden=delete noswapfile 
   setlocal nomodified
   doau StdinReadPost <buffer>
