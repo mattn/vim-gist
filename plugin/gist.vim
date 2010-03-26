@@ -285,7 +285,7 @@ function! s:GistGet(user, token, gistid, clipboard)
     if exists('g:gist_clip_command')
       exec 'silent w !'.g:gist_clip_command
     else
-      normal! ggVG"+y
+      normal! gg"+yG
     endif
   endif
   au! BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
