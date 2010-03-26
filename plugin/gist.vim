@@ -272,13 +272,12 @@ function! s:GistGet(user, token, gistid, clipboard)
     exec 'silent split gist:'.a:gistid
   endif
   filetype detect
-  exec '%d _'
+  silent %d _
   exec 'silent 0r! curl -s '.url
   normal! Gd_
   setlocal buftype=acwrite bufhidden=delete noswapfile 
   setlocal nomodified
   doau StdinReadPost <buffer>
-  normal! gg
   if (&ft == '' && g:gist_detect_filetype == 1) || g:gist_detect_filetype == 2
     call s:GistDetectFiletype(a:gistid)
   endif
@@ -289,6 +288,7 @@ function! s:GistGet(user, token, gistid, clipboard)
       normal! gg"+yG
     endif
   endif
+  normal! gg
   au! BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
 endfunction
 
