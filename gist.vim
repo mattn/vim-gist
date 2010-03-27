@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 28-Feb-2010.
-" Version: 3.1
+" Last Change: 27-Mar-2010.
+" Version: 3.2
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -193,12 +193,13 @@ function! s:GistList(user, token, gistls)
     endif
     silent %d _
     let quote = &shellxquote == '"' ?  "'" : '"'
-    exec 'silent 0r! curl -i -b '.quote.substitute(cookie,'%','\\%','g').quote.' '.url
+    exec 'silent r! curl -i -b '.quote.substitute(cookie,'%','\\%','g').quote.' '.url
   else
     silent %d _
-    exec 'silent 0r! curl -s '.url
+    exec 'silent r! curl -s '.url
   endif
 
+  silent normal! ggdd
   silent! %s/>/>\r/g
   silent! %s/</\r</g
   silent! %g/<pre/,/<\/pre/join!
@@ -273,7 +274,8 @@ function! s:GistGet(user, token, gistid, clipboard)
   endif
   filetype detect
   exec '%d _'
-  exec 'silent 0r! curl -s '.url
+  exec 'silent r! curl -s '.url
+  silent normal! ggdd
   setlocal buftype=acwrite bufhidden=delete noswapfile 
   setlocal nomodified
   doau StdinReadPost <buffer>
