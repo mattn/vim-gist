@@ -247,6 +247,14 @@ function! s:GistDetectFiletype(gistid)
   let res = system('curl -s '.url)
   let res = substitute(matchstr(res, mx), mx, '\1', '')
   let res = substitute(res, '.*\(\.[^\.]\+\)$', '\1', '')
+  let res = substitute(res, '-', '', 'g')
+  " TODO: more filetype detection that is specified in html.
+  if res == 'bat' | let res = 'dosbatch' | endif
+  if res == 'as' | let res = 'actionscript' | endif
+  if res == 'bash' | let res = 'sh' | endif
+  if res == 'cl' | let res = 'lisp' | endif
+  if res == 'rb' | let res = 'ruby' | endif
+
   if res =~ '^\.'
     silent! exec "doau BufRead *".res
   else
