@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 28-Mar-2010.
+" Last Change: 29-Mar-2010.
 " Version: 3.4
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -243,8 +243,9 @@ endfunction
 
 function! s:GistDetectFiletype(gistid)
   let url = 'http://gist.github.com/'.a:gistid
+  let mx = '^.*<div class="data syntax type-\([^"]\+\)">.*$'
   let res = system('curl -s '.url)
-  let res = substitute(res, '^.*<div class="meta">[\r\n ]*<div class="info">[\r\n ]*<span>\([^>]\+\)</span>.*$', '\1', '')
+  let res = substitute(matchstr(res, mx), mx, '\1', '')
   let res = substitute(res, '.*\(\.[^\.]\+\)$', '\1', '')
   if res =~ '^\.'
     silent! exec "doau BufRead *".res
