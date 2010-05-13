@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 29-Mar-2010.
-" Version: 3.5
+" Last Change: 13-May-2010.
+" Version: 3.6
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -254,6 +254,8 @@ function! s:GistDetectFiletype(gistid)
   if res == 'bash' | let res = 'sh' | endif
   if res == 'cl' | let res = 'lisp' | endif
   if res == 'rb' | let res = 'ruby' | endif
+  if res == 'viml' | let res = 'vim' | endif
+  if res == 'plain' || res == 'text' | let res = '' | endif
 
   if res =~ '^\.'
     silent! exec "doau BufRead *".res
