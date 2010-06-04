@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 13-May-2010.
-" Version: 3.6
+" Last Change: 04-Jun-2010.
+" Version: 3.7
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
 "
@@ -179,6 +179,8 @@ function! s:GistList(user, token, gistls)
     exec 'silent split gist:'.a:gistls
   endif
 
+  setlocal foldmethod=manual
+
   if g:gist_show_privates
     let password = inputsecret('Password:')
     if len(password) == 0
@@ -197,6 +199,9 @@ function! s:GistList(user, token, gistls)
   else
     silent %d _
     exec 'silent r! curl -s '.url
+  endif
+  if exists("g:hoge")
+      return
   endif
 
   silent normal! ggdd

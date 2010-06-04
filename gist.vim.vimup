@@ -2,7 +2,7 @@ script_name: Gist.vim
 script_id: '2423'
 script_type: utility
 script_package: plugin/gist.vim
-script_version: '3.6'
+script_version: '3.7'
 required_vim_version: '7.0'
 summary: vimscript for gist
 
@@ -88,6 +88,9 @@ install_details: |
   copy it to your plugin directory.
 
 versions:
+- '3.7': |
+   This is an upgrade for Gist.vim: fix problem that break "gist list" window at twice.
+
 - '3.6': |
    This is an upgrade for Gist.vim: fix filetype detection for 'vimscript'.
 
