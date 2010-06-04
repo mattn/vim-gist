@@ -200,9 +200,6 @@ function! s:GistList(user, token, gistls)
     silent %d _
     exec 'silent r! curl -s '.url
   endif
-  if exists("g:hoge")
-      return
-  endif
 
   silent normal! ggdd
   silent! %s/>/>\r/g
