@@ -6,43 +6,43 @@ This is vimscript for gist (http://gist.github.com)
 Usage:
 ------
 
-  :Gist
-    post whole text to gist.
+    :Gist
+  post whole text to gist.
 
-  :'<,'>Gist
-    post selected text to gist.
+    :'<,'>Gist
+  post selected text to gist.
 
-  :Gist -p
-    post whole text to gist with private.
+    :Gist -p
+  post whole text to gist with private.
 
-  :Gist -a
-    post whole text to gist with anonymous.
+    :Gist -a
+  post whole text to gist with anonymous.
 
-  :Gist -m
-    post multi buffer to gist.
+    :Gist -m
+  post multi buffer to gist.
 
-  :Gist -e
-    edit the gist. (shoud be work on gist buffer)
-    you can update the gist with :w command on gist buffer.
+    :Gist -e
+  edit the gist. (shoud be work on gist buffer)
+  you can update the gist with :w command on gist buffer.
 
-  :Gist -e foo.js
-    edit the gist with name 'foo.js'. (shoud be work on gist buffer)
+    :Gist -e foo.js
+  edit the gist with name 'foo.js'. (shoud be work on gist buffer)
 
-  :Gist -d
-    delete the gist. (should be work on gist buffer)
-    password authentication is needed.
+    :Gist -d
+  delete the gist. (should be work on gist buffer)
+  password authentication is needed.
 
-  :Gist XXXXX
-    get gist XXXXX.
+    :Gist XXXXX
+  get gist XXXXX.
 
-  :Gist -c XXXXX.
-    get gist XXXXX and put to clipboard.
+    :Gist -c XXXXX.
+  get gist XXXXX and put to clipboard.
 
-  :Gist -l
-    list gists from mine.
+    :Gist -l
+  list gists from mine.
 
-  :Gist -la
-    list gists from all.
+    :Gist -la
+  list gists from all.
 
 Tips:
 -----
@@ -70,11 +70,11 @@ Tips:
 
     let g:gist_browser_command = 'w3m %URL%'
 
-      or
+  or
 
     let g:gist_browser_command = 'opera %URL% &'
 
-    on windows, should work with your setting.
+  on windows, should work with your setting.
 
 Require:
 --------
