@@ -1,9 +1,10 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 04-Jun-2010.
+" Last Change: 07-Jun-2010.
 " Version: 3.7
-" WebPage: http://github.com/mattn/gist-vim/tree/master
+" WebPage: http://github.com/mattn/gist-vim
+" License: BSD
 " Usage:
 "
 "   :Gist
