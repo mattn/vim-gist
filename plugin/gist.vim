@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 29-Mar-2010.
+" Last Change: 29-Jul-2010.
 " Version: 3.5
 " WebPage: http://github.com/mattn/gist-vim/tree/master
 " Usage:
@@ -163,7 +163,7 @@ function! s:encodeURIComponent(instr)
   return outstr
 endfunction
 
-function! s:GistList(user, token, gistls)
+function! s:GistList(user, token, gistls, page)
   if a:gistls == '-all'
     let url = 'http://gist.github.com/gists'
   else
@@ -177,6 +177,13 @@ function! s:GistList(user, token, gistls)
     setlocal modifiable
   else
     exec 'silent split gist:'.a:gistls
+  endif
+
+  setlocal foldexpr=
+  let oldlines = []
+  if a:page > 1
+    let oldlines = getline(0, line('$'))
+    let url = url . '?page=' . a:page
   endif
 
   if g:gist_show_privates
@@ -219,14 +226,21 @@ function! s:GistList(user, token, gistls)
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
   silent! %g/^gist: /s/ //g
 
+  call append(0, oldlines)
+  normal! Gomore...
+
+  let b:user = a:user
+  let b:token = a:token
+  let b:gistls = a:gistls
+  let b:page = a:page
   setlocal buftype=nofile bufhidden=hide noswapfile
   setlocal nomodified
   syntax match SpecialKey /^gist:/he=e-1
   exec 'nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>'
 
-  cal cursor(1,1)
+  cal cursor(1+len(oldlines),1)
   setlocal foldmethod=expr
-  setlocal foldexpr=getline(v:lnum)=~'^gist:'?'>1':'='
+  setlocal foldexpr=getline(v:lnum)=~'^\\(gist:\\\|more\\)'?'>1':'='
   setlocal foldtext=getline(v:foldstart)
 endfunction
 
@@ -308,6 +322,12 @@ function! s:GistListAction()
   if line =~# mx
     let gistid = substitute(line, mx, '\1', '')
     call s:GistGet(g:github_user, g:github_token, gistid, 0)
+    return
+  endif
+  if line =~# '^more\.\.\.$'
+    normal! dd
+    call s:GistList(b:user, b:token, b:gistls, b:page+1)
+    return
   endif
 endfunction
 
@@ -653,7 +673,7 @@ function! Gist(line1, line2, ...)
   "echo "deletepost=".deletepost
 
   if len(gistls) > 0
-    call s:GistList(user, token, gistls)
+    call s:GistList(user, token, gistls, 1)
   elseif len(gistid) > 0 && editpost == 0 && deletepost == 0
     call s:GistGet(user, token, gistid, clipboard)
   else
