@@ -1,0 +1,111 @@
+Gist.vim
+========
+
+This is vimscript for gist (http://gist.github.com)
+
+Usage:
+------
+
+    :Gist
+  post whole text to gist.
+
+    :'<,'>Gist
+  post selected text to gist.
+
+    :Gist -p
+  post whole text to gist with private.
+
+    :Gist -a
+  post whole text to gist with anonymous.
+
+    :Gist -m
+  post multi buffer to gist.
+
+    :Gist -e
+  edit the gist. (shoud be work on gist buffer)
+  you can update the gist with :w command on gist buffer.
+
+    :Gist -e foo.js
+  edit the gist with name 'foo.js'. (shoud be work on gist buffer)
+
+    :Gist -d
+  delete the gist. (should be work on gist buffer)
+  password authentication is needed.
+
+    :Gist XXXXX
+  get gist XXXXX.
+
+    :Gist -c XXXXX.
+  get gist XXXXX and put to clipboard.
+
+    :Gist -l
+  list gists from mine.
+
+    :Gist -la
+  list gists from all.
+
+Tips:
+-----
+  if set g:gist_clip_command, gist.vim will copy the gist code
+    with option '-c'.
+
+    # mac
+    let g:gist_clip_command = 'pbcopy'
+
+    # linux
+    let g:gist_clip_command = 'xclip -selection clipboard'
+
+    # others(cygwin?)
+    let g:gist_clip_command = 'putclip'
+
+  if you want to detect filetype from filename...
+
+    let g:gist_detect_filetype = 1
+
+  if you want to open browser after the post...
+
+    let g:gist_open_browser_after_post = 1
+
+  if you want to change the browser...
+
+    let g:gist_browser_command = 'w3m %URL%'
+
+  or
+
+    let g:gist_browser_command = 'opera %URL% &'
+
+  on windows, should work with your setting.
+
+Require:
+--------
+  curl command (http://curl.haxx.se/)
+  and if you want to use profile of git, it require git command.
+
+License:
+
+> Copyright 2010 by Yasuhiro Matsumoto
+> modification, are permitted provided that the following conditions are met:
+> 
+> 1\. Redistributions of source code must retain the above copyright notice,
+>    this list of conditions and the following disclaimer.
+> 2\. Redistributions in binary form must reproduce the above copyright notice,
+>    this list of conditions and the following disclaimer in the documentation
+>    and/or other materials provided with the distribution.
+> 
+> THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+> ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+> LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+> FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+> REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+> INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+> (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+> SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+> HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+> STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+> ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+> OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Install:
+--------
+  copy it to your plugin directory.
+

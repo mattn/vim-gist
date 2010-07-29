@@ -2,8 +2,9 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 29-Jul-2010.
-" Version: 3.6
-" WebPage: http://github.com/mattn/gist-vim/tree/master
+" Version: 3.8
+" WebPage: http://github.com/mattn/gist-vim
+" License: BSD
 " Usage:
 "
 "   :Gist
@@ -179,7 +180,7 @@ function! s:GistList(user, token, gistls, page)
     exec 'silent split gist:'.a:gistls
   endif
 
-  setlocal foldexpr=
+  setlocal foldmethod=manual
   let oldlines = []
   if a:page > 1
     let oldlines = getline(0, line('$'))
@@ -268,6 +269,8 @@ function! s:GistDetectFiletype(gistid)
   if res == 'bash' | let res = 'sh' | endif
   if res == 'cl' | let res = 'lisp' | endif
   if res == 'rb' | let res = 'ruby' | endif
+  if res == 'viml' | let res = 'vim' | endif
+  if res == 'plain' || res == 'text' | let res = '' | endif
 
   if res =~ '^\.'
     silent! exec "doau BufRead *".res
@@ -453,7 +456,7 @@ function! s:GistPost(user, token, content, private)
   " find GistID: in content , then we should just update
   for l in split( a:content , "\n" )
     if l =~ '\<GistID:'
-      let gistid = matchstr( l , '\(GistID:\s*\)\@<=[0-9]\+')
+      let gistid = matchstr( l , 'GistID:\s*\zs\d\+')
 
       if strlen(gistid) == 0
         echohl WarningMsg | echo "GistID error" | echohl None
@@ -464,7 +467,7 @@ function! s:GistPost(user, token, content, private)
       cal s:GistUpdate( a:user , a:token ,  a:content , gistid , '' )
       return
     elseif l =~ '\<Gist:'
-      let gistid = matchstr( l , '\(Gist:\s*http://gist.github.com/\)\@<=[0-9]\+')
+      let gistid = matchstr( l , 'Gist:\s*http://gist.github.com/\zs\d\+')
 
       if strlen(gistid) == 0
         echohl WarningMsg | echo "GistID error" | echohl None
