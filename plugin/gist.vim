@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 29-Jul-2010.
-" Version: 3.8
+" Last Change: 18-Oct-2010.
+" Version: 3.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 " Usage:
@@ -280,7 +280,7 @@ function! s:GistDetectFiletype(gistid)
 endfunction
 
 function! s:GistWrite(fname)
-  if a:fname == expand("%:p")
+  if substitute(a:fname, '\\', '/', 'g') == substitute(expand("%:p"), '\\', '/', 'g')
     Gist -e
   else
     exe "w".(v:cmdbang ? "!" : "")." ".fnameescape(v:cmdarg)." ".fnameescape(a:fname)
