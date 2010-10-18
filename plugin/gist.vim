@@ -280,7 +280,7 @@ function! s:GistDetectFiletype(gistid)
 endfunction
 
 function! s:GistWrite(fname)
-  if substitute(a:fname, '\\', '/', 'g') == substitute(expand("%:p"), '\\', '/', 'g')
+  if substitute(a:fname, '\\', '/', 'g') == expand("%:p:gs@\\@/@")
     Gist -e
   else
     exe "w".(v:cmdbang ? "!" : "")." ".fnameescape(v:cmdarg)." ".fnameescape(a:fname)
