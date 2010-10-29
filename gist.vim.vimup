@@ -88,6 +88,9 @@ install_details: |
   copy it to your plugin directory.
 
 versions:
+- '4.1': |
+   This is an upgrade for Gist.vim: fixed code cleanup.
+
 - '4.0': |
    This is an upgrade for Gist.vim: fixed deleting gist, listing privates.
 

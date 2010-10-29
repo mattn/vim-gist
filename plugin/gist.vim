@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 29-Oct-2010.
-" Version: 4.0
+" Version: 4.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 " Usage:
@@ -352,9 +352,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   unlet query
 
   let file = tempname()
-  exec 'redir! > '.file
-  silent echo squery
-  redir END
+  call writefile([squery], file)
   echon " Updating it to gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/gists/'.a:gistid
@@ -515,9 +513,7 @@ function! s:GistPost(user, token, content, private)
   unlet query
 
   let file = tempname()
-  exec 'redir! > '.file
-  silent echo squery
-  redir END
+  call writefile([squery], file)
   echon " Posting it to gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/gists'
@@ -577,9 +573,7 @@ function! s:GistPostBuffers(user, token, private)
   silent! exec "buffer! ".bn
 
   let file = tempname()
-  exec 'redir! > '.file
-  silent echo squery
-  redir END
+  call writefile([squery], file)
   echo "Posting it to gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/gists'
