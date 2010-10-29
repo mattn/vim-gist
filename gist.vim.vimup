@@ -87,6 +87,15 @@ detailed_description: |
 install_details: |
   copy it to your plugin directory.
 
+  gist.vim leave cookie-jar file into runtimepath.
+
+  rtp:
+    plugin/gist.vim
+    cookies/github
+
+  if you want to uninstall gist.vim, you have better to remove 'cookies/github'.
+
+
 versions:
 - '4.1': |
    This is an upgrade for Gist.vim: fixed code cleanup.

@@ -110,3 +110,11 @@ Install:
 --------
   copy it to your plugin directory.
 
+  gist.vim leave cookie-jar file into runtimepath.
+
+  rtp:
+    plugin/gist.vim
+    cookies/github
+
+  if you want to uninstall gist.vim, you have better to remove 'cookies/github'.
+
