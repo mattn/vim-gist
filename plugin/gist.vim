@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 18-Oct-2010.
-" Version: 3.9
+" Last Change: 29-Oct-2010.
+" Version: 4.0
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 " Usage:
@@ -188,20 +188,10 @@ function! s:GistList(user, token, gistls, page)
   endif
 
   if g:gist_show_privates
-    let password = inputsecret('Password:')
-    if len(password) == 0
-      echo 'Canceled'
-      return
-    endif
     echon "Login to gist... "
-    let cookie = s:GistGetSessionID(a:user, password)
-    if len(cookie) == 0
-      echo 'Failed'
-      return
-    endif
     silent %d _
-    let quote = &shellxquote == '"' ?  "'" : '"'
-    exec 'silent r! curl -i -b '.quote.substitute(cookie,'%','\\%','g').quote.' '.url
+    let page = s:GistGetPage('https://gist.github.com/mine', a:user, '')
+    silent put =page
   else
     silent %d _
     exec 'silent r! curl -s '.url
@@ -381,54 +371,70 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   return res
 endfunction
 
-function! s:GistGetSessionID(user, password)
-  let query = [
-    \ 'login=%s',
-    \ 'password=%s',
-    \ ]
-  let squery = printf(join(query, '&'),
-    \ s:encodeURIComponent(a:user),
-    \ s:encodeURIComponent(a:password))
-  unlet query
-
-  let file = tempname()
-  exec 'redir! > '.file
-  silent echo squery
-  redir END
-  let quote = &shellxquote == '"' ?  "'" : '"'
-  let url = 'https://gist.github.com/session'
-  let res = system('curl -i -d @'.quote.file.quote.' '.url)
-  call delete(file)
-  let loc = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
-  let loc = substitute(res, '^.*: ', '', '')
-  if len(loc)
-    let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Set-Cookie: ')
-    let res = substitute(res, '^.*: \([^;]\+\).*$', '\1', '')
-  else
-    let res = ''
+function! s:GistGetPage(url, user, param)
+  let cookiedir = substitute(expand('<sfile>:p:h'), '[/\\]plugin$', '', '').'/cookies'
+  if !isdirectory(cookiedir)
+    call mkdir(cookiedir, 'p')
   endif
-  return res
+  let cookiefile = cookiedir.'/github'
+
+  let quote = &shellxquote == '"' ?  "'" : '"'
+  if !filereadable(cookiefile)
+    let password = inputsecret('Password:')
+    if len(password) == 0
+      echo 'Canceled'
+      return
+    endif
+    let url = 'https://gist.github.com/login?return_to=gist'
+    let res = system('curl -L -s -k -c '.quote.cookiefile.quote.' '.quote.url.quote)
+    let token = substitute(res, '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$', '\1', '')
+
+    let query = [
+      \ 'authenticity_token=%s',
+      \ 'login=%s',
+      \ 'password=%s',
+      \ 'return_to=gist',
+      \ 'commit=Log+in',
+      \ ]
+    let squery = printf(join(query, '&'),
+      \ s:encodeURIComponent(token),
+      \ s:encodeURIComponent(a:user),
+      \ s:encodeURIComponent(a:password))
+    unlet query
+
+    let file = tempname()
+    let command = 'curl -s -k -i'
+    let command .= ' -b '.quote.cookiefile.quote
+    let command .= ' -c '.quote.cookiefile.quote
+    let command .= ' '.quote.'https://gist.github.com/session'.quote
+    let command .= ' -d @' . quote.file.quote
+    call writefile([squery], file)
+    let res = system(command)
+    call delete(file)
+    let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
+    let res = substitute(res, '^.*: ', '', '')
+    if len(res) == 0
+      call delete(cookiefile)
+      return ''
+    endif
+  endif
+  let command = 'curl -s -k -L'
+  if len(a:param)
+    let command .= ' -d '.quote.a:param.quote
+  endif
+  let command .= ' -b '.quote.cookiefile.quote
+  let command .= ' '.quote.a:url.quote
+  return iconv(system(command), "utf-8", &encoding)
 endfunction
 
 function! s:GistDelete(user, token, gistid)
-  let password = inputsecret('Password:')
-  if len(password) == 0
-    echo 'Canceled'
-    return
-  endif
-  echon "Login to gist... "
-  let cookie = s:GistGetSessionID(a:user, password)
-  if len(cookie) == 0
-    echo 'Failed'
-    return
-  endif
   echon " Deleting gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/delete/'.a:gistid
-  let res = system('curl -i -b '.quote.substitute(cookie,'%','\\%','g').quote.' '.url)
-  let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
-  let res = substitute(res, '^.*: ', '', '')
-  if len(res) > 0 && res != 'http://gist.github.com/gists'
+  let res = s:GistGetPage('http://gist.github.com/'.a:gistid, a:user, '')
+  let token = substitute(res, '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$', '\1', '')
+  let res = s:GistGetPage('http://gist.github.com/delete/'.a:gistid, a:user, '_method=delete&authenticity_token='.token)
+  if len(res) > 0
     echo 'Done: '
   else
     echoerr 'Delete failed'
