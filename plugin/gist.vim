@@ -732,7 +732,12 @@ function! Gist(line1, line2, ...)
       endif
     endif
     if g:gist_put_url_to_clipboard_after_post == 1
-      if has('unix') && !has('xterm_clipboard')
+      if exists('g:gist_clip_command')
+        silent! 1sp
+        silent! put! =url
+        exec 'silent! 1,1w !'.g:gist_clip_command
+        silent! bw!
+      elseif has('unix') && !has('xterm_clipboard')
         let @" = url
       else
         let @+ = url
