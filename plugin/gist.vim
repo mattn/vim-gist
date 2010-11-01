@@ -2,7 +2,7 @@
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 01-Nov-2010.
-" Version: 4.2
+" Version: 4.3
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 " Usage:
@@ -28,6 +28,10 @@
 "
 "   :Gist -d
 "     delete the gist. (should be work on gist buffer)
+"     password authentication is needed.
+"
+"   :Gist -f
+"     fork the gist. (should be work on gist buffer)
 "     password authentication is needed.
 "
 "   :Gist -e foo.js
@@ -167,6 +171,8 @@ endfunction
 function! s:GistList(user, token, gistls, page)
   if a:gistls == '-all'
     let url = 'http://gist.github.com/gists'
+  elseif g:gist_show_privates && a:gistls == a:user
+    let url = 'http://gist.github.com/mine'
   else
     let url = 'http://gist.github.com/'.a:gistls
   endif
@@ -179,19 +185,18 @@ function! s:GistList(user, token, gistls, page)
   else
     exec 'silent split gist:'.a:gistls
   endif
-
-  setlocal foldmethod=manual
-  let oldlines = []
   if a:page > 1
     let oldlines = getline(0, line('$'))
     let url = url . '?page=' . a:page
   endif
 
+  setlocal foldmethod=manual
+  let oldlines = []
   if g:gist_show_privates
-    echon "Login to gist... "
+    echon 'Login to gist... '
     silent %d _
-    let page = s:GistGetPage('https://gist.github.com/mine', a:user, '')
-    silent put =page
+    let res = s:GistGetPage(url, a:user, '', '-L')
+    silent put =res.content
   else
     silent %d _
     exec 'silent r! curl -s '.url
@@ -353,13 +358,13 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
 
   let file = tempname()
   call writefile([squery], file)
-  echon " Updating it to gist... "
+  echon 'Updating it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/gists/'.a:gistid
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
-  let res = substitute(res, '^.*: ', '', '')
+  let res = substitute(res, '^[^:]\+: ', '', '')
   if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     setlocal nomodified
     echo 'Done: '.res
@@ -369,7 +374,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   return res
 endfunction
 
-function! s:GistGetPage(url, user, param)
+function! s:GistGetPage(url, user, param, opt)
   let cookiedir = substitute(expand('<sfile>:p:h'), '[/\\]plugin$', '', '').'/cookies'
   if !isdirectory(cookiedir)
     call mkdir(cookiedir, 'p')
@@ -410,30 +415,44 @@ function! s:GistGetPage(url, user, param)
     let res = system(command)
     call delete(file)
     let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
-    let res = substitute(res, '^.*: ', '', '')
+    let res = substitute(res, '^[^:]\+: ', '', '')
     if len(res) == 0
       call delete(cookiefile)
       return ''
     endif
   endif
-  let command = 'curl -s -k -L'
+  let command = 'curl -s -k -i '.a:opt
   if len(a:param)
     let command .= ' -d '.quote.a:param.quote
   endif
   let command .= ' -b '.quote.cookiefile.quote
   let command .= ' '.quote.a:url.quote
-  return iconv(system(command), "utf-8", &encoding)
+  let res = iconv(system(command), "utf-8", &encoding)
+  let pos = stridx(res, "\r\n\r\n")
+  if pos != -1
+    let content = res[pos+4:]
+  else
+    let pos = stridx(res, "\n\n")
+    let content = res[pos+2:]
+  endif
+  return {
+  \ "header" : split(res[0:pos], '\r\?\n'),
+  \ "content" : content
+  \}
 endfunction
 
 function! s:GistDelete(user, token, gistid)
-  echon " Deleting gist... "
-  let quote = &shellxquote == '"' ?  "'" : '"'
-  let url = 'http://gist.github.com/delete/'.a:gistid
-  let res = s:GistGetPage('http://gist.github.com/'.a:gistid, a:user, '')
-  let token = substitute(res, '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$', '\1', '')
-  let res = s:GistGetPage('http://gist.github.com/delete/'.a:gistid, a:user, '_method=delete&authenticity_token='.token)
-  if len(res) > 0
-    echo 'Done: '
+  echon 'Deleting gist... '
+  let res = s:GistGetPage('http://gist.github.com/'.a:gistid, a:user, '', '')
+  let mx = '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$'
+  let token = substitute(matchstr(res.content, mx), mx, '\1', '')
+  if len(token) > 0
+    let res = s:GistGetPage('http://gist.github.com/delete/'.a:gistid, a:user, '_method=delete&authenticity_token='.token, '')
+    if len(res.content) > 0
+      echo 'Done: '
+    else
+      echoerr 'Delete failed'
+    endif
   else
     echoerr 'Delete failed'
   endif
@@ -514,13 +533,13 @@ function! s:GistPost(user, token, content, private)
 
   let file = tempname()
   call writefile([squery], file)
-  echon " Posting it to gist... "
+  echon 'Posting it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'http://gist.github.com/gists'
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
-  let res = substitute(res, '^.*: ', '', '')
+  let res = substitute(res, '^[^:]\+: ', '', '')
   if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     echo 'Done: '.res
   else
@@ -652,7 +671,19 @@ function! Gist(line1, line2, ...)
     elseif arg =~ '^\(-e\|--edit\)$' && bufname =~ bufnamemx
       let editpost = 1
       let gistid = substitute(bufname, bufnamemx, '\1', '')
-    elseif len(gistnm) == 0
+    elseif arg =~ '^\(-f\|--fork\)$' && bufname =~ bufnamemx
+      let gistid = substitute(bufname, bufnamemx, '\1', '')
+      let res = s:GistGetPage("http://gist.github.com/fork/".gistid, g:github_user, '', '')
+      let loc = filter(res.header, 'v:val =~ "^Location:"')[0]
+      let loc = substitute(loc, '^[^:]\+: ', '', '')
+      let mx = '^http://gist.github.com/\(\d\+\)$'
+      if loc =~ mx
+        let gistid = substitute(loc, mx, '\1', '')
+      else
+        echoerr 'Fork failed'
+        return
+      endif
+    elseif arg !~ '^-' && len(gistnm) == 0
       if editpost == 1 || deletepost == 1
         let gistnm = arg
       elseif len(gistls) > 0
