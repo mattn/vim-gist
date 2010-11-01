@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 29-Oct-2010.
+" Last Change: 01-Nov-2010.
 " Version: 4.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -397,7 +397,7 @@ function! s:GistGetPage(url, user, param)
     let squery = printf(join(query, '&'),
       \ s:encodeURIComponent(token),
       \ s:encodeURIComponent(a:user),
-      \ s:encodeURIComponent(a:password))
+      \ s:encodeURIComponent(password))
     unlet query
 
     let file = tempname()
