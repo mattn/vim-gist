@@ -170,11 +170,11 @@ endfunction
 
 function! s:GistList(user, token, gistls, page)
   if a:gistls == '-all'
-    let url = 'http://gist.github.com/gists'
+    let url = 'https://gist.github.com/gists'
   elseif g:gist_show_privates && a:gistls == a:user
-    let url = 'http://gist.github.com/mine'
+    let url = 'https://gist.github.com/mine'
   else
-    let url = 'http://gist.github.com/'.a:gistls
+    let url = 'https://gist.github.com/'.a:gistls
   endif
   let winnum = bufwinnr(bufnr('gist:'.a:gistls))
   if winnum != -1
@@ -241,7 +241,7 @@ function! s:GistList(user, token, gistls, page)
 endfunction
 
 function! s:GistGetFileName(gistid)
-  let url = 'http://gist.github.com/'.a:gistid
+  let url = 'https://gist.github.com/'.a:gistid
   let res = system('curl -s '.url)
   let res = substitute(res, '^.*<a href="/raw/[^"]\+/\([^"]\+\)".*$', '\1', '')
   if res =~ '/'
@@ -252,7 +252,7 @@ function! s:GistGetFileName(gistid)
 endfunction
 
 function! s:GistDetectFiletype(gistid)
-  let url = 'http://gist.github.com/'.a:gistid
+  let url = 'https://gist.github.com/'.a:gistid
   let mx = '^.*<div class="data syntax type-\([^"]\+\)">.*$'
   let res = system('curl -s '.url)
   let res = substitute(matchstr(res, mx), mx, '\1', '')
@@ -283,7 +283,7 @@ function! s:GistWrite(fname)
 endfunction
 
 function! s:GistGet(user, token, gistid, clipboard)
-  let url = 'http://gist.github.com/'.a:gistid.'.txt'
+  let url = 'https://gist.github.com/'.a:gistid.'.txt'
   let winnum = bufwinnr(bufnr('gist:'.a:gistid))
   if winnum != -1
     if winnum != bufwinnr('%')
@@ -360,7 +360,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   call writefile([squery], file)
   echon 'Updating it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
-  let url = 'http://gist.github.com/gists/'.a:gistid
+  let url = 'https://gist.github.com/gists/'.a:gistid
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
@@ -443,11 +443,11 @@ endfunction
 
 function! s:GistDelete(user, token, gistid)
   echon 'Deleting gist... '
-  let res = s:GistGetPage('http://gist.github.com/'.a:gistid, a:user, '', '')
+  let res = s:GistGetPage('https://gist.github.com/'.a:gistid, a:user, '', '')
   let mx = '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$'
   let token = substitute(matchstr(res.content, mx), mx, '\1', '')
   if len(token) > 0
-    let res = s:GistGetPage('http://gist.github.com/delete/'.a:gistid, a:user, '_method=delete&authenticity_token='.token, '')
+    let res = s:GistGetPage('https://gist.github.com/delete/'.a:gistid, a:user, '_method=delete&authenticity_token='.token, '')
     if len(res.content) > 0
       echo 'Done: '
     else
@@ -468,7 +468,7 @@ endfunction
 "
 "   embedded gist url format:
 "
-"       Gist: http://gist.github.com/123123
+"       Gist: https://gist.github.com/123123
 "
 "   embedded gist id format:
 "
@@ -490,7 +490,7 @@ function! s:GistPost(user, token, content, private)
       cal s:GistUpdate( a:user , a:token ,  a:content , gistid , '' )
       return
     elseif l =~ '\<Gist:'
-      let gistid = matchstr( l , 'Gist:\s*http://gist.github.com/\zs\d\+')
+      let gistid = matchstr( l , 'Gist:\s*https://gist.github.com/\zs\d\+')
 
       if strlen(gistid) == 0
         echohl WarningMsg | echo "GistID error" | echohl None
@@ -535,7 +535,7 @@ function! s:GistPost(user, token, content, private)
   call writefile([squery], file)
   echon 'Posting it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
-  let url = 'http://gist.github.com/gists'
+  let url = 'https://gist.github.com/gists'
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
@@ -595,7 +595,7 @@ function! s:GistPostBuffers(user, token, private)
   call writefile([squery], file)
   echo "Posting it to gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
-  let url = 'http://gist.github.com/gists'
+  let url = 'https://gist.github.com/gists'
   let res = system('curl -i -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
@@ -673,10 +673,10 @@ function! Gist(line1, line2, ...)
       let gistid = substitute(bufname, bufnamemx, '\1', '')
     elseif arg =~ '^\(-f\|--fork\)$' && bufname =~ bufnamemx
       let gistid = substitute(bufname, bufnamemx, '\1', '')
-      let res = s:GistGetPage("http://gist.github.com/fork/".gistid, g:github_user, '', '')
+      let res = s:GistGetPage("https://gist.github.com/fork/".gistid, g:github_user, '', '')
       let loc = filter(res.header, 'v:val =~ "^Location:"')[0]
       let loc = substitute(loc, '^[^:]\+: ', '', '')
-      let mx = '^http://gist.github.com/\(\d\+\)$'
+      let mx = '^https://gist.github.com/\(\d\+\)$'
       if loc =~ mx
         let gistid = substitute(loc, mx, '\1', '')
       else
