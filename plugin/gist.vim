@@ -15,7 +15,7 @@
 "
 "   :Gist -p
 "     post whole text to gist with private.
-"     if you got empty gist list, try :Gist --abandon 
+"     if you got empty gist list, try :Gist --abandon
 "
 "   :Gist -a
 "     post whole text to gist with anonymous.
@@ -86,7 +86,11 @@
 "
 "     let g:gist_browser_command = 'opera %URL% &'
 "
-"     on windows, should work with your setting.
+"     on windows, should work with original setting.
+"
+"   * if you want to show your private gists with ':Gist -l'
+"
+"     let g:gist_show_privates = 1
 "
 " Thanks:
 "   MATSUU Takuto:

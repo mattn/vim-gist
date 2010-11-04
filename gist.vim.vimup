@@ -83,7 +83,7 @@ detailed_description: |
 
       let g:gist_browser_command = 'opera %URL% &'
 
-      on windows, should work with your setting.
+      on windows, should work with original setting.
 
   Require:
     curl command (http://curl.haxx.se/)
