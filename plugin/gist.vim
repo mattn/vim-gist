@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 01-Nov-2010.
-" Version: 4.3
+" Last Change: 04-Nov-2010.
+" Version: 4.4
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 " Usage:
@@ -15,6 +15,7 @@
 "
 "   :Gist -p
 "     post whole text to gist with private.
+"     if you got empty gist list, try :Gist --abandon 
 "
 "   :Gist -a
 "     post whole text to gist with anonymous.
@@ -381,6 +382,11 @@ function! s:GistGetPage(url, user, param, opt)
   endif
   let cookiefile = cookiedir.'/github'
 
+  if len(a:url) == 0
+    call delete(cookiefile)
+    return
+  endif
+
   let quote = &shellxquote == '"' ?  "'" : '"'
   if !filereadable(cookiefile)
     let password = inputsecret('Password:')
@@ -656,6 +662,9 @@ function! Gist(line1, line2, ...)
       else
         let gistls = g:github_user
       endif
+    elseif arg == '--abandon'
+      call s:GistGetPage('', '', '', '')
+      return
     elseif arg =~ '^\(-m\|--multibuffer\)$'
       let multibuffer = 1
     elseif arg =~ '^\(-p\|--private\)$'
