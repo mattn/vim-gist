@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 04-Nov-2010.
+" Last Change: 08-Nov-2010.
 " Version: 4.4
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -724,6 +724,7 @@ function! Gist(line1, line2, ...)
   elseif len(gistid) > 0 && editpost == 0 && deletepost == 0
     call s:GistGet(user, token, gistid, clipboard)
   else
+    let url = ''
     if multibuffer == 1
       let url = s:GistPostBuffers(user, token, private)
     else
@@ -731,11 +732,13 @@ function! Gist(line1, line2, ...)
       if editpost == 1
         let url = s:GistUpdate(user, token, content, gistid, gistnm)
       elseif deletepost == 1
-        let url = s:GistDelete(user, token, gistid)
+        call s:GistDelete(user, token, gistid)
       else
         let url = s:GistPost(user, token, content, private)
       endif
-      if len(url) > 0 && g:gist_open_browser_after_post
+    endif
+    if len(url) > 0
+      if g:gist_open_browser_after_post
         let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
         if cmd =~ '^!'
           silent! exec cmd
@@ -743,17 +746,15 @@ function! Gist(line1, line2, ...)
           call system(cmd)
         endif
       endif
-    endif
-    if g:gist_put_url_to_clipboard_after_post == 1
-      if exists('g:gist_clip_command')
-        silent! 1sp
-        silent! put! =url
-        exec 'silent! 1,1w !'.g:gist_clip_command
-        silent! bw!
-      elseif has('unix') && !has('xterm_clipboard')
-        let @" = url
-      else
-        let @+ = url
+      if g:gist_put_url_to_clipboard_after_post == 1
+        if exists('g:gist_clip_command')
+          let quote = &shellxquote == '"' ?  "'" : '"'
+          call system('echo '.quote.url.quote.'|'.g:gist_clip_command)
+        elseif has('unix') && !has('xterm_clipboard')
+          let @" = url
+        else
+          let @+ = url
+        endif
       endif
     endif
   endif
