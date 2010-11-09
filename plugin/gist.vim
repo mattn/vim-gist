@@ -752,8 +752,7 @@ function! Gist(line1, line2, ...)
       endif
       if g:gist_put_url_to_clipboard_after_post == 1
         if exists('g:gist_clip_command')
-          let quote = &shellxquote == '"' ?  "'" : '"'
-          call system('echo '.quote.url.quote.'|'.g:gist_clip_command)
+          call system('echo '.url.' | '.g:gist_clip_command)
         elseif has('unix') && !has('xterm_clipboard')
           let @" = url
         else
