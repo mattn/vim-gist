@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 08-Nov-2010.
+" Last Change: 09-Nov-2010.
 " Version: 4.5
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -699,10 +699,14 @@ function! Gist(line1, line2, ...)
     elseif arg !~ '^-' && len(gistnm) == 0
       if editpost == 1 || deletepost == 1
         let gistnm = arg
-      elseif len(gistls) > 0
+      elseif len(gistls) > 0 && arg != '^\w\+$'
         let gistls = arg
-      else
+      elseif arg =~ '^\d\+$'
         let gistid = arg
+      else
+        echoerr 'Invalid arguments'
+        unlet args
+        return 0
       endif
     elseif len(arg) > 0
       echoerr 'Invalid arguments'
