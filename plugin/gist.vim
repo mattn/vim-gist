@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 09-Nov-2010.
-" Version: 4.5
+" Last Change: 13-Dec-2010.
+" Version: 4.6
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 " Usage:
@@ -379,12 +379,12 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   return res
 endfunction
 
+let s:cookiedir = substitute(expand('<sfile>:p:h'), '[/\\]plugin$', '', '').'/cookies'
 function! s:GistGetPage(url, user, param, opt)
-  let cookiedir = substitute(expand('<sfile>:p:h'), '[/\\]plugin$', '', '').'/cookies'
-  if !isdirectory(cookiedir)
-    call mkdir(cookiedir, 'p')
+  if !isdirectory(s:cookiedir)
+    call mkdir(s:cookiedir, 'p')
   endif
-  let cookiefile = cookiedir.'/github'
+  let cookiefile = s:cookiedir.'/github'
 
   if len(a:url) == 0
     call delete(cookiefile)
