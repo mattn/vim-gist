@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 13-Dec-2010.
-" Version: 4.6
+" Last Change: 04-Jan-2011.
+" Version: 4.7
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 " Usage:
@@ -258,7 +258,7 @@ endfunction
 
 function! s:GistDetectFiletype(gistid)
   let url = 'https://gist.github.com/'.a:gistid
-  let mx = '^.*<div class="data syntax type-\([^"]\+\)">.*$'
+  let mx = '^.*<div class=".\{-}type-\([^"]\+\)">.*$'
   let res = system('curl -s '.url)
   let res = substitute(matchstr(res, mx), mx, '\1', '')
   let res = substitute(res, '.*\(\.[^\.]\+\)$', '\1', '')
