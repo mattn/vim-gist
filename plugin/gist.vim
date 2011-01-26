@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 04-Jan-2011.
+" Last Change: 26-Jan-2011.
 " Version: 4.7
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -142,6 +142,10 @@ endif
 
 if !exists('g:gist_show_privates')
   let g:gist_show_privates = 0
+endif
+
+if !exists('g:gist_cookie_dir')
+  let g:gist_cookie_dir = substitute(expand('<sfile>:p:h'), '[/\\]plugin$', '', '').'/cookies'
 endif
 
 function! s:nr2hex(nr)
@@ -379,27 +383,26 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   return res
 endfunction
 
-let s:cookiedir = substitute(expand('<sfile>:p:h'), '[/\\]plugin$', '', '').'/cookies'
 function! s:GistGetPage(url, user, param, opt)
-  if !isdirectory(s:cookiedir)
-    call mkdir(s:cookiedir, 'p')
+  if !isdirectory(g:gist_cookie_dir)
+    call mkdir(g:gist_cookie_dir, 'p')
   endif
-  let cookiefile = s:cookiedir.'/github'
+  let cookie_file = g:gist_cookie_dir.'/github'
 
   if len(a:url) == 0
-    call delete(cookiefile)
+    call delete(cookie_file)
     return
   endif
 
   let quote = &shellxquote == '"' ?  "'" : '"'
-  if !filereadable(cookiefile)
+  if !filereadable(cookie_file)
     let password = inputsecret('Password:')
     if len(password) == 0
       echo 'Canceled'
       return
     endif
     let url = 'https://gist.github.com/login?return_to=gist'
-    let res = system('curl -L -s -k -c '.quote.cookiefile.quote.' '.quote.url.quote)
+    let res = system('curl -L -s -k -c '.quote.cookie_file.quote.' '.quote.url.quote)
     let token = substitute(res, '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$', '\1', '')
 
     let query = [
@@ -417,8 +420,8 @@ function! s:GistGetPage(url, user, param, opt)
 
     let file = tempname()
     let command = 'curl -s -k -i'
-    let command .= ' -b '.quote.cookiefile.quote
-    let command .= ' -c '.quote.cookiefile.quote
+    let command .= ' -b '.quote.cookie_file.quote
+    let command .= ' -c '.quote.cookie_file.quote
     let command .= ' '.quote.'https://gist.github.com/session'.quote
     let command .= ' -d @' . quote.file.quote
     call writefile([squery], file)
@@ -427,7 +430,7 @@ function! s:GistGetPage(url, user, param, opt)
     let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
     let res = substitute(res, '^[^:]\+: ', '', '')
     if len(res) == 0
-      call delete(cookiefile)
+      call delete(cookie_file)
       return ''
     endif
   endif
@@ -435,7 +438,7 @@ function! s:GistGetPage(url, user, param, opt)
   if len(a:param)
     let command .= ' -d '.quote.a:param.quote
   endif
-  let command .= ' -b '.quote.cookiefile.quote
+  let command .= ' -b '.quote.cookie_file.quote
   let command .= ' '.quote.a:url.quote
   let res = iconv(system(command), "utf-8", &encoding)
   let pos = stridx(res, "\r\n\r\n")
