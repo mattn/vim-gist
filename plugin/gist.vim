@@ -177,6 +177,8 @@ function! s:encodeURIComponent(instr)
   return outstr
 endfunction
 
+" Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it. 
+let s:bufprefix = 'gist' . (has('unix') ? ':' : '_')
 function! s:GistList(user, token, gistls, page)
   if a:gistls == '-all'
     let url = 'https://gist.github.com/gists'
@@ -185,14 +187,14 @@ function! s:GistList(user, token, gistls, page)
   else
     let url = 'https://gist.github.com/'.a:gistls
   endif
-  let winnum = bufwinnr(bufnr('gist:'.a:gistls))
+  let winnum = bufwinnr(bufnr(s:bufprefix.a:gistls))
   if winnum != -1
     if winnum != bufwinnr('%')
       exe "normal \<c-w>".winnum."w"
     endif
     setlocal modifiable
   else
-    exec 'silent split gist:'.a:gistls
+    exec 'silent split' s:bufprefix.a:gistls
   endif
   if a:page > 1
     let oldlines = getline(0, line('$'))
@@ -293,14 +295,14 @@ endfunction
 
 function! s:GistGet(user, token, gistid, clipboard)
   let url = 'https://gist.github.com/'.a:gistid.'.txt'
-  let winnum = bufwinnr(bufnr('gist:'.a:gistid))
+  let winnum = bufwinnr(bufnr(s:bufprefix.a:gistid))
   if winnum != -1
     if winnum != bufwinnr('%')
       exe "normal \<c-w>".winnum."w"
     endif
     setlocal modifiable
   else
-    exec 'silent split gist:'.a:gistid
+    exec 'silent split' s:bufprefix.a:gistid
   endif
   filetype detect
   silent %d _
@@ -657,7 +659,7 @@ function! Gist(line1, line2, ...)
   let deletepost = 0
   let editpost = 0
   let listmx = '^\(-l\|--list\)\s*\([^\s]\+\)\?$'
-  let bufnamemx = '^gist:\([0-9a-f]\+\)$'
+  let bufnamemx = '^' . s:bufprefix .'\([0-9a-f]\+\)$'
 
   let args = (a:0 > 0) ? split(a:1, ' ') : []
   for arg in args
