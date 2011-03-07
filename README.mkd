@@ -3,6 +3,8 @@ Gist.vim
 
 This is vimscript for gist (http://gist.github.com)
 
+For the latest version please see https://github.com/mattn/gist-vim
+
 Usage:
 ------
 
@@ -13,24 +15,24 @@ Usage:
   post selected text to gist.
 
     :Gist -p
-  post whole text to gist with private.
+  post whole text to gist as private.
  if you got empty gist list, try :Gist --abandon
 
     :Gist -a
-  post whole text to gist with anonymous.
+  post whole text to gist as anonymous.
 
     :Gist -m
   post multi buffer to gist.
 
     :Gist -e
-  edit the gist. (shoud be work on gist buffer)
+  edit the gist. (you need to have opened the gist buffer first)
   you can update the gist with :w command on gist buffer.
 
     :Gist -e foo.js
-  edit the gist with name 'foo.js'. (shoud be work on gist buffer)
+  edit the gist with name 'foo.js'. (you need to have opened the gist buffer first)
 
     :Gist -d
-  delete the gist. (should be work on gist buffer)
+  delete the gist. (you need to have opened the gist buffer first)
   password authentication is needed.
 
     :Gist -f
@@ -51,7 +53,7 @@ Usage:
 
 Tips:
 -----
-  if set g:gist_clip_command, gist.vim will copy the gist code
+  if you set g:gist_clip_command, gist.vim will copy the gist code
     with option '-c'.
 
     # mac
@@ -85,7 +87,7 @@ Tips:
 
     let g:gist_show_privates = 1
 
-Require:
+Requirements:
 --------
   curl command (http://curl.haxx.se/)
   and if you want to use profile of git, it require git command.
@@ -119,11 +121,11 @@ Install:
 --------
   copy it to your plugin directory.
 
-  gist.vim leave cookie-jar file into runtimepath.
+  gist.vim will create a curl cookie-jar file in your runtimepath.
 
   rtp:
     plugin/gist.vim
     cookies/github
 
-  if you want to uninstall gist.vim, you have better to remove 'cookies/github'.
+  if you want to uninstall gist.vim, you will also have to remove 'cookies/github'.
 
