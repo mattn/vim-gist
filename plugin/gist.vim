@@ -459,6 +459,10 @@ endfunction
 function! s:GistDelete(user, token, gistid)
   echon 'Deleting gist... '
   let res = s:GistGetPage('https://gist.github.com/'.a:gistid, a:user, '', '')
+  if (!len(res)) 
+      echoerr 'Wrong password? no response received from github trying to delete ' . a:gistid
+      return
+  endif
   let mx = '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$'
   let token = substitute(matchstr(res.content, mx), mx, '\1', '')
   if len(token) > 0
