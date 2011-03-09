@@ -100,6 +100,14 @@ install_details: |
 
   if you want to uninstall gist.vim, you have better to remove 'cookies/github'.
 
+  for using gist.vim, you should install git. or set g:github_user and g:github_token into your vimrc. 
+  note that g:github_token is NOT a your password.
+
+  how get your token.
+    1. login to github.
+    2. click "Account Settings"
+    3. click "Account Admin"
+    4. you'll see it at following of 'API Token'.
 
 versions:
 - '4.8': |
