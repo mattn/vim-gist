@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 04-Jan-2011.
+" Last Change: 09-Mar-2011.
 " Version: 4.7
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -486,10 +486,10 @@ endfunction
 "
 function! s:GistPost(user, token, content, private)
 
-  " find GistID: in content , then we should just update
-  for l in split( a:content , "\n" )
+  " find GistID: in content, then we should just update
+  for l in split(a:content, "\n")
     if l =~ '\<GistID:'
-      let gistid = matchstr( l , 'GistID:\s*\zs\d\+')
+      let gistid = matchstr(l, 'GistID:\s*[0-9a-z]\+')
 
       if strlen(gistid) == 0
         echohl WarningMsg | echo "GistID error" | echohl None
@@ -497,10 +497,10 @@ function! s:GistPost(user, token, content, private)
       endif
       echo "Found GistID: " . gistid
 
-      cal s:GistUpdate( a:user , a:token ,  a:content , gistid , '' )
+      cal s:GistUpdate(a:user, a:token,  a:content, gistid, '')
       return
     elseif l =~ '\<Gist:'
-      let gistid = matchstr( l , 'Gist:\s*https://gist.github.com/\zs\d\+')
+      let gistid = matchstr(l, 'Gist:\s*https://gist.github.com/[0-9a-z]\+')
 
       if strlen(gistid) == 0
         echohl WarningMsg | echo "GistID error" | echohl None
@@ -508,7 +508,7 @@ function! s:GistPost(user, token, content, private)
       endif
       echo "Found GistID: " . gistid
 
-      cal s:GistUpdate( a:user , a:token ,  a:content , gistid , '' )
+      cal s:GistUpdate(a:user, a:token,  a:content, gistid, '')
       return
     endif
   endfor
@@ -689,7 +689,7 @@ function! Gist(line1, line2, ...)
       let res = s:GistGetPage("https://gist.github.com/fork/".gistid, g:github_user, '', '')
       let loc = filter(res.header, 'v:val =~ "^Location:"')[0]
       let loc = substitute(loc, '^[^:]\+: ', '', '')
-      let mx = '^https://gist.github.com/\(\d\+\)$'
+      let mx = '^https://gist.github.com/\([0-9a-z]\+\)$'
       if loc =~ mx
         let gistid = substitute(loc, mx, '\1', '')
       else
@@ -701,7 +701,7 @@ function! Gist(line1, line2, ...)
         let gistnm = arg
       elseif len(gistls) > 0 && arg != '^\w\+$'
         let gistls = arg
-      elseif arg =~ '^\d\+$'
+      elseif arg =~ '^[0-9a-z]\+$'
         let gistid = arg
       else
         echoerr 'Invalid arguments'
