@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 09-Mar-2011.
+" Last Change: 19-Mar-2011.
 " Version: 4.8
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -555,7 +555,7 @@ function! s:GistPost(user, token, content, private)
   echon 'Posting it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'https://gist.github.com/gists'
-  let res = system('curl -i -d @'.quote.file.quote.' '.url)
+  let res = system('curl -k -i -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^[^:]\+: ', '', '')
@@ -615,7 +615,7 @@ function! s:GistPostBuffers(user, token, private)
   echo "Posting it to gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'https://gist.github.com/gists'
-  let res = system('curl -i -d @'.quote.file.quote.' '.url)
+  let res = system('curl -k -i -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
