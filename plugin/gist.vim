@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 19-Mar-2011.
-" Version: 4.8
+" Last Change: 24-Mar-2011.
+" Version: 4.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 " Usage:
@@ -124,6 +124,10 @@ if !exists('g:gist_put_url_to_clipboard_after_post')
   let g:gist_put_url_to_clipboard_after_post = 1
 endif
 
+if !exists('g:gist_curl_options')
+  let g:gist_curl_options = ""
+endif
+
 if !exists('g:gist_browser_command')
   if has('win32')
     let g:gist_browser_command = "!start rundll32 url.dll,FileProtocolHandler %URL%"
@@ -210,7 +214,7 @@ function! s:GistList(user, token, gistls, page)
     silent put =res.content
   else
     silent %d _
-    exec 'silent r! curl -s '.url
+    exec 'silent r! curl -s '.g:gist_curl_options.' '.url
   endif
 
   silent normal! ggdd
@@ -253,7 +257,7 @@ endfunction
 
 function! s:GistGetFileName(gistid)
   let url = 'https://gist.github.com/'.a:gistid
-  let res = system('curl -s '.url)
+  let res = system('curl -s '.g:gist_curl_options.' '.url)
   let res = substitute(res, '^.*<a href="/raw/[^"]\+/\([^"]\+\)".*$', '\1', '')
   if res =~ '/'
     return ''
@@ -265,7 +269,7 @@ endfunction
 function! s:GistDetectFiletype(gistid)
   let url = 'https://gist.github.com/'.a:gistid
   let mx = '^.*<div class=".\{-}type-\([^"]\+\)">.*$'
-  let res = system('curl -s '.url)
+  let res = system('curl -s '.g:gist_curl_options.' '.url)
   let res = substitute(matchstr(res, mx), mx, '\1', '')
   let res = substitute(res, '.*\(\.[^\.]\+\)$', '\1', '')
   let res = substitute(res, '-', '', 'g')
@@ -306,7 +310,7 @@ function! s:GistGet(user, token, gistid, clipboard)
   endif
   filetype detect
   silent %d _
-  exec 'silent 0r! curl -s '.url
+  exec 'silent 0r! curl -s '.g:gist_curl_options.' '.url
   normal! Gd_
   setlocal buftype=acwrite bufhidden=delete noswapfile
   setlocal nomodified
@@ -372,7 +376,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   echon 'Updating it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'https://gist.github.com/gists/'.a:gistid
-  let res = system('curl -i -d @'.quote.file.quote.' '.url)
+  let res = system('curl -i '.g:gist_curl_options.' -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^[^:]\+: ', '', '')
@@ -404,7 +408,7 @@ function! s:GistGetPage(url, user, param, opt)
       return
     endif
     let url = 'https://gist.github.com/login?return_to=gist'
-    let res = system('curl -L -s -k -c '.quote.cookie_file.quote.' '.quote.url.quote)
+    let res = system('curl -L -s '.g:gist_curl_options.' -c '.quote.cookie_file.quote.' '.quote.url.quote)
     let token = substitute(res, '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$', '\1', '')
 
     let query = [
@@ -421,7 +425,7 @@ function! s:GistGetPage(url, user, param, opt)
     unlet query
 
     let file = tempname()
-    let command = 'curl -s -k -i'
+    let command = 'curl -s '.g:gist_curl_options.' -i'
     let command .= ' -b '.quote.cookie_file.quote
     let command .= ' -c '.quote.cookie_file.quote
     let command .= ' '.quote.'https://gist.github.com/session'.quote
@@ -436,7 +440,7 @@ function! s:GistGetPage(url, user, param, opt)
       return ''
     endif
   endif
-  let command = 'curl -s -k -i '.a:opt
+  let command = 'curl -s '.g:gist_curl_options.' -i '.a:opt
   if len(a:param)
     let command .= ' -d '.quote.a:param.quote
   endif
@@ -555,7 +559,7 @@ function! s:GistPost(user, token, content, private)
   echon 'Posting it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'https://gist.github.com/gists'
-  let res = system('curl -k -i -d @'.quote.file.quote.' '.url)
+  let res = system('curl -i '.g:gist_curl_options.' -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^[^:]\+: ', '', '')
@@ -615,7 +619,7 @@ function! s:GistPostBuffers(user, token, private)
   echo "Posting it to gist... "
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'https://gist.github.com/gists'
-  let res = system('curl -k -i -d @'.quote.file.quote.' '.url)
+  let res = system('curl -i '.g:gist_curl_options.' -d @'.quote.file.quote.' '.url)
   call delete(file)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
