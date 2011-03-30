@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 24-Mar-2011.
+" Last Change: 30-Mar-2011.
 " Version: 4.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -759,6 +759,8 @@ function! Gist(line1, line2, ...)
         let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
         if cmd =~ '^!'
           silent! exec cmd
+        elseif cmd =~ '^:[A-Z]'
+          exec cmd
         else
           call system(cmd)
         endif
