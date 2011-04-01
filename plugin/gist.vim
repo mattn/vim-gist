@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 30-Mar-2011.
+" Last Change: 01-Apr-2011.
 " Version: 4.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -378,15 +378,18 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   let url = 'https://gist.github.com/gists/'.a:gistid
   let res = system('curl -i '.g:gist_curl_options.' -d @'.quote.file.quote.' '.url)
   call delete(file)
-  let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
-  let res = substitute(res, '^[^:]\+: ', '', '')
-  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/'
+  let headers = split(res, '\(\r\?\n\|\r\n\?\)')
+  let location = matchstr(headers, '^Location: ')
+  let location = substitute(location, '^[^:]\+: ', '', '')
+  if len(location) > 0 && location =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     setlocal nomodified
-    echo 'Done: '.res
+    echo 'Done: '.location
   else
-    echoerr 'Edit failed'
+    let message = matchstr(headers, '^Status: ')
+    let message = substitute(message, '^[^:]\+: [0-9]\+ ', '', '')
+    echoerr 'Edit failed: '.message
   endif
-  return res
+  return location
 endfunction
 
 function! s:GistGetPage(url, user, param, opt)
@@ -474,7 +477,9 @@ function! s:GistDelete(user, token, gistid)
     if len(res.content) > 0
       echo 'Done: '
     else
-      echoerr 'Delete failed'
+      let message = matchstr(res.header, '^Status: ')
+      let message = substitute(message, '^[^:]\+: [0-9]\+ ', '', '')
+      echoerr 'Delete failed: '.message
     endif
   else
     echoerr 'Delete failed'
@@ -561,14 +566,17 @@ function! s:GistPost(user, token, content, private)
   let url = 'https://gist.github.com/gists'
   let res = system('curl -i '.g:gist_curl_options.' -d @'.quote.file.quote.' '.url)
   call delete(file)
-  let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
-  let res = substitute(res, '^[^:]\+: ', '', '')
-  if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/'
-    echo 'Done: '.res
+  let headers = split(res, '\(\r\?\n\|\r\n\?\)')
+  let location = matchstr(headers, '^Location: ')
+  let location = substitute(location, '^[^:]\+: ', '', '')
+  if len(location) > 0 && location =~ '^\(http\|https\):\/\/gist\.github\.com\/'
+    echo 'Done: '.location
   else
-    echoerr 'Post failed'
+    let message = matchstr(headers, '^Status: ')
+    let message = substitute(message, '^[^:]\+: [0-9]\+ ', '', '')
+    echoerr 'Post failed: '.message
   endif
-  return res
+  return location
 endfunction
 
 function! s:GistPostBuffers(user, token, private)
