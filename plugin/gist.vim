@@ -154,6 +154,10 @@ if !exists('g:gist_detect_filetype')
   let g:gist_detect_filetype = 0
 endif
 
+if !exists('g:gist_privates')
+  let g:gist_privates = 0
+endif
+
 if !exists('g:gist_show_privates')
   let g:gist_show_privates = 0
 endif
@@ -683,7 +687,7 @@ function! Gist(line1, line2, ...)
   let gistid = ''
   let gistls = ''
   let gistnm = ''
-  let private = 0
+  let private = g:gist_private
   let multibuffer = 0
   let clipboard = 0
   let deletepost = 0
