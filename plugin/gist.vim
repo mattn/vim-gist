@@ -144,8 +144,8 @@ if !exists('g:gist_detect_filetype')
   let g:gist_detect_filetype = 0
 endif
 
-if !exists('g:gist_privates')
-  let g:gist_privates = 0
+if !exists('g:gist_private')
+  let g:gist_private = 0
 endif
 
 if !exists('g:gist_show_privates')
