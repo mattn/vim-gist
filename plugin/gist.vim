@@ -8,10 +8,12 @@
 " Usage:
 "
 "   :Gist
-"     post whole text to gist.
+"     post whole text to gist, using default privicy option
+"     (see g:gist_private).
 "
 "   :'<,'>Gist
-"     post selected text to gist.
+"     post selected text to gist., using default privicy option
+"     (see g:gist_private).
 "
 "   :Gist -p
 "     post whole text to gist with private.

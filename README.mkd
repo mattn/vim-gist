@@ -9,10 +9,10 @@ Usage:
 ------
 
     :Gist
-  post whole text to gist.
+  post whole text to gist, using default privicy option
 
     :'<,'>Gist
-  post selected text to gist.
+  post selected text to gist, using defualt privicy option
 
     :Gist -p
   post whole text to gist as private.
