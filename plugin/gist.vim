@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 01-Apr-2011.
+" Last Change: 14-Apr-2011.
 " Version: 4.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -383,6 +383,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   let location = substitute(location, '^[^:]\+: ', '', '')
   if len(location) > 0 && location =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     setlocal nomodified
+    redraw
     echo 'Done: '.location
   else
     let message = matchstr(headers, '^Status: ')
@@ -475,6 +476,7 @@ function! s:GistDelete(user, token, gistid)
   if len(token) > 0
     let res = s:GistGetPage('https://gist.github.com/delete/'.a:gistid, a:user, '_method=delete&authenticity_token='.token, '')
     if len(res.content) > 0
+      redraw
       echo 'Done: '
     else
       let message = matchstr(res.header, '^Status: ')
@@ -570,6 +572,7 @@ function! s:GistPost(user, token, content, private)
   let location = matchstr(headers, '^Location: ')
   let location = substitute(location, '^[^:]\+: ', '', '')
   if len(location) > 0 && location =~ '^\(http\|https\):\/\/gist\.github\.com\/'
+    redraw
     echo 'Done: '.location
   else
     let message = matchstr(headers, '^Status: ')
@@ -632,6 +635,7 @@ function! s:GistPostBuffers(user, token, private)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
   if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/'
+    redraw
     echo 'Done: '.res
   else
     echoerr 'Post failed'
