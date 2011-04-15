@@ -92,13 +92,15 @@
 "
 "     let g:gist_show_privates = 1
 "
-"   * if you want to copy URL of the post...
+"   * if don't you want to copy URL of the post...
 "
-"     let g:gist_put_url_to_clipboard_after_post = 1
+"     let g:gist_put_url_to_clipboard_after_post = 0
 "
-"     or if you want to add linefeed more,
+"     or if you want to copy URL and add linefeed at the last of URL,
 "
 "     let g:gist_put_url_to_clipboard_after_post = 2
+"
+"     default value is 1.
 "
 " Thanks:
 "   MATSUU Takuto:
