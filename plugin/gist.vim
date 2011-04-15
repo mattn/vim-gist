@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 14-Apr-2011.
+" Last Change: 15-Apr-2011.
 " Version: 4.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -91,6 +91,14 @@
 "   * if you want to show your private gists with ':Gist -l'
 "
 "     let g:gist_show_privates = 1
+"
+"   * if you want to copy URL of the post...
+"
+"     let g:gist_put_url_to_clipboard_after_post = 1
+"
+"     or if you want to add linefeed more,
+"
+"     let g:gist_put_url_to_clipboard_after_post = 2
 "
 " Thanks:
 "   MATSUU Takuto:
@@ -777,9 +785,12 @@ function! Gist(line1, line2, ...)
           call system(cmd)
         endif
       endif
-      if g:gist_put_url_to_clipboard_after_post == 1
+      if g:gist_put_url_to_clipboard_after_post > 0
+        if g:gist_put_url_to_clipboard_after_post == 2
+          let url = url . "\n"
+        endif
         if exists('g:gist_clip_command')
-          call system('echo '.url.' | '.g:gist_clip_command)
+          call system(g:gist_clip_command, url)
         elseif has('unix') && !has('xterm_clipboard')
           let @" = url
         else
