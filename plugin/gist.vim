@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 01-Apr-2011.
+" Last Change: 15-Apr-2011.
 " Version: 4.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -91,6 +91,16 @@
 "   * if you want to show your private gists with ':Gist -l'
 "
 "     let g:gist_show_privates = 1
+"
+"   * if don't you want to copy URL of the post...
+"
+"     let g:gist_put_url_to_clipboard_after_post = 0
+"
+"     or if you want to copy URL and add linefeed at the last of URL,
+"
+"     let g:gist_put_url_to_clipboard_after_post = 2
+"
+"     default value is 1.
 "
 " Thanks:
 "   MATSUU Takuto:
@@ -383,6 +393,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   let location = substitute(location, '^[^:]\+: ', '', '')
   if len(location) > 0 && location =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     setlocal nomodified
+    redraw
     echo 'Done: '.location
   else
     let message = matchstr(headers, '^Status: ')
@@ -475,6 +486,7 @@ function! s:GistDelete(user, token, gistid)
   if len(token) > 0
     let res = s:GistGetPage('https://gist.github.com/delete/'.a:gistid, a:user, '_method=delete&authenticity_token='.token, '')
     if len(res.content) > 0
+      redraw
       echo 'Done: '
     else
       let message = matchstr(res.header, '^Status: ')
@@ -570,6 +582,7 @@ function! s:GistPost(user, token, content, private)
   let location = matchstr(headers, '^Location: ')
   let location = substitute(location, '^[^:]\+: ', '', '')
   if len(location) > 0 && location =~ '^\(http\|https\):\/\/gist\.github\.com\/'
+    redraw
     echo 'Done: '.location
   else
     let message = matchstr(headers, '^Status: ')
@@ -632,6 +645,7 @@ function! s:GistPostBuffers(user, token, private)
   let res = matchstr(split(res, '\(\r\?\n\|\r\n\?\)'), '^Location: ')
   let res = substitute(res, '^.*: ', '', '')
   if len(res) > 0 && res =~ '^\(http\|https\):\/\/gist\.github\.com\/'
+    redraw
     echo 'Done: '.res
   else
     echoerr 'Post failed'
@@ -773,9 +787,12 @@ function! Gist(line1, line2, ...)
           call system(cmd)
         endif
       endif
-      if g:gist_put_url_to_clipboard_after_post == 1
+      if g:gist_put_url_to_clipboard_after_post > 0
+        if g:gist_put_url_to_clipboard_after_post == 2
+          let url = url . "\n"
+        endif
         if exists('g:gist_clip_command')
-          call system('echo '.url.' | '.g:gist_clip_command)
+          call system(g:gist_clip_command, url)
         elseif has('unix') && !has('xterm_clipboard')
           let @" = url
         else
