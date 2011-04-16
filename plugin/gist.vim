@@ -19,6 +19,9 @@
 "     post whole text to gist with private.
 "     if you got empty gist list, try :Gist --abandon
 "
+"   :Gist -P
+"     post whole text to gist as public
+"     This is only relevant if you've set gists to be private by default
 "   :Gist -a
 "     post whole text to gist with anonymous.
 "
@@ -700,6 +703,8 @@ function! Gist(line1, line2, ...)
       let multibuffer = 1
     elseif arg =~ '^\(-p\|--private\)$'
       let private = 1
+    elseif arg =~ '^\(-P\|--public\)$'
+      let private = 0
     elseif arg =~ '^\(-a\|--anonymous\)$'
       let user = ''
       let token = ''
