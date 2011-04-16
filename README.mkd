@@ -18,6 +18,11 @@ Usage:
   post whole text to gist as private.
  if you got empty gist list, try :Gist --abandon
 
+    :Gist -P
+  post whole text to gist as public
+ This is only relevant if you've set gists to be private by default
+ if you got empty gist list, try :Gist --abandon
+
     :Gist -a
   post whole text to gist as anonymous.
 
