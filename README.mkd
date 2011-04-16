@@ -94,6 +94,9 @@ Tips:
 
     let g:gist_show_privates = 1
 
+  if you get problems when creating gists try:
+	:Gist --abandon
+
 Requirements:
 --------
   curl command (http://curl.haxx.se/)
