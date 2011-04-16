@@ -1,7 +1,7 @@
 Gist.vim
 ========
 
-This is vimscript for gist (http://gist.github.com)
+This is vimscript for creating gists (http://gist.github.com) 
 
 For the latest version please see https://github.com/mattn/gist-vim
 
@@ -16,11 +16,14 @@ Usage:
  This applies to all permutations listed below (except multi)
 
     :Gist -p
-  post whole text to gist as private.
- if you got empty gist list, try :Gist --abandon
+  create a private gist
+
+    :Gist -P
+  create a public gist
+ (only relevant if you've set gists to be private by default)
 
     :Gist -a
-  post whole text to gist as anonymous.
+  create a gist anonymously
 
     :Gist -m
   create a gist with all open buffers
@@ -131,5 +134,5 @@ Install:
     plugin/gist.vim
     cookies/github
 
-  if you want to uninstall gist.vim, you will also have to remove 'cookies/github'.
+  if you want to uninstall gist.vim, rememeber to also remove 'cookies/github'.
 
