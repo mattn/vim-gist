@@ -580,7 +580,7 @@ function! s:GistPost(user, token, content, private)
 endfunction
 
 function! s:GistPostBuffers(user, token, private)
-  let bufnrs = range(1, last_buffer_nr())
+  let bufnrs = range(1, bufnr("$"))
   let bn = bufnr('%')
   let query = []
   if len(a:user) > 0 && len(a:token) > 0
@@ -605,7 +605,7 @@ function! s:GistPostBuffers(user, token, private)
 
   let index = 1
   for bufnr in bufnrs
-    if buflisted(bufnr) == 0 || bufwinnr(bufnr) == -1
+    if !bufexists(bufnr) || buflisted(bufnr) == 0
       continue
     endif
     echo "Creating gist content".index."... "
