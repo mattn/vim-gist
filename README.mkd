@@ -1,7 +1,7 @@
 Gist.vim
 ========
 
-This is vimscript for gist (http://gist.github.com)
+This is vimscript for creating gists (http://gist.github.com) 
 
 For the latest version please see https://github.com/mattn/gist-vim
 
@@ -9,14 +9,18 @@ Usage:
 ------
 
     :Gist
-  post whole text to gist, using default privicy option
+  post current buffer to gist, using default privicy option
 
     :'<,'>Gist
   post selected text to gist, using defualt privicy option
+ This applies to all permutations listed below (except multi)
 
     :Gist -p
-  post whole text to gist as private.
- if you got empty gist list, try :Gist --abandon
+  create a private gist
+
+    :Gist -P
+  create a public gist
+ (only relevant if you've set gists to be private by default)
 
     :Gist -P
   post whole text to gist as public
@@ -24,37 +28,40 @@ Usage:
  if you got empty gist list, try :Gist --abandon
 
     :Gist -a
-  post whole text to gist as anonymous.
+  create a gist anonymously
 
     :Gist -m
-  post multi buffer to gist.
+  create a gist with all open buffers
 
     :Gist -e
   edit the gist. (you need to have opened the gist buffer first)
-  you can update the gist with :w command on gist buffer.
+  you can update the gist with :w command on gist buffer
 
     :Gist -e foo.js
   edit the gist with name 'foo.js'. (you need to have opened the gist buffer first)
 
     :Gist -d
   delete the gist. (you need to have opened the gist buffer first)
-  password authentication is needed.
+  password authentication is needed
 
     :Gist -f
-      fork the gist. (should be work on gist buffer)
-      password authentication is needed.
+      fork the gist. (you need to have opened the gist buffer first)
+      password authentication is needed
  
     :Gist XXXXX
-  get gist XXXXX.
+  get gist XXXXX
 
-    :Gist -c XXXXX.
-  get gist XXXXX and put to clipboard.
+    :Gist -c XXXXX
+  get gist XXXXX and add to clipboard
 
     :Gist -l
-  list gists from mine.
+  list your public gists
 
-    :Gist -la
-  list gists from all.
+   :Gist -l mattn
+  list gists from mattn
+
+  :Gist -la
+  list all your (public and private) gists
 
 Tips:
 -----
@@ -91,6 +98,9 @@ Tips:
   if you want to show your private gists with ':Gist -l'
 
     let g:gist_show_privates = 1
+
+  if you get problems when creating gists try:
+	:Gist --abandon
 
 Requirements:
 --------
@@ -132,5 +142,5 @@ Install:
     plugin/gist.vim
     cookies/github
 
-  if you want to uninstall gist.vim, you will also have to remove 'cookies/github'.
+  if you want to uninstall gist.vim, rememeber to also remove 'cookies/github'.
 

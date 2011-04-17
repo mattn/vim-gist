@@ -8,55 +8,59 @@
 " Usage:
 "
 "   :Gist
-"     post whole text to gist, using default privicy option
-"     (see g:gist_private).
+"     post current buffer to gist, using default privicy option
+"     (see g:gist_private)
 "
 "   :'<,'>Gist
 "     post selected text to gist., using default privicy option
-"     (see g:gist_private).
+"     This applies to all permutations listed below (except multi)
+"     (see g:gist_private)
 "
 "   :Gist -p
-"     post whole text to gist with private.
-"     if you got empty gist list, try :Gist --abandon
+"     create a private gist
+"
+"   :Gist -P
+"     create a public gist
+"     (only relevant if you've set gists to be private by default)
 "
 "   :Gist -P
 "     post whole text to gist as public
 "     This is only relevant if you've set gists to be private by default
 "   :Gist -a
-"     post whole text to gist with anonymous.
+"     create a gist anonymously
 "
 "   :Gist -m
-"     post multi buffer to gist.
+"     create a gist with all open buffers
 "
 "   :Gist -e
-"     edit the gist. (shoud be work on gist buffer)
-"     you can update the gist with :w command on gist buffer.
+"     edit the gist. (you need to have opend the gist buffer first)
+"     you can update the gist with :w command on gist buffer
 "
 "   :Gist -d
-"     delete the gist. (should be work on gist buffer)
-"     password authentication is needed.
+"     delete the gist. (you need to have opend the gist buffer first)
+"     password authentication is needed
 "
 "   :Gist -f
-"     fork the gist. (should be work on gist buffer)
-"     password authentication is needed.
+"     fork the gist. (you need to have opend the gist buffer first)
+"     password authentication is needed
 "
 "   :Gist -e foo.js
-"     edit the gist with name 'foo.js'. (shoud be work on gist buffer)
+"     edit the gist with name 'foo.js'. (you need to have opend the gist buffer first)
 "
 "   :Gist XXXXX
-"     edit gist XXXXX.
+"     get gist XXXXX
 "
-"   :Gist -c XXXXX.
-"     get gist XXXXX and put to clipboard.
+"   :Gist -c XXXXX
+"     get gist XXXXX and add to clipboard
 "
 "   :Gist -l
-"     list gists from mine.
+"     list your public gists
 "
 "   :Gist -l mattn
-"     list gists from mattn.
+"     list gists from mattn
 "
 "   :Gist -la
-"     list gists from all.
+"     list all your (public and private) gists
 "
 " Tips:
 "   * if set g:gist_clip_command, gist.vim will copy the gist code
