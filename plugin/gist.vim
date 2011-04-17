@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 15-Apr-2011.
+" Last Change: 18-Apr-2011.
 " Version: 4.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -702,35 +702,35 @@ function! Gist(line1, line2, ...)
 
   let args = (a:0 > 0) ? split(a:1, ' ') : []
   for arg in args
-    if arg =~ '^\(-la\|--listall\)$'
+    if arg =~ '^\(-la\|--listall\)$\C'
       let gistls = '-all'
-    elseif arg =~ '^\(-l\|--list\)$'
+    elseif arg =~ '^\(-l\|--list\)$\C'
       if g:gist_show_privates
         let gistls = 'mine'
       else
         let gistls = g:github_user
       endif
-    elseif arg == '--abandon'
+    elseif arg == '--abandon\C'
       call s:GistGetPage('', '', '', '')
       return
-    elseif arg =~ '^\(-m\|--multibuffer\)$'
+    elseif arg =~ '^\(-m\|--multibuffer\)$\C'
       let multibuffer = 1
-    elseif arg =~ '^\(-p\|--private\)$'
+    elseif arg =~ '^\(-p\|--private\)$\C'
       let private = 1
-    elseif arg =~ '^\(-P\|--public\)$'
+    elseif arg =~ '^\(-P\|--public\)$\C'
       let private = 0
-    elseif arg =~ '^\(-a\|--anonymous\)$'
+    elseif arg =~ '^\(-a\|--anonymous\)$\C'
       let user = ''
       let token = ''
-    elseif arg =~ '^\(-c\|--clipboard\)$'
+    elseif arg =~ '^\(-c\|--clipboard\)$\C'
       let clipboard = 1
-    elseif arg =~ '^\(-d\|--delete\)$' && bufname =~ bufnamemx
+    elseif arg =~ '^\(-d\|--delete\)$\C' && bufname =~ bufnamemx
       let deletepost = 1
       let gistid = substitute(bufname, bufnamemx, '\1', '')
-    elseif arg =~ '^\(-e\|--edit\)$' && bufname =~ bufnamemx
+    elseif arg =~ '^\(-e\|--edit\)$\C' && bufname =~ bufnamemx
       let editpost = 1
       let gistid = substitute(bufname, bufnamemx, '\1', '')
-    elseif arg =~ '^\(-f\|--fork\)$' && bufname =~ bufnamemx
+    elseif arg =~ '^\(-f\|--fork\)$\C' && bufname =~ bufnamemx
       let gistid = substitute(bufname, bufnamemx, '\1', '')
       let res = s:GistGetPage("https://gist.github.com/fork/".gistid, g:github_user, '', '')
       let loc = filter(res.header, 'v:val =~ "^Location:"')[0]
@@ -745,9 +745,9 @@ function! Gist(line1, line2, ...)
     elseif arg !~ '^-' && len(gistnm) == 0
       if editpost == 1 || deletepost == 1
         let gistnm = arg
-      elseif len(gistls) > 0 && arg != '^\w\+$'
+      elseif len(gistls) > 0 && arg != '^\w\+$\C'
         let gistls = arg
-      elseif arg =~ '^[0-9a-z]\+$'
+      elseif arg =~ '^[0-9a-z]\+$\C'
         let gistid = arg
       else
         echoerr 'Invalid arguments'
