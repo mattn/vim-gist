@@ -75,7 +75,7 @@ USAGE                                                         *gist-vim-usage*
     List all (public and private) of your gists.
 
 ==============================================================================
-TIPS                                                           |gist-vim-tips|
+TIPS                                                           *gist-vim-tips*
 
 If you set {g:gist_clip_command}, gist.vim will copy the gist code with option
 "-c".
@@ -118,13 +118,13 @@ If you get problems when creating gists try: >
 <
 
 ==============================================================================
-REQUIREMENTS                                           |gist-vim-requirements|
+REQUIREMENTS                                           *gist-vim-requirements*
 
   - Curl command (http://curl.haxx.se/)
   - and, if you want to use your git profile, the git command-line client.
 
 ==============================================================================
-License                                                     |gist-vim-license|
+LICENSE                                                     *gist-vim-license*
 
 
 Copyright 2010 by Yasuhiro Matsumoto
@@ -150,7 +150,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ==============================================================================
-INSTALL                                                     |gist-vim-install|
+INSTALL                                                     *gist-vim-install*
 
 Copy gist.vim to your plugin directory.
 
@@ -161,3 +161,5 @@ rtp:
   - cookies/github
 
 If you want to uninstall gist.vim, remember to also remove "cookies/github".
+
+ vim:tw=78:ts=8:ft=help:norl:
