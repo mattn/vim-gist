@@ -8,81 +8,98 @@ For the latest version please see https://github.com/mattn/gist-vim.
 Usage:
 ------
 
-    :Gist
-  Post current buffer to gist, using default privacy option.
+- Post current buffer to gist, using default privacy option.
 
-    :'<,'>Gist
-  Post selected text to gist, using defualt privacy option.
+    :Gist
+
+- Post selected text to gist, using defualt privacy option.
   This applies to all permutations listed below (except multi).
 
-    :Gist -p
-  Create a private gist.
+    :'<,'>Gist
 
-    :Gist -P
-  Create a public gist.
+- Create a private gist.
+
+    :Gist -p
+
+- Create a public gist.
   (Only relevant if you've set gists to be private by default.)
 
     :Gist -P
-  Post whole text to gist as public
+
+- Post whole text to gist as public
   This is only relevant if you've set gists to be private by default;
   if you get an empty gist list, try ":Gist --abandon".
 
     :Gist -P
-  Post whole text to gist as public.
+
+- Post whole text to gist as public.
   This is only relevant if you've set gists to be private by default;
   if you get an empty gist list, try ":Gist --abandon".
 
+    :Gist -P
+
+- Create a gist anonymously.
+
     :Gist -a
-  Create a gist anonymously.
+
+- Create a gist with all open buffers.
 
     :Gist -m
-  Create a gist with all open buffers.
 
-    :Gist -e
-  Edit the gist (you need to have opened the gist buffer first).
+- Edit the gist (you need to have opened the gist buffer first).
   You can update the gist with the ":w" command within the gist buffer.
 
-    :Gist -e foo.js
-  Edit the gist with name 'foo.js' (you need to have opened the gist buffer
+    :Gist -e
+
+- Edit the gist with name 'foo.js' (you need to have opened the gist buffer
   first).
 
+    :Gist -e foo.js
+
+- Delete the gist (you need to have opened the gist buffer first).
+  Password authentication is needed.
+
     :Gist -d
-  Delete the gist (you need to have opened the gist buffer first).
+
+- Fork the gist (you need to have opened the gist buffer first).
   Password authentication is needed.
 
     :Gist -f
-  Fork the gist (you need to have opened the gist buffer first).
-  Password authentication is needed.
  
+- Get gist XXXXX.
+
     :Gist XXXXX
-  Get gist XXXXX.
+
+- Get gist XXXXX and add to clipboard.
 
     :Gist -c XXXXX
-  Get gist XXXXX and add to clipboard.
+
+- List your public gists.
 
     :Gist -l
-  List your public gists.
+
+- List gists from user "mattn".
 
     :Gist -l mattn
-  List gists from user "mattn".
+
+- List all (public and private) of your gists.
 
     :Gist -la
-  List all (public and private) of your gists.
 
 Tips:
 -----
 If you set g:gist_clip_command, gist.vim will copy the gist code with option
 '-c'.
 
-  # mac
+- Mac:
 
     let g:gist_clip_command = 'pbcopy'
 
-  # linux
+- Linux:
 
     let g:gist_clip_command = 'xclip -selection clipboard'
 
-  # others(cygwin?)
+- Others (cygwin?):
 
     let g:gist_clip_command = 'putclip'
 
@@ -98,7 +115,7 @@ If you want to change the browser:
 
     let g:gist_browser_command = 'w3m %URL%'
 
-or
+or:
 
     let g:gist_browser_command = 'opera %URL% &'
 
@@ -114,21 +131,22 @@ If you get problems when creating gists try:
 
 Requirements:
 --------
-  - curl command (http://curl.haxx.se/)
-  - and if you want to use your git profile, the git command-line client.
+
+- curl command (http://curl.haxx.se/)
+- and if you want to use your git profile, the git command-line client.
 
 License:
 --------
 
     Copyright 2010 by Yasuhiro Matsumoto
     modification, are permitted provided that the following conditions are met:
-    
+
     1. Redistributions of source code must retain the above copyright notice,
        this list of conditions and the following disclaimer.
     2. Redistributions in binary form must reproduce the above copyright notice,
        this list of conditions and the following disclaimer in the documentation
        and/or other materials provided with the distribution.
-    
+
     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
     ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
     LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -149,9 +167,9 @@ Copy it to your plugin directory.
 
 gist.vim will create a curl cookie-jar file in your runtimepath.
 
- - rtp:
-   - plugin/gist.vim
-   - cookies/github
+- rtp:
+  - plugin/gist.vim
+  - cookies/github
 
 If you want to uninstall gist.vim, remember to also remove "cookies/github".
 
