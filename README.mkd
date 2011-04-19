@@ -93,15 +93,15 @@ If you set g:gist_clip_command, gist.vim will copy the gist code with option
 
 - Mac:
 
-    let g:gist_clip_command = 'pbcopy'
+        let g:gist_clip_command = 'pbcopy'
 
 - Linux:
 
-    let g:gist_clip_command = 'xclip -selection clipboard'
+        let g:gist_clip_command = 'xclip -selection clipboard'
 
 - Others (cygwin?):
 
-    let g:gist_clip_command = 'putclip'
+        let g:gist_clip_command = 'putclip'
 
 If you want to detect filetype from the filename:
 
