@@ -6,9 +6,9 @@ Requirements                                   |gist-vim-requirements|
 License                                        |gist-vim-license| 
 Install                                        |gist-vim-install| 
 
-This is vimscript for creating gists (http://gist.github.com) 
+This is a vimscript for creating gists (http://gist.github.com) 
 
-For the latest version please see https://github.com/mattn/gist-vim
+For the latest version please see https://github.com/mattn/gist-vim.
 
 ==============================================================================
 USAGE                                                         *gist-vim-usage* 

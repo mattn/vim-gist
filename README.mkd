@@ -1,116 +1,121 @@
 Gist.vim
 ========
 
-This is vimscript for creating gists (http://gist.github.com) 
+This is a vimscript for creating gists (http://gist.github.com).
 
-For the latest version please see https://github.com/mattn/gist-vim
+For the latest version please see https://github.com/mattn/gist-vim.
 
 Usage:
 ------
 
     :Gist
-  post current buffer to gist, using default privicy option
+  Post current buffer to gist, using default privacy option.
 
     :'<,'>Gist
-  post selected text to gist, using defualt privicy option
- This applies to all permutations listed below (except multi)
+  Post selected text to gist, using defualt privacy option.
+  This applies to all permutations listed below (except multi).
 
     :Gist -p
-  create a private gist
+  Create a private gist.
 
     :Gist -P
-  create a public gist
- (only relevant if you've set gists to be private by default)
+  Create a public gist.
+  (Only relevant if you've set gists to be private by default.)
 
     :Gist -P
-  post whole text to gist as public
- This is only relevant if you've set gists to be private by default
- if you got empty gist list, try :Gist --abandon
+  Post whole text to gist as public
+  This is only relevant if you've set gists to be private by default;
+  if you get an empty gist list, try ":Gist --abandon".
 
     :Gist -P
-  post whole text to gist as public
- This is only relevant if you've set gists to be private by default
- if you got empty gist list, try :Gist --abandon
+  Post whole text to gist as public.
+  This is only relevant if you've set gists to be private by default;
+  if you get an empty gist list, try ":Gist --abandon".
 
     :Gist -a
-  create a gist anonymously
+  Create a gist anonymously.
 
     :Gist -m
-  create a gist with all open buffers
+  Create a gist with all open buffers.
 
     :Gist -e
-  edit the gist. (you need to have opened the gist buffer first)
-  you can update the gist with :w command on gist buffer
+  Edit the gist (you need to have opened the gist buffer first).
+  You can update the gist with the ":w" command within the gist buffer.
 
     :Gist -e foo.js
-  edit the gist with name 'foo.js'. (you need to have opened the gist buffer first)
+  Edit the gist with name 'foo.js' (you need to have opened the gist buffer
+  first).
 
     :Gist -d
-  delete the gist. (you need to have opened the gist buffer first)
-  password authentication is needed
+  Delete the gist (you need to have opened the gist buffer first).
+  Password authentication is needed.
 
     :Gist -f
-      fork the gist. (you need to have opened the gist buffer first)
-      password authentication is needed
+  Fork the gist (you need to have opened the gist buffer first).
+  Password authentication is needed.
  
     :Gist XXXXX
-  get gist XXXXX
+  Get gist XXXXX.
 
     :Gist -c XXXXX
-  get gist XXXXX and add to clipboard
+  Get gist XXXXX and add to clipboard.
 
     :Gist -l
-  list your public gists
+  List your public gists.
 
-   :Gist -l mattn
-  list gists from mattn
+    :Gist -l mattn
+  List gists from user "mattn".
 
-  :Gist -la
-  list all your (public and private) gists
+    :Gist -la
+  List all (public and private) of your gists.
 
 Tips:
 -----
-  if you set g:gist_clip_command, gist.vim will copy the gist code
-    with option '-c'.
+If you set g:gist_clip_command, gist.vim will copy the gist code with option
+'-c'.
 
-    # mac
+  # mac
+
     let g:gist_clip_command = 'pbcopy'
 
-    # linux
+  # linux
+
     let g:gist_clip_command = 'xclip -selection clipboard'
 
-    # others(cygwin?)
+  # others(cygwin?)
+
     let g:gist_clip_command = 'putclip'
 
-  if you want to detect filetype from filename...
+If you want to detect filetype from the filename:
 
     let g:gist_detect_filetype = 1
 
-  if you want to open browser after the post...
+If you want to open browser after the post:
 
     let g:gist_open_browser_after_post = 1
 
-  if you want to change the browser...
+If you want to change the browser:
 
     let g:gist_browser_command = 'w3m %URL%'
 
-  or
+or
 
     let g:gist_browser_command = 'opera %URL% &'
 
-  on windows, should work with your setting.
+On windows, this should work with your user settings.
 
-  if you want to show your private gists with ':Gist -l'
+If you want to show your private gists with ":Gist -l":
 
     let g:gist_show_privates = 1
 
-  if you get problems when creating gists try:
+If you get problems when creating gists try:
+
 	:Gist --abandon
 
 Requirements:
 --------
-  curl command (http://curl.haxx.se/)
-  and if you want to use profile of git, it require git command.
+  - curl command (http://curl.haxx.se/)
+  - and if you want to use your git profile, the git command-line client.
 
 License:
 --------
@@ -137,15 +142,16 @@ License:
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
     OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 Install:
 --------
-  copy it to your plugin directory.
+Copy it to your plugin directory.
 
-  gist.vim will create a curl cookie-jar file in your runtimepath.
+gist.vim will create a curl cookie-jar file in your runtimepath.
 
-  rtp:
-    plugin/gist.vim
-    cookies/github
+ - rtp:
+   - plugin/gist.vim
+   - cookies/github
 
-  if you want to uninstall gist.vim, rememeber to also remove 'cookies/github'.
+If you want to uninstall gist.vim, remember to also remove "cookies/github".
 
