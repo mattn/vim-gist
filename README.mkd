@@ -10,81 +10,81 @@ Usage:
 
 - Post current buffer to gist, using default privacy option.
 
-    :Gist
+        :Gist
 
 - Post selected text to gist, using defualt privacy option.
   This applies to all permutations listed below (except multi).
 
-    :'<,'>Gist
+        :'<,'>Gist
 
 - Create a private gist.
 
-    :Gist -p
+        :Gist -p
 
 - Create a public gist.
   (Only relevant if you've set gists to be private by default.)
 
-    :Gist -P
+        :Gist -P
 
 - Post whole text to gist as public
   This is only relevant if you've set gists to be private by default;
   if you get an empty gist list, try ":Gist --abandon".
 
-    :Gist -P
+        :Gist -P
 
 - Post whole text to gist as public.
   This is only relevant if you've set gists to be private by default;
   if you get an empty gist list, try ":Gist --abandon".
 
-    :Gist -P
+        :Gist -P
 
 - Create a gist anonymously.
 
-    :Gist -a
+        :Gist -a
 
 - Create a gist with all open buffers.
 
-    :Gist -m
+        :Gist -m
 
 - Edit the gist (you need to have opened the gist buffer first).
   You can update the gist with the ":w" command within the gist buffer.
 
-    :Gist -e
+        :Gist -e
 
 - Edit the gist with name 'foo.js' (you need to have opened the gist buffer
   first).
 
-    :Gist -e foo.js
+        :Gist -e foo.js
 
 - Delete the gist (you need to have opened the gist buffer first).
   Password authentication is needed.
 
-    :Gist -d
+        :Gist -d
 
 - Fork the gist (you need to have opened the gist buffer first).
   Password authentication is needed.
 
-    :Gist -f
+        :Gist -f
  
 - Get gist XXXXX.
 
-    :Gist XXXXX
+        :Gist XXXXX
 
 - Get gist XXXXX and add to clipboard.
 
-    :Gist -c XXXXX
+        :Gist -c XXXXX
 
 - List your public gists.
 
-    :Gist -l
+        :Gist -l
 
 - List gists from user "mattn".
 
-    :Gist -l mattn
+        :Gist -l mattn
 
 - List all (public and private) of your gists.
 
-    :Gist -la
+        :Gist -la
 
 Tips:
 -----
