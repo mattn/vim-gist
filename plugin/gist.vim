@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 18-Apr-2011.
+" Last Change: 20-May-2011.
 " Version: 4.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -317,6 +317,8 @@ function! s:GistWrite(fname)
     Gist -e
   else
     exe "w".(v:cmdbang ? "!" : "")." ".fnameescape(v:cmdarg)." ".fnameescape(a:fname)
+    silent! exe "file ".fnameescape(a:fname)
+    silent! au! BufWriteCmd <buffer>
   endif
 endfunction
 
