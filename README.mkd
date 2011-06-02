@@ -32,12 +32,6 @@ Usage:
 
         :Gist -P
 
-- Post whole text to gist as public.
-  This is only relevant if you've set gists to be private by default;
-  if you get an empty gist list, try ":Gist --abandon".
-
-        :Gist -P
-
 - Create a gist anonymously.
 
         :Gist -a
