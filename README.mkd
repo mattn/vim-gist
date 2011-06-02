@@ -26,10 +26,8 @@ Usage:
 
         :Gist -P
 
-  This is only relevant if you've set gists to be private by default;
-  if you get an empty gist list, try ":Gist --abandon".
-
-        :Gist -P
+>  This is only relevant if you've set gists to be private by default;
+> if you get an empty gist list, try ":Gist --abandon".
 
 - Create a gist anonymously.
 
