@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 20-May-2011.
+" Last Change: 15-Jun-2011.
 " Version: 4.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -323,7 +323,7 @@ function! s:GistWrite(fname)
 endfunction
 
 function! s:GistGet(user, token, gistid, clipboard)
-  let url = 'https://gist.github.com/'.a:gistid.'.txt'
+  let url = 'https://raw.github.com/gist/'.a:gistid
   let winnum = bufwinnr(bufnr(s:bufprefix.a:gistid))
   if winnum != -1
     if winnum != bufwinnr('%')
