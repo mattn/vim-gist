@@ -12,7 +12,7 @@ Usage:
 
         :Gist
 
-- Post selected text to gist, using defualt privacy option.
+- Post selected text to gist, using default privacy option.
   This applies to all permutations listed below (except multi).
 
         :'<,'>Gist
