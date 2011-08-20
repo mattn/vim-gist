@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 15-Jun-2011.
+" Last Change: 20-Aug-2011.
 " Version: 5.0
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -237,7 +237,7 @@ function! s:GistList(user, token, gistls, page)
     silent put =res.content
   else
     silent %d _
-    exec 'silent r! curl -s '.g:gist_curl_options.' '.url
+    exec 'silent r! curl -s' g:gist_curl_options url
   endif
 
   1delete _
@@ -270,7 +270,7 @@ function! s:GistList(user, token, gistls, page)
   setlocal buftype=nofile bufhidden=hide noswapfile
   setlocal nomodified
   syntax match SpecialKey /^gist:/he=e-1
-  exec 'nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>'
+  nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>
 
   cal cursor(1+len(oldlines),1)
   setlocal foldmethod=expr
@@ -316,8 +316,8 @@ function! s:GistWrite(fname)
   if substitute(a:fname, '\\', '/', 'g') == expand("%:p:gs@\\@/@")
     Gist -e
   else
-    exe "w".(v:cmdbang ? "!" : "")." ".fnameescape(v:cmdarg)." ".fnameescape(a:fname)
-    silent! exe "file ".fnameescape(a:fname)
+    exe "w".(v:cmdbang ? "!" : "") fnameescape(v:cmdarg) fnameescape(a:fname)
+    silent! exe "file" fnameescape(a:fname)
     silent! au! BufWriteCmd <buffer>
   endif
 endfunction
@@ -335,7 +335,7 @@ function! s:GistGet(user, token, gistid, clipboard)
   endif
   filetype detect
   silent %d _
-  exec 'silent 0r! curl -s '.g:gist_curl_options.' '.url
+  exec 'silent 0r! curl -s' g:gist_curl_options url
   $delete _
   setlocal buftype=acwrite bufhidden=delete noswapfile
   setlocal nomodified
@@ -637,7 +637,7 @@ function! s:GistPostBuffers(user, token, private)
       continue
     endif
     echo "Creating gist content".index."... "
-    silent! exec "buffer! ".bufnr
+    silent! exec "buffer!" bufnr
     let content = join(getline(1, line('$')), "\n")
     let ext = expand('%:e')
     let ext = len(ext) ? '.'.ext : ''
@@ -648,7 +648,7 @@ function! s:GistPostBuffers(user, token, private)
       \ s:encodeURIComponent(content))
     let index = index + 1
   endfor
-  silent! exec "buffer! ".bn
+  silent! exec "buffer!" bn
 
   let file = tempname()
   call writefile([squery], file)
