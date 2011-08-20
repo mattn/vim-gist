@@ -11,7 +11,7 @@ This is a vimscript for creating gists (http://gist.github.com)
 For the latest version please see https://github.com/mattn/gist-vim.
 
 ==============================================================================
-USAGE                                                         *gist-vim-usage* 
+USAGE                                                 *:Gist* *gist-vim-usage* 
 
 - Post current buffer to gist, using default privacy option. >
 
