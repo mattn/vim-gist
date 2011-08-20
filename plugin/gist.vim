@@ -126,12 +126,12 @@ endif
 let g:loaded_gist_vim = 1
 
 if (!exists('g:github_user') || !exists('g:github_token')) && !executable('git')
-  echoerr "Gist: require 'git' command"
+  echohl ErrorMsg | echomsg "Gist: require 'git' command" | echohl None
   finish
 endif
 
 if !executable('curl')
-  echoerr "Gist: require 'curl' command"
+  echohl ErrorMsg | echomsg "Gist: require 'curl' command" | echohl None
   finish
 endif
 
@@ -413,7 +413,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   else
     let message = matchstr(headers, '^Status: ')
     let message = substitute(message, '^[^:]\+: [0-9]\+ ', '', '')
-    echoerr 'Edit failed: '.message
+    echohl ErrorMsg | echomsg 'Edit failed: '.message | echohl None
   endif
   return location
 endfunction
@@ -493,7 +493,7 @@ function! s:GistDelete(user, token, gistid)
   echon 'Deleting gist... '
   let res = s:GistGetPage('https://gist.github.com/'.a:gistid, a:user, '', '')
   if (!len(res)) 
-      echoerr 'Wrong password? no response received from github trying to delete ' . a:gistid
+      echohl ErrorMsg | echomsg 'Wrong password? no response received from github trying to delete ' . a:gistid | echohl None
       return
   endif
   let mx = '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$'
@@ -506,10 +506,10 @@ function! s:GistDelete(user, token, gistid)
     else
       let message = matchstr(res.header, '^Status: ')
       let message = substitute(message, '^[^:]\+: [0-9]\+ ', '', '')
-      echoerr 'Delete failed: '.message
+      echohl ErrorMsg | echomsg 'Delete failed: '.message | echohl None
     endif
   else
-    echoerr 'Delete failed'
+    echohl ErrorMsg | echomsg 'Delete failed' | echohl None
   endif
 endfunction
 
@@ -602,7 +602,7 @@ function! s:GistPost(user, token, content, private)
   else
     let message = matchstr(headers, '^Status: ')
     let message = substitute(message, '^[^:]\+: [0-9]\+ ', '', '')
-    echoerr 'Post failed: '.message
+    echohl ErrorMsg | echomsg 'Post failed: '.message | echohl None
   endif
   return location
 endfunction
@@ -663,7 +663,7 @@ function! s:GistPostBuffers(user, token, private)
     redraw
     echo 'Done: '.res
   else
-    echoerr 'Post failed'
+    echohl ErrorMsg | echomsg 'Post failed' | echohl None
   endif
   return res
 endfunction
@@ -682,7 +682,8 @@ function! Gist(line1, line2, ...)
     end
   endif
   if strlen(g:github_user) == 0 || strlen(g:github_token) == 0
-    echoerr "You have no setting for github."
+    echohl ErrorMsg
+    echomsg "You have no setting for github."
     echohl WarningMsg
     echo "git config --global github.user  your-name"
     echo "git config --global github.token your-token"
@@ -745,7 +746,7 @@ function! Gist(line1, line2, ...)
       if loc =~ mx
         let gistid = substitute(loc, mx, '\1', '')
       else
-        echoerr 'Fork failed'
+        echohl ErrorMsg | echomsg 'Fork failed' | echohl None
         return
       endif
     elseif arg !~ '^-' && len(gistnm) == 0
@@ -756,12 +757,12 @@ function! Gist(line1, line2, ...)
       elseif arg =~ '^[0-9a-z]\+$\C'
         let gistid = arg
       else
-        echoerr 'Invalid arguments'
+        echohl ErrorMsg | echomsg 'Invalid arguments' | echohl None
         unlet args
         return 0
       endif
     elseif len(arg) > 0
-      echoerr 'Invalid arguments'
+      echohl ErrorMsg | echomsg 'Invalid arguments' | echohl None
       unlet args
       return 0
     endif
