@@ -148,7 +148,7 @@ if !exists('g:gist_curl_options')
 endif
 
 if !exists('g:gist_browser_command')
-  if has('win32')
+  if has('win32') || has('win64')
     let g:gist_browser_command = "!start rundll32 url.dll,FileProtocolHandler %URL%"
   elseif has('mac')
     let g:gist_browser_command = "open %URL%"
