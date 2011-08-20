@@ -217,7 +217,7 @@ function! s:GistList(user, token, gistls, page)
   let winnum = bufwinnr(bufnr(s:bufprefix.a:gistls))
   if winnum != -1
     if winnum != bufwinnr('%')
-      exe "normal \<c-w>".winnum."w"
+      exe winnum 'wincmd w'
     endif
     setlocal modifiable
   else
@@ -240,7 +240,7 @@ function! s:GistList(user, token, gistls, page)
     exec 'silent r! curl -s '.g:gist_curl_options.' '.url
   endif
 
-  silent normal! ggdd
+  1delete _
   silent! %s/>/>\r/g
   silent! %s/</\r</g
   silent! %g/<pre/,/<\/pre/join!
@@ -261,7 +261,7 @@ function! s:GistList(user, token, gistls, page)
   silent! %g/^gist: /s/ //g
 
   call append(0, oldlines)
-  normal! Gomore...
+  $put='more...'
 
   let b:user = a:user
   let b:token = a:token
@@ -327,7 +327,7 @@ function! s:GistGet(user, token, gistid, clipboard)
   let winnum = bufwinnr(bufnr(s:bufprefix.a:gistid))
   if winnum != -1
     if winnum != bufwinnr('%')
-      exe "normal \<c-w>".winnum."w"
+      exe winnum 'wincmd w'
     endif
     setlocal modifiable
   else
@@ -336,7 +336,7 @@ function! s:GistGet(user, token, gistid, clipboard)
   filetype detect
   silent %d _
   exec 'silent 0r! curl -s '.g:gist_curl_options.' '.url
-  normal! Gd_
+  $delete _
   setlocal buftype=acwrite bufhidden=delete noswapfile
   setlocal nomodified
   doau StdinReadPost <buffer>
@@ -347,10 +347,10 @@ function! s:GistGet(user, token, gistid, clipboard)
     if exists('g:gist_clip_command')
       exec 'silent w !'.g:gist_clip_command
     else
-      normal! gg"+yG
+      %yank +
     endif
   endif
-  normal! gg
+  1
   au! BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
 endfunction
 
@@ -363,7 +363,7 @@ function! s:GistListAction()
     return
   endif
   if line =~# '^more\.\.\.$'
-    normal! dd
+    delete
     call s:GistList(b:user, b:token, b:gistls, b:page+1)
     return
   endif
