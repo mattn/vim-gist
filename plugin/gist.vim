@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 20-Aug-2011.
+" Last Change: 16-Sep-2011.
 " Version: 5.0
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -382,25 +382,41 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   endif
   let query = [
     \ '_method=put',
-    \ 'file_ext[gistfile1%s]=%s',
-    \ 'file_name[gistfile1%s]=%s',
-    \ 'file_contents[gistfile1%s]=%s',
+    \ 'file_ext[gistfile1]=%s',
+    \ 'file_name[gistfile1]=%s',
+    \ 'file_contents[gistfile1]=%s',
     \ 'login=%s',
     \ 'token=%s',
     \ ]
   let squery = printf(join(query, '&'),
-    \ s:encodeURIComponent(ext), s:encodeURIComponent(ext),
-    \ s:encodeURIComponent(ext), s:encodeURIComponent(name),
-    \ s:encodeURIComponent(ext), s:encodeURIComponent(a:content),
+    \ s:encodeURIComponent(ext),
+    \ s:encodeURIComponent(name),
+    \ s:encodeURIComponent(a:content),
     \ s:encodeURIComponent(a:user),
     \ s:encodeURIComponent(a:token))
   unlet query
+
+  let action = a:gistid
+  if a:gistid !~ '^\d\+$'
+    echon 'Login to gist... '
+    let res = s:GistGetPage('https://gist.github.com/'.a:gistid, a:user, '', '')
+    if (!len(res))
+      echohl ErrorMsg | echomsg 'Wrong password? no response received from github trying to update ' . a:gistid | echohl None
+      return
+    endif
+    let mx = '^.*<form action="/gists/\([^"]\+\)".*$'
+    let action = substitute(matchstr(res.content, mx), mx, '\1', '')
+    let mx = '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$'
+    let token = substitute(matchstr(res.content, mx), mx, '\1', '')
+    unlet res
+    let squery .= '&authenticity_token='.token
+  endif
 
   let file = tempname()
   call writefile([squery], file)
   echon 'Updating it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
-  let url = 'https://gist.github.com/gists/'.a:gistid
+  let url = 'https://gist.github.com/gists/'.action
   let res = system('curl -i '.g:gist_curl_options.' -d @'.quote.file.quote.' '.url)
   call delete(file)
   let headers = split(res, '\(\r\?\n\|\r\n\?\)')
@@ -493,8 +509,8 @@ function! s:GistDelete(user, token, gistid)
   echon 'Deleting gist... '
   let res = s:GistGetPage('https://gist.github.com/'.a:gistid, a:user, '', '')
   if (!len(res)) 
-      echohl ErrorMsg | echomsg 'Wrong password? no response received from github trying to delete ' . a:gistid | echohl None
-      return
+    echohl ErrorMsg | echomsg 'Wrong password? no response received from github trying to delete ' . a:gistid | echohl None
+    return
   endif
   let mx = '^.* name="authenticity_token" type="hidden" value="\([^"]\+\)".*$'
   let token = substitute(matchstr(res.content, mx), mx, '\1', '')
