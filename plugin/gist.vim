@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 16-Sep-2011.
+" Last Change: 12-Oct-2011.
 " Version: 5.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -801,7 +801,15 @@ function! Gist(line1, line2, ...)
     if multibuffer == 1
       let url = s:GistPostBuffers(user, token, private)
     else
-      let content = join(getline(a:line1, a:line2), "\n")
+      if visualmode() == ''
+        let content = join(getline(a:line1, a:line2), "\n")
+      else
+        let save_regcont = @"
+        let save_regtype = getregtype('"')
+        silent! normal! gvygv
+        let content = @"
+        call setreg('"', save_regcont, save_regtype)
+      endif
       if editpost == 1
         let url = s:GistUpdate(user, token, content, gistid, gistnm)
       elseif deletepost == 1
