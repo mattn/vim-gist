@@ -314,7 +314,7 @@ function! s:GistGet(user, token, gistid, clipboard)
     endif
     setlocal modifiable
   else
-    exec 'silent split' s:bufprefix.a:gistid
+    exec 'silent noautocmd split' s:bufprefix.a:gistid
   endif
   filetype detect
   silent %d _
