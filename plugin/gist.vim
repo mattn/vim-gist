@@ -3,12 +3,6 @@
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
-" Thanks:
-"   MATSUU Takuto:
-"     removed carriage return
-"     gist_browser_command enhancement
-"     edit support
-"
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 " script type: plugin
 

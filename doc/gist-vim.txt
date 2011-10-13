@@ -179,4 +179,22 @@ rtp:
 
 If you want to uninstall gist.vim, remember to also remove "cookies/github".
 
+==============================================================================
+THANKS                                                     *gist-vim-thanks*
+
+  AD7six
+  Bruno Bigras
+  c9s
+  Daniel Bretoi
+  Jeremy Michael Cantrell
+  Kien N
+  kongo2002
+  MATSUU Takuto
+  Matthew Weier O'Phinney
+  ornicar
+  Roland Schilter
+  steve
+  tyru
+  Will Gray
+
  vim:tw=78:ts=8:ft=help:norl:

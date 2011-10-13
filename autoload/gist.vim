@@ -111,12 +111,6 @@
 "
 "     default value is 1.
 "
-" Thanks:
-"   MATSUU Takuto:
-"     removed carriage return
-"     gist_browser_command enhancement
-"     edit support
-"
 
 if !exists('g:gist_open_browser_after_post')
   let g:gist_open_browser_after_post = 0
