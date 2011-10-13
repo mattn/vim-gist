@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 12-Oct-2011.
+" Last Change: 13-Oct-2011.
 " Version: 5.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -240,6 +240,8 @@ function! s:GistList(user, token, gistls, page)
     exec 'silent r! curl -s' g:gist_curl_options url
   endif
 
+  let oldgdefault = &gdefault
+  let &gdefault = 0
   1delete _
   silent! %s/>/>\r/g
   silent! %s/</\r</g
@@ -259,6 +261,7 @@ function! s:GistList(user, token, gistls, page)
   silent! %s/&lt;/</g
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
   silent! %g/^gist: /s/ //g
+  let &gdefault = oldgdefault
 
   call append(0, oldlines)
   $put='more...'
