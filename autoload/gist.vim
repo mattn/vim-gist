@@ -112,6 +112,9 @@
 "     default value is 1.
 "
 
+let s:save_cpo = &cpo
+set cpo&vim
+
 if !exists('g:gist_open_browser_after_post')
   let g:gist_open_browser_after_post = 0
 endif
@@ -149,7 +152,7 @@ if !exists('g:gist_show_privates')
 endif
 
 if !exists('g:gist_cookie_dir')
-  let g:gist_cookie_dir = substitute(expand('<sfile>:p:h'), '[/\\]plugin$', '', '').'/cookies'
+  let g:gist_cookie_dir = substitute(expand('<sfile>:p:h'), '[/\\]autoload$', '', '').'/cookies'
 endif
 
 function! s:nr2hex(nr)
@@ -825,5 +828,8 @@ function! gist#Gist(line1, line2, ...)
   endif
   return 1
 endfunction
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
 
 " vim:set et:
