@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 13-Oct-2011.
+" Last Change: 14-Oct-2011.
 " Version: 5.3
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -201,7 +201,7 @@ function! s:GistList(user, token, gistls, page)
     endif
     setlocal modifiable
   else
-    exec 'silent split' s:bufprefix.a:gistls
+    exec 'silent noautocmd split' s:bufprefix.a:gistls
   endif
   if a:page > 1
     let oldlines = getline(0, line('$'))
