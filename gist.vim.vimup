@@ -2,7 +2,7 @@ script_name: Gist.vim
 script_id: '2423'
 script_type: utility
 script_package: plugin/gist.vim
-script_version: '5.3'
+script_version: '5.4'
 required_vim_version: '7.0'
 summary: vimscript for gist
 
@@ -110,6 +110,9 @@ install_details: |
     4. you'll see it at following of 'API Token'.
 
 versions:
+- '5.4': |
+   This is an upgrade for Gist.vim: fix: does not work correctly with blockwize selection.
+
 - '5.3': |
    This is an upgrade for Gist.vim: upd: support autoload.
 
@@ -117,7 +120,7 @@ versions:
    This is an upgrade for Gist.vim: add: support block-wise selection.
 
 - '5.1': |
-   This is an upgrade for Gist.vim: fixed: can't update privates.
+   This is an upgrade for Gist.vim: fix: can't update privates.
 
 - '5.0': |
    This is an upgrade for Gist.vim: follow update of gist.github.com
@@ -129,19 +132,19 @@ versions:
     add: new option 'gist_curl_options'.
 
 - '4.8': |
-   This is an upgrade for Gist.vim: fixed: can't open private gist with ":Gist XXXXX".
+   This is an upgrade for Gist.vim: fix: can't open private gist with ":Gist XXXXX".
 
 - '4.7': |
-   This is an upgrade for Gist.vim: fixed: filetype detection.
+   This is an upgrade for Gist.vim: fix: filetype detection.
 
 - '4.6': |
-   This is an upgrade for Gist.vim: fixed: strange cookies folder.
+   This is an upgrade for Gist.vim: fix: strange cookies folder.
 
 - '4.5': |
-   This is an upgrade for Gist.vim: fixed: use gist_clip_command for copying URL to clipboard. this fix strange behavior on Mac OSX.
+   This is an upgrade for Gist.vim: fix: use gist_clip_command for copying URL to clipboard. this fix strange behavior on Mac OSX.
 
 - '4.4': |
-   This is an upgrade for Gist.vim: fixed: gist is now only using https.
+   This is an upgrade for Gist.vim: fix: gist is now only using https.
 
 - '4.3': |
    This is an upgrade for Gist.vim: add new option '-f' for fork.
