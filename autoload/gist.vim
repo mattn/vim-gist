@@ -667,7 +667,7 @@ function! s:GistPostBuffers(user, token, private)
   return res
 endfunction
 
-function! gist#Gist(line1, line2, ...)
+function! gist#Gist(count, line1, line2, ...)
   if !exists('g:github_user')
     let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
     if strlen(g:github_user) == 0
@@ -784,7 +784,7 @@ function! gist#Gist(line1, line2, ...)
     if multibuffer == 1
       let url = s:GistPostBuffers(user, token, private)
     else
-      if visualmode() == ''
+      if a:count < 1
         let content = join(getline(a:line1, a:line2), "\n")
       else
         let save_regcont = @"
