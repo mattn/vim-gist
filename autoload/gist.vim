@@ -211,6 +211,7 @@ function! s:GistList(user, token, gistls, page)
   setlocal foldmethod=manual
   let oldlines = []
   if g:gist_show_privates
+    redraw
     echon 'Login to gist... '
     silent %d _
     let res = s:GistGetPage(url, a:user, '', '-L')
@@ -266,6 +267,8 @@ function! s:GistList(user, token, gistls, page)
   setlocal foldmethod=expr
   setlocal foldexpr=getline(v:lnum)=~'^\\(gist:\\\|more\\)'?'>1':'='
   setlocal foldtext=getline(v:foldstart)
+  redraw
+  echo ""
 endfunction
 
 function! s:GistGetFileName(gistid)
@@ -394,6 +397,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
 
   let action = a:gistid
   if a:gistid !~ '^\d\+$'
+    redraw
     echon 'Login to gist... '
     let res = s:GistGetPage('https://gist.github.com/'.a:gistid, a:user, '', '')
     if (!len(res))
@@ -410,6 +414,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
 
   let file = tempname()
   call writefile([squery], file)
+  redraw
   echon 'Updating it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'https://gist.github.com/gists/'.action
@@ -502,6 +507,7 @@ function! s:GistGetPage(url, user, param, opt)
 endfunction
 
 function! s:GistDelete(user, token, gistid)
+  redraw
   echon 'Deleting gist... '
   let res = s:GistGetPage('https://gist.github.com/'.a:gistid, a:user, '', '')
   if (!len(res)) 
@@ -600,6 +606,7 @@ function! s:GistPost(user, token, content, private)
 
   let file = tempname()
   call writefile([squery], file)
+  redraw
   echon 'Posting it to gist... '
   let quote = &shellxquote == '"' ?  "'" : '"'
   let url = 'https://gist.github.com/gists'
