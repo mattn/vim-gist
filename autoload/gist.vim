@@ -209,6 +209,8 @@ function! s:GistList(user, token, gistls, page)
   endif
 
   setlocal foldmethod=manual
+  let old_undolevels = &undolevels
+  set undolevels=-1
   let oldlines = []
   if g:gist_show_privates
     redraw
@@ -222,6 +224,7 @@ function! s:GistList(user, token, gistls, page)
   endif
 
   if v:shell_error != 0
+    let &undolevels = old_undolevels
     bw!
     redraw
     echohl ErrorMsg | echomsg 'User not found' | echohl None
@@ -253,6 +256,7 @@ function! s:GistList(user, token, gistls, page)
 
   call append(0, oldlines)
   $put='more...'
+  let &undolevels = old_undolevels
 
   let b:user = a:user
   let b:token = a:token
@@ -326,16 +330,20 @@ function! s:GistGet(user, token, gistid, clipboard)
   else
     exec 'silent noautocmd split' s:bufprefix.a:gistid
   endif
+  let old_undolevels = &undolevels
+  set undolevels=-1
   filetype detect
   silent %d _
   exec 'silent 0r! curl -f -s' g:gist_curl_options url
   if v:shell_error != 0
+    let &undolevels = old_undolevels
     bw!
     redraw
     echohl ErrorMsg | echomsg 'Gist not found' | echohl None
     return
   endif
   $delete _
+  let &undolevels = old_undolevels
   setlocal buftype=acwrite bufhidden=delete noswapfile
   setlocal nomodified
   doau StdinReadPost <buffer>
