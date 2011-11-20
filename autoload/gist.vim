@@ -272,6 +272,7 @@ function! s:GistList(user, token, gistls, page)
   setlocal foldexpr=getline(v:lnum)=~'^\\(gist:\\\|more\\)'?'>1':'='
   setlocal foldtext=getline(v:foldstart)
   redraw
+  noh
   echo ""
 endfunction
 
