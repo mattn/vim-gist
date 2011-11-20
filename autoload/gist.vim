@@ -746,7 +746,7 @@ function! gist#Gist(count, line1, line2, ...)
       else
         let gistls = g:github_user
       endif
-    elseif arg == '--abandon\C'
+    elseif arg == '--abandon'
       call s:GistGetPage('', '', '', '')
       return
     elseif arg =~ '^\(-m\|--multibuffer\)$\C'
