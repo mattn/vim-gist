@@ -115,6 +115,10 @@ On windows, this should work with your user settings.
 If you want to show your private gists with ":Gist -l":
 
     let g:gist_show_privates = 1
+    
+If you want your gist to be private by default:
+
+    let g:gist_private = 1
 
 If you get problems when creating gists try:
 
