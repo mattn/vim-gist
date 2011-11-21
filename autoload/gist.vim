@@ -587,7 +587,7 @@ function! s:GistPost(user, token, content, private)
   endfor
 
   let ext = expand('%:e')
-  let ext = len(ext) ? '.'.ext : ''
+  let ext = '.' . (len(ext) ? ext : &ft)
   let name = expand('%:t')
 
   let query = [
