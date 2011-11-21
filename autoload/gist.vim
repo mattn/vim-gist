@@ -272,6 +272,7 @@ function! s:GistList(user, token, gistls, page)
   setlocal foldexpr=getline(v:lnum)=~'^\\(gist:\\\|more\\)'?'>1':'='
   setlocal foldtext=getline(v:foldstart)
   redraw
+  noh
   echo ""
 endfunction
 
@@ -487,7 +488,8 @@ function! s:GistGetPage(url, user, param, opt)
     call writefile([squery], file)
     let res = system(command)
     call delete(file)
-    let loc = matchstr(res, '^Location:')
+    let headers = split(res, '\(\r\?\n\|\r\n\?\)')
+    let loc = matchstr(headers, '^Location:')
     let loc = matchstr(loc, '^[^:]\+: \zs.*')
     if len(loc) == 0
       call delete(cookie_file)
@@ -746,7 +748,7 @@ function! gist#Gist(count, line1, line2, ...)
       else
         let gistls = g:github_user
       endif
-    elseif arg == '--abandon\C'
+    elseif arg == '--abandon'
       call s:GistGetPage('', '', '', '')
       return
     elseif arg =~ '^\(-m\|--multibuffer\)$\C'
