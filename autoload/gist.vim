@@ -432,7 +432,7 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
   if len(loc) > 0 && loc =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     setlocal nomodified
     redraw
-    echo 'Done: '.loc
+    echomsg 'Done: '.loc
   else
     let message = matchstr(headers, '^Status:')
     let message = matchstr(message, '^[^:]\+:\s*[0-9]\+\s*\zs\(.*\)')
@@ -527,7 +527,7 @@ function! s:GistDelete(user, token, gistid)
     let res = s:GistGetPage('https://gist.github.com/delete/'.a:gistid, a:user, '_method=delete&authenticity_token='.token, '')
     if len(res.content) > 0
       redraw
-      echo 'Done: '
+      echomsg 'Done: '
     else
       let message = matchstr(res.headers, '^Status:')
       let message = matchstr(message, '^[^:]\+:\s*[0-9]\+\s*\zs\(.*\)')
@@ -633,7 +633,7 @@ function! s:GistPost(user, token, content, private)
   let loc = matchstr(loc, '^[^:]\+: \zs.*')
   if len(loc) > 0 && loc =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     redraw
-    echo 'Done: '.loc
+    echomsg 'Done: '.loc
   else
     let message = matchstr(headers, '^Status:')
     let message = matchstr(message, '^[^:]\+:\s*[0-9]\+\s*\zs\(.*\)')
@@ -697,7 +697,7 @@ function! s:GistPostBuffers(user, token, private)
   let loc = matchstr(loc, '^[^:]\+: \zs.*')
   if len(loc) > 0 && loc =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     redraw
-    echo 'Done: '.res
+    echomsg 'Done: '.res
   else
     echohl ErrorMsg | echomsg 'Post failed' | echohl None
   endif
