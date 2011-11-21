@@ -294,14 +294,11 @@ function! s:GistDetectFiletype(gistid)
   let res = matchstr(res, mx)
   let res = matchstr(res, '.*\zs\(\.[^\.]\+\)\ze$')
   let res = substitute(res, '-', '', 'g')
-  " TODO: more filetype detection that is specified in html.
-  if res == 'bat' | let res = 'dosbatch' | endif
-  if res == 'as' | let res = 'actionscript' | endif
-  if res == 'bash' | let res = 'sh' | endif
-  if res == 'cl' | let res = 'lisp' | endif
-  if res == 'rb' | let res = 'ruby' | endif
-  if res == 'viml' | let res = 'vim' | endif
-  if res == 'plain' || res == 'text' | let res = '' | endif
+  if has_key(s:extmap, res)
+    let res = s:extmap[res]
+  else
+    let res = ''
+  endif
 
   if res =~ '^\.'
     silent! exec "doau BufRead *".res
@@ -587,7 +584,16 @@ function! s:GistPost(user, token, content, private)
   endfor
 
   let ext = expand('%:e')
-  let ext = '.' . (len(ext) ? ext : &ft)
+  if ext == ''
+    for k in keys(s:extmap)
+      if s:extmap[k] == &ft
+        let ext = k
+        break
+      endif
+    endfor
+  else
+    let ext = '.' ext
+  endif
   let name = expand('%:t')
 
   let query = [
@@ -861,6 +867,139 @@ function! gist#Gist(count, line1, line2, ...)
   return 1
 endfunction
 
+let s:extmap = {
+\".adb": "ada",
+\".ahk": "ahk",
+\".arc": "arc",
+\".as": "actionscript",
+\".asm": "asm",
+\".asp": "asp",
+\".aw": "php",
+\".b": "b",
+\".bat": "bat",
+\".befunge": "befunge",
+\".bmx": "bmx",
+\".boo": "boo",
+\".c-objdump": "c-objdump",
+\".c": "c",
+\".cfg": "cfg",
+\".cfm": "cfm",
+\".ck": "ck",
+\".cl": "cl",
+\".clj": "clj",
+\".cmake": "cmake",
+\".coffee": "coffee",
+\".cpp": "cpp",
+\".cppobjdump": "cppobjdump",
+\".cs": "csharp",
+\".css": "css",
+\".cw": "cw",
+\".d-objdump": "d-objdump",
+\".d": "d",
+\".darcspatch": "darcspatch",
+\".diff": "diff",
+\".duby": "duby",
+\".dylan": "dylan",
+\".e": "e",
+\".ebuild": "ebuild",
+\".eclass": "eclass",
+\".el": "lisp",
+\".erb": "erb",
+\".erl": "erlang",
+\".f90": "f90",
+\".factor": "factor",
+\".feature": "feature",
+\".fs": "fs",
+\".fy": "fy",
+\".go": "go",
+\".groovy": "groovy",
+\".gs": "gs",
+\".gsp": "gsp",
+\".haml": "haml",
+\".hs": "haskell",
+\".html": "html",
+\".hx": "hx",
+\".ik": "ik",
+\".ino": "ino",
+\".io": "io",
+\".j": "j",
+\".java": "java",
+\".js": "javascript",
+\".json": "json",
+\".jsp": "jsp",
+\".kid": "kid",
+\".lhs": "lhs",
+\".lisp": "lisp",
+\".ll": "ll",
+\".lua": "lua",
+\".ly": "ly",
+\".m": "objc",
+\".mak": "mak",
+\".man": "man",
+\".mao": "mao",
+\".matlab": "matlab",
+\".md": "md",
+\".minid": "minid",
+\".ml": "ml",
+\".moo": "moo",
+\".mu": "mu",
+\".mustache": "mustache",
+\".mxt": "mxt",
+\".myt": "myt",
+\".n": "n",
+\".nim": "nim",
+\".nu": "nu",
+\".numpy": "numpy",
+\".objdump": "objdump",
+\".ooc": "ooc",
+\".parrot": "parrot",
+\".pas": "pas",
+\".pasm": "pasm",
+\".pd": "pd",
+\".phtml": "phtml",
+\".pir": "pir",
+\".pl": "perl",
+\".po": "po",
+\".py": "python",
+\".pytb": "pytb",
+\".pyx": "pyx",
+\".r": "r",
+\".raw": "raw",
+\".rb": "ruby",
+\".rhtml": "rhtml",
+\".rkt": "rkt",
+\".rs": "rs",
+\".rst": "rst",
+\".s": "s",
+\".sass": "sass",
+\".sc": "sc",
+\".scala": "scala",
+\".scm": "scheme",
+\".scpt": "scpt",
+\".scss": "scss",
+\".self": "self",
+\".sh": "sh",
+\".sml": "sml",
+\".sql": "sql",
+\".st": "smalltalk",
+\".tcl": "tcl",
+\".tcsh": "tcsh",
+\".tex": "tex",
+\".textile": "textile",
+\".tpl": "smarty",
+\".twig": "twig",
+\".txt" : "text",
+\".v": "verilog",
+\".vala": "vala",
+\".vb": "vbnet",
+\".vhd": "vhdl",
+\".vim": "vim",
+\".weechatlog": "weechatlog",
+\".xml": "xml",
+\".xq": "xquery",
+\".xs": "xs",
+\".yml": "yaml",
+\}
 let &cpo = s:save_cpo
 unlet s:save_cpo
 
