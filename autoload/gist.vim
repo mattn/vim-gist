@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 21-Nov-2011.
+" Last Change: 22-Nov-2011.
 " Version: 5.6
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -592,7 +592,7 @@ function! s:GistPost(user, token, content, private)
       endif
     endfor
   else
-    let ext = '.' ext
+    let ext = '.'.ext
   endif
   let name = expand('%:t')
 
