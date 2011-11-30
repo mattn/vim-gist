@@ -353,7 +353,7 @@ function! s:GistGet(user, token, gistid, clipboard)
     if exists('g:gist_clip_command')
       exec 'silent w !'.g:gist_clip_command
     elseif has('clipboard')
-      %yank +
+      silent! %yank +
     else
       %yank
     endif
