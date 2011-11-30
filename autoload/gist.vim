@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 28-Nov-2011.
+" Last Change: 30-Nov-2011.
 " Version: 5.7
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -352,8 +352,10 @@ function! s:GistGet(user, token, gistid, clipboard)
   if a:clipboard
     if exists('g:gist_clip_command')
       exec 'silent w !'.g:gist_clip_command
-    else
+    elseif has('clipboard')
       %yank +
+    else
+      %yank
     endif
   endif
   1
