@@ -208,6 +208,7 @@ function! s:GistList(user, token, gistls, page)
     let url = url . '?page=' . a:page
   endif
 
+  setlocal modifiable
   setlocal foldmethod=manual
   let old_undolevels = &undolevels
   set undolevels=-1
@@ -375,7 +376,7 @@ function! s:GistListAction()
   endif
 endfunction
 
-function! s:GistUpdate(user, token, content, gistid, gistnm)
+function! s:GistUpdate(user, token, content, gistid, gistnm, desc)
   if len(a:gistnm) == 0
     let name = s:GistGetFileName(a:gistid)
   else
@@ -400,6 +401,9 @@ function! s:GistUpdate(user, token, content, gistid, gistnm)
     \ s:encodeURIComponent(a:content),
     \ s:encodeURIComponent(a:user),
     \ s:encodeURIComponent(a:token))
+  if a:desc != ' '
+    let squery .= '&description='.s:encodeURIComponent(a:desc)
+  endif
   unlet query
 
   let action = a:gistid
@@ -555,7 +559,7 @@ endfunction
 "
 "       GistID: 123123
 "
-function! s:GistPost(user, token, content, private)
+function! s:GistPost(user, token, content, private, desc)
 
   " find GistID: in content, then we should just update
   for l in split(a:content, "\n")
@@ -619,6 +623,9 @@ function! s:GistPost(user, token, content, private)
     \ s:encodeURIComponent(a:content),
     \ s:encodeURIComponent(a:user),
     \ s:encodeURIComponent(a:token))
+  if a:desc != ' '
+    let squery .= '&description='.s:encodeURIComponent(a:desc)
+  endif
   unlet query
 
   let file = tempname()
@@ -643,7 +650,7 @@ function! s:GistPost(user, token, content, private)
   return loc
 endfunction
 
-function! s:GistPostBuffers(user, token, private)
+function! s:GistPostBuffers(user, token, private, desc)
   let bufnrs = range(1, bufnr("$"))
   let bn = bufnr('%')
   let query = []
@@ -684,6 +691,9 @@ function! s:GistPostBuffers(user, token, private)
       \ s:encodeURIComponent(content))
     let index = index + 1
   endfor
+  if a:desc != ' '
+    let squery .= '&description='.s:encodeURIComponent(a:desc)
+  endif
   silent! exec "buffer!" bn
 
   let file = tempname()
@@ -737,6 +747,7 @@ function! gist#Gist(count, line1, line2, ...)
   let gistid = ''
   let gistls = ''
   let gistnm = ''
+  let gistdesc = ' '
   let private = g:gist_private
   let multibuffer = 0
   let clipboard = 0
@@ -767,6 +778,8 @@ function! gist#Gist(count, line1, line2, ...)
     elseif arg =~ '^\(-a\|--anonymous\)$\C'
       let user = ''
       let token = ''
+    elseif arg =~ '^\(-s\|--description\)$\C'
+      let gistdesc = ''
     elseif arg =~ '^\(-c\|--clipboard\)$\C'
       let clipboard = 1
     elseif arg =~ '^\(-d\|--delete\)$\C' && bufname =~ bufnamemx
@@ -788,7 +801,9 @@ function! gist#Gist(count, line1, line2, ...)
         return
       endif
     elseif arg !~ '^-' && len(gistnm) == 0
-      if editpost == 1 || deletepost == 1
+      if gistdesc != ' '
+        let gistdesc = matchstr(arg, '^\s*\zs.*\ze\s*$')
+      elseif editpost == 1 || deletepost == 1
         let gistnm = arg
       elseif len(gistls) > 0 && arg != '^\w\+$\C'
         let gistls = arg
@@ -809,6 +824,7 @@ function! gist#Gist(count, line1, line2, ...)
   "echo "gistid=".gistid
   "echo "gistls=".gistls
   "echo "gistnm=".gistnm
+  "echo "gistdesc=".gistdesc
   "echo "private=".private
   "echo "clipboard=".clipboard
   "echo "editpost=".editpost
@@ -821,7 +837,7 @@ function! gist#Gist(count, line1, line2, ...)
   else
     let url = ''
     if multibuffer == 1
-      let url = s:GistPostBuffers(user, token, private)
+      let url = s:GistPostBuffers(user, token, private, gistdesc)
     else
       if a:count < 1
         let content = join(getline(a:line1, a:line2), "\n")
@@ -833,11 +849,11 @@ function! gist#Gist(count, line1, line2, ...)
         call setreg('"', save_regcont, save_regtype)
       endif
       if editpost == 1
-        let url = s:GistUpdate(user, token, content, gistid, gistnm)
+        let url = s:GistUpdate(user, token, content, gistid, gistnm, gistdesc)
       elseif deletepost == 1
         call s:GistDelete(user, token, gistid)
       else
-        let url = s:GistPost(user, token, content, private)
+        let url = s:GistPost(user, token, content, private, gistdesc)
       endif
     endif
     if len(url) > 0
