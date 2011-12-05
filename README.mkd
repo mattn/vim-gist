@@ -47,6 +47,12 @@ Usage:
 
         :Gist -e foo.js
 
+- Post/Edit with the description " (you need to have opened the gist buffer
+  first). >
+
+    :Gist -s something
+    :Gist -e -s something
+
 - Delete the gist (you need to have opened the gist buffer first).
   Password authentication is needed.
 
