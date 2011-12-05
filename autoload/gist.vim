@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 30-Nov-2011.
+" Last Change: 05-Dec-2011.
 " Version: 5.7
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -237,12 +237,12 @@ function! s:GistList(user, token, gistls, page)
   silent! %s/>/>\r/g
   silent! %s/</\r</g
   silent! %g/<pre/,/<\/pre/join!
-  silent! %g/<span class="date"/,/<\/span/join
-  silent! %g/^<span class="date"/s/> */>/g
-  silent! %v/^\(gist:\|<pre>\|<span class="date">\)/d _
+  silent! %g/<div class="info"/,/<\/div/join
+  silent! %g/^<div class="info"/s/> */>/g
+  silent! %v/^\(<pre>\|<div class="info">\)/d _
+  silent! %s/<div class="info">//g
   silent! %s/<div[^>]*>/\r  /g
   silent! %s/<\/pre>/\r/g
-  silent! %g/^gist:/,/<span class="date"/join
   silent! %s/<[^>]\+>//g
   silent! %s/\r//g
   silent! %s/&nbsp;/ /g
@@ -251,7 +251,6 @@ function! s:GistList(user, token, gistls, page)
   silent! %s/&gt;/>/g
   silent! %s/&lt;/</g
   silent! %s/&#\(\d\d\);/\=nr2char(submatch(1))/g
-  silent! %g/^gist: /s/ //g
   let &gdefault = oldgdefault
 
   call append(0, oldlines)
@@ -364,7 +363,7 @@ endfunction
 
 function! s:GistListAction()
   let line = getline('.')
-  let mx = '^gist:\zs\(\w\+\)\ze.*'
+  let mx = '^gist:\s*\zs\(\w\+\)\ze.*'
   if line =~# mx
     let gistid = matchstr(line, mx)
     call s:GistGet(g:github_user, g:github_token, gistid, 0)
