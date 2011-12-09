@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 05-Dec-2011.
+" Last Change: 09-Dec-2011.
 " Version: 5.8
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -293,11 +293,10 @@ function! s:GistDetectFiletype(gistid)
   let mx = '^.*<div class=".\{-}type-\zs\([^"]\+\)\ze">.*$'
   let res = system('curl -s '.g:gist_curl_options.' '.url)
   let res = matchstr(res, mx)
-  let res = matchstr(res, '.*\zs\(\.[^\.]\+\)\ze$')
   let res = substitute(res, '-', '', 'g')
   if has_key(s:extmap, res)
     let res = s:extmap[res]
-  else
+  elseif index(values(s:extmap), res) == -1
     let res = ''
   endif
 
