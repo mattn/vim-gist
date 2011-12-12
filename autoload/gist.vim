@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 09-Dec-2011.
+" Last Change: 12-Dec-2011.
 " Version: 5.8
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -182,6 +182,13 @@ function! s:encodeURIComponent(instr)
     let i = i + 1
   endwhile
   return outstr
+endfunction
+
+function! s:shellwords(str)
+  let words = split(a:str, '\%(\([^ \t\''"]\+\)\|''\([^\'']*\)''\|"\(\%([^\"\\]\|\\.\)*\)"\)\zs\s*\ze')
+  let words = map(words, 'substitute(v:val, ''\\\([\\ ]\)'', ''\1'', "g")')
+  let words = map(words, 'matchstr(v:val, ''^\%\("\zs\(.*\)\ze"\|''''\zs\(.*\)\ze''''\|.*\)$'')')
+  return words
 endfunction
 
 " Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it. 
@@ -755,7 +762,7 @@ function! gist#Gist(count, line1, line2, ...)
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
   let bufnamemx = '^' . s:bufprefix .'\zs\([0-9a-f]\+\)\ze$'
 
-  let args = (a:0 > 0) ? split(a:1, ' ') : []
+  let args = (a:0 > 0) ? s:shellwords(a:1) : []
   for arg in args
     if arg =~ '^\(-la\|--listall\)$\C'
       let gistls = '-all'
