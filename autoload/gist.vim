@@ -814,7 +814,6 @@ function! gist#Gist(count, line1, line2, ...)
     elseif arg =~ '^\(+1\|--star\)$\C' && bufname =~ bufnamemx
       let gistid = matchstr(bufname, bufnamemx)
       let res = s:GistGetPage("https://gist.github.com/star/".gistid, g:github_user, '_method=post', '')
-      let g:hoge = res
       let loc = matchstr(res.header, '^Location:')
       let loc = matchstr(loc, '^[^:]\+: \zs.*')
       let mx = '^https://gist.github.com/\zs\([0-9a-z]\+\)$'
@@ -827,7 +826,6 @@ function! gist#Gist(count, line1, line2, ...)
     elseif arg =~ '^\(-1\|--unstar\)$\C' && bufname =~ bufnamemx
       let gistid = matchstr(bufname, bufnamemx)
       let res = s:GistGetPage("https://gist.github.com/unstar/".gistid, g:github_user, '_method=post', '')
-      let g:hoge = res
       let loc = matchstr(res.header, '^Location:')
       let loc = matchstr(loc, '^[^:]\+: \zs.*')
       let mx = '^https://gist.github.com/\zs\([0-9a-z]\+\)$'
