@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 12-Dec-2011.
+" Last Change: 14-Dec-2011.
 " Version: 5.8
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -196,6 +196,8 @@ let s:bufprefix = 'gist' . (has('unix') ? ':' : '_')
 function! s:GistList(user, token, gistls, page)
   if a:gistls == '-all'
     let url = 'https://gist.github.com/gists'
+  elseif g:gist_show_privates && a:gistls == 'starred'
+    let url = 'https://gist.github.com/starred'
   elseif g:gist_show_privates && a:gistls == a:user
     let url = 'https://gist.github.com/mine'
   else
@@ -511,6 +513,15 @@ function! s:GistGetPage(url, user, param, opt)
   let command .= ' -b '.quote.cookie_file.quote
   let command .= ' '.quote.a:url.quote
   let res = iconv(system(command), "utf-8", &encoding)
+  if res =~ '^HTTP/1.\d 3' || res =~ '^HTTP/1\.\d 200 Connection established'
+    let pos = stridx(res, "\r\n\r\n")
+    if pos != -1
+      let res = res[pos+4:]
+    else
+      let pos = stridx(res, "\n\n")
+      let res = res[pos+2:]
+    endif
+  endif
   let pos = stridx(res, "\r\n\r\n")
   if pos != -1
     let content = res[pos+4:]
@@ -766,6 +777,12 @@ function! gist#Gist(count, line1, line2, ...)
   for arg in args
     if arg =~ '^\(-la\|--listall\)$\C'
       let gistls = '-all'
+    elseif arg =~ '^\(-ls\|--liststar\)$\C'
+      if g:gist_show_privates
+        let gistls = 'starred'
+      else
+        let gistls = g:github_user
+      endif
     elseif arg =~ '^\(-l\|--list\)$\C'
       if g:gist_show_privates
         let gistls = 'mine'
@@ -794,6 +811,32 @@ function! gist#Gist(count, line1, line2, ...)
     elseif arg =~ '^\(-e\|--edit\)$\C' && bufname =~ bufnamemx
       let editpost = 1
       let gistid = matchstr(bufname, bufnamemx)
+    elseif arg =~ '^\(+1\|--star\)$\C' && bufname =~ bufnamemx
+      let gistid = matchstr(bufname, bufnamemx)
+      let res = s:GistGetPage("https://gist.github.com/star/".gistid, g:github_user, '_method=post', '')
+      let g:hoge = res
+      let loc = matchstr(res.header, '^Location:')
+      let loc = matchstr(loc, '^[^:]\+: \zs.*')
+      let mx = '^https://gist.github.com/\zs\([0-9a-z]\+\)$'
+      if loc =~ mx
+        echomsg "Stared" gistid
+      else
+        echohl ErrorMsg | echomsg 'Star failed' | echohl None
+      endif
+      return
+    elseif arg =~ '^\(-1\|--unstar\)$\C' && bufname =~ bufnamemx
+      let gistid = matchstr(bufname, bufnamemx)
+      let res = s:GistGetPage("https://gist.github.com/unstar/".gistid, g:github_user, '_method=post', '')
+      let g:hoge = res
+      let loc = matchstr(res.header, '^Location:')
+      let loc = matchstr(loc, '^[^:]\+: \zs.*')
+      let mx = '^https://gist.github.com/\zs\([0-9a-z]\+\)$'
+      if loc =~ mx
+        echomsg "Unstared" gistid
+      else
+        echohl ErrorMsg | echomsg 'Unstar failed' | echohl None
+      endif
+      return
     elseif arg =~ '^\(-f\|--fork\)$\C' && bufname =~ bufnamemx
       let gistid = matchstr(bufname, bufnamemx)
       let res = s:GistGetPage("https://gist.github.com/fork/".gistid, g:github_user, '', '')

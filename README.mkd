@@ -63,6 +63,16 @@ Usage:
 
         :Gist -f
  
+- Star the gist (you need to have opened the gist buffer first).
+  Password authentication is needed.
+
+        :Gist +1
+
+- Unstar the gist (you need to have opened the gist buffer first).
+  Password authentication is needed.
+
+        :Gist -1
+
 - Get gist XXXXX.
 
         :Gist XXXXX
@@ -82,6 +92,10 @@ Usage:
 - List all (public and private) of your gists.
 
         :Gist -la
+
+- List gists from your starred gists.
+
+        :Gist -ls
 
 Tips:
 -----
