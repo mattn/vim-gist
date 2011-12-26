@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 14-Dec-2011.
+" Last Change: 26-Dec-2011.
 " Version: 5.8
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -746,21 +746,10 @@ function! gist#Gist(count, line1, line2, ...)
       let g:github_token = $GITHUB_TOKEN
     end
   endif
-  if strlen(g:github_user) == 0 || strlen(g:github_token) == 0
-    echohl ErrorMsg
-    echomsg "You have no setting for github."
-    echohl WarningMsg
-    echo "git config --global github.user  your-name"
-    echo "git config --global github.token your-token"
-    echo "or set g:github_user and g:github_token in your vimrc"
-    echo "or set shell env vars GITHUB_USER and GITHUB_TOKEN"
-    echohl None
-    return 0
-  end
-
   let bufname = bufname("%")
   let user = g:github_user
   let token = g:github_token
+  let needtoken = 0
   let gistid = ''
   let gistls = ''
   let gistnm = ''
@@ -778,17 +767,15 @@ function! gist#Gist(count, line1, line2, ...)
     if arg =~ '^\(-la\|--listall\)$\C'
       let gistls = '-all'
     elseif arg =~ '^\(-ls\|--liststar\)$\C'
-      if g:gist_show_privates
-        let gistls = 'starred'
-      else
-        let gistls = g:github_user
-      endif
+      let gistls = 'starred'
+      let needtoken = 1
     elseif arg =~ '^\(-l\|--list\)$\C'
       if g:gist_show_privates
         let gistls = 'mine'
       else
         let gistls = g:github_user
       endif
+      let needtoken = 1
     elseif arg == '--abandon'
       call s:GistGetPage('', '', '', '')
       return
@@ -796,11 +783,13 @@ function! gist#Gist(count, line1, line2, ...)
       let multibuffer = 1
     elseif arg =~ '^\(-p\|--private\)$\C'
       let private = 1
+      let needtoken = 1
     elseif arg =~ '^\(-P\|--public\)$\C'
       let private = 0
     elseif arg =~ '^\(-a\|--anonymous\)$\C'
       let user = ''
       let token = ''
+      let needtoken = 0
     elseif arg =~ '^\(-s\|--description\)$\C'
       let gistdesc = ''
     elseif arg =~ '^\(-c\|--clipboard\)$\C'
@@ -808,6 +797,7 @@ function! gist#Gist(count, line1, line2, ...)
     elseif arg =~ '^\(-d\|--delete\)$\C' && bufname =~ bufnamemx
       let deletepost = 1
       let gistid = matchstr(bufname, bufnamemx)
+      let needtoken = 1
     elseif arg =~ '^\(-e\|--edit\)$\C' && bufname =~ bufnamemx
       let editpost = 1
       let gistid = matchstr(bufname, bufnamemx)
@@ -847,6 +837,7 @@ function! gist#Gist(count, line1, line2, ...)
         echohl ErrorMsg | echomsg 'Fork failed' | echohl None
         return
       endif
+      let needtoken = 1
     elseif arg !~ '^-' && len(gistnm) == 0
       if gistdesc != ' '
         let gistdesc = matchstr(arg, '^\s*\zs.*\ze\s*$')
@@ -876,6 +867,18 @@ function! gist#Gist(count, line1, line2, ...)
   "echo "clipboard=".clipboard
   "echo "editpost=".editpost
   "echo "deletepost=".deletepost
+
+  if needtoken != 0 && (strlen(g:github_user) == 0 || strlen(g:github_token) == 0)
+    echohl ErrorMsg
+    echomsg "You have no setting for github."
+    echohl WarningMsg
+    echo "git config --global github.user  your-name"
+    echo "git config --global github.token your-token"
+    echo "or set g:github_user and g:github_token in your vimrc"
+    echo "or set shell env vars GITHUB_USER and GITHUB_TOKEN"
+    echohl None
+    return 0
+  end
 
   if len(gistls) > 0
     call s:GistList(user, token, gistls, 1)
