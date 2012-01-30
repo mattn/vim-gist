@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 26-Dec-2011.
+" Last Change: 30-Jan-2012.
 " Version: 5.8
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -275,7 +275,8 @@ function! s:GistList(user, token, gistls, page)
   setlocal nomodified
   setlocal nomodifiable
   syntax match SpecialKey /^gist:/he=e-1
-  nnoremap <silent> <buffer> <cr> :call <SID>GistListAction()<cr>
+  nnoremap <silent> <buffer> <cr> :call <SID>GistListAction(0)<cr>
+  nnoremap <silent> <buffer> <s-cr> :call <SID>GistListAction(1)<cr>
 
   cal cursor(1+len(oldlines),1)
   setlocal foldmethod=expr
@@ -370,12 +371,24 @@ function! s:GistGet(user, token, gistid, clipboard)
   au! BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
 endfunction
 
-function! s:GistListAction()
+function! s:GistListAction(shift)
   let line = getline('.')
   let mx = '^gist:\s*\zs\(\w\+\)\ze.*'
   if line =~# mx
     let gistid = matchstr(line, mx)
-    call s:GistGet(g:github_user, g:github_token, gistid, 0)
+    if a:shift
+      let url = "https://gist.github.com/" . gistid
+      let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
+      if cmd =~ '^!'
+        silent! exec cmd
+      elseif cmd =~ '^:[A-Z]'
+        exec cmd
+      else
+        call system(cmd)
+      endif
+    else
+      call s:GistGet(g:github_user, g:github_token, gistid, 0)
+    endif
     return
   endif
   if line =~# '^more\.\.\.$'
