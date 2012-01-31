@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 30-Jan-2012.
+" Last Change: 31-Jan-2012.
 " Version: 5.8
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -738,11 +738,11 @@ function! s:GistPostBuffers(user, token, private, desc)
   let loc = matchstr(loc, '^[^:]\+: \zs.*')
   if len(loc) > 0 && loc =~ '^\(http\|https\):\/\/gist\.github\.com\/'
     redraw
-    echomsg 'Done: '.res
+    echomsg 'Done: '.loc
   else
     echohl ErrorMsg | echomsg 'Post failed' | echohl None
   endif
-  return res
+  return loc
 endfunction
 
 function! gist#Gist(count, line1, line2, ...)
