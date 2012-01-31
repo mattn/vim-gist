@@ -110,6 +110,9 @@ install_details: |
     4. you'll see it at following of 'API Token'.
 
 versions:
+- '5.9': |
+   This is an upgrade for Gist.vim: add support anonymous post. fixed many bugs.
+
 - '5.8': |
    This is an upgrade for Gist.vim: add support for description. you can post description using -s option.
 
