@@ -152,7 +152,19 @@ If you get problems when creating gists try: >
 
     :Gist --abandon
 <
-
+You need to either set global git config
+>
+    $ git config --global github.user Username
+    $ git config --global github.token APIToken
+<
+or in your .vimrc
+>
+    let g:github_token = 'XXXXX'
+<
+or by using an environment variable on *nix systems
+>
+    let g:github_token = $GITHUB_TOKEN
+<
 ==============================================================================
 REQUIREMENTS                                           *gist-vim-requirements*
 
