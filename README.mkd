@@ -151,11 +151,11 @@ You need to either set global git config
 
 or in your `.vimrc`
 
-    let:github_token = 'XXXXX'
+    let g:github_token = 'XXXXX'
 
 or by using an environment variable on *nix systems
     
-    let:github_token = $GITHUB_TOKEN
+    let g:github_token = $GITHUB_TOKEN
     
 
 Requirements:
