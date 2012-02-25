@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 31-Jan-2012.
+" Last Change: 25-Feb-2012.
 " Version: 5.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -125,6 +125,10 @@ endif
 
 if !exists('g:gist_curl_options')
   let g:gist_curl_options = ""
+endif
+
+if !exists('g:gist_keep_selection')
+  let g:gist_keep_selection = 0
 endif
 
 if !exists('g:gist_browser_command')
@@ -907,7 +911,7 @@ function! gist#Gist(count, line1, line2, ...)
       else
         let save_regcont = @"
         let save_regtype = getregtype('"')
-        silent! normal! gvygv
+        silent! normal! gvy
         let content = @"
         call setreg('"', save_regcont, save_regtype)
       endif
@@ -917,6 +921,9 @@ function! gist#Gist(count, line1, line2, ...)
         call s:GistDelete(user, token, gistid)
       else
         let url = s:GistPost(user, token, content, private, gistdesc)
+      endif
+      if a:count >= 1 && g:gist_keep_selection
+        silent! normal! gv
       endif
     endif
     if len(url) > 0
