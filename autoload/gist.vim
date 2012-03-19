@@ -634,15 +634,20 @@ function! gist#Gist(count, line1, line2, ...)
 endfunction
 
 function! s:GetAuthHeader()
-  let ctx = ""
+  let auth = ""
   let configfile = expand('~/.gist-vim')
   if filereadable(configfile)
     let str = join(readfile(configfile), "")
     if type(str) == 1
-      let ctx = str
+      let auth = str
     endif
   endif
-  if len(ctx) == 0
+  if len(auth) > 0
+    return auth
+  endif
+
+  let api = inputlist(['Which API:', '1. basic auth', '2. oauth2'])
+  if api == 1
     if !exists('g:github_user')
       let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
       if strlen(g:github_user) == 0
@@ -651,10 +656,35 @@ function! s:GetAuthHeader()
     endif
     redraw | echo "\r"
     let password = inputsecret("Password:")
-    let ctx = base64#b64encode(g:github_user.":".password)
-    call writefile([ctx], configfile)
+    let secret = printf("basic %s", base64#b64encode(g:github_user.":".password))
+    call writefile([secret], configfile)
+    return secret
+  elseif api == 2
+    let auth_url =  "https://github.com/login/oauth/authorize"
+    let access_token_url = "https://github.com/login/oauth/access_token"
+    redraw | echo "\r"
+    let client_id = input("ClientID:")
+    redraw | echo "\r"
+    let client_secret = input("ClientSecret:")
+    if has("win32") || has("win64")
+      silent exe "!start rundll32 url.dll,FileProtocolHandler ".auth_url."?scope=gist&client_id=".client_id
+    else
+      silent call system("xdg-open '".auth_url."?scope=gist&client_id=".client_id."'")
+    endif
+    let pin = input("PIN:")
+    redraw | echo ''
+    let res = http#post(access_token_url, {"client_id": client_id, "code": pin, "client_secret": client_secret})
+    for item in split(res.content, '&')
+      let token = split(item, '=')
+      if len(token) == 2 && token[0] == 'access_token'
+        let secret = printf("token %s", http#decodeURI(token[1]))
+        break
+      endif
+    endfor
+    call writefile([secret], configfile)
+    return secret
   endif
-  return printf("basic %s", ctx)
+  return ""
 endfunction
 
 let &cpo = s:save_cpo
