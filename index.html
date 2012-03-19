@@ -1,1 +1,27 @@
-Gist.vim
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Gist.vim</title>
+</head>
+<body>
+Gist.vim<br />
+<br />
+<script>
+(function() {
+  var tokens = location.href.split("?");
+  if (tokens.length == 2) {
+    var params = tokens[1].split("=");
+    if (params.length == 2 && params[0] == 'code') {
+      var input = document.createElement('input');
+      input.value = params[1];
+      document.body.appendChild(document.createTextNode('PIN:'));
+      document.body.appendChild(input);
+      document.body.appendChild(document.createElement('br'));
+      document.body.appendChild(document.createTextNode('Copy & paste this to gist.vim prompt'));
+    }
+  }
+})();
+</script>
+</body>
+</html>
