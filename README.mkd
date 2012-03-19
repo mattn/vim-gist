@@ -163,6 +163,7 @@ Requirements:
 
 - curl command (http://curl.haxx.se/)
 - and if you want to use your git profile, the git command-line client.
+- webapi-vim (https://github.com/mattn/webapi-vim)
 
 License:
 --------
