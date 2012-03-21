@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 19-Mar-2012.
+" Last Change: 21-Mar-2012.
 " Version: 5.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -9,12 +9,12 @@
 "
 "   :Gist
 "     post current buffer to gist, using default privicy option
-"     (see g:gist_private)
+"     (see g:gist_show_private)
 "
 "   :'<,'>Gist
 "     post selected text to gist., using default privicy option
 "     This applies to all permutations listed below (except multi)
-"     (see g:gist_private)
+"     (see g:gist_show_private)
 "
 "   :Gist -p
 "     create a private gist
@@ -115,41 +115,21 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-if !exists('g:gist_open_browser_after_post')
-  let g:gist_open_browser_after_post = 0
-endif
-
-if !exists('g:gist_put_url_to_clipboard_after_post')
-  let g:gist_put_url_to_clipboard_after_post = 1
-endif
-
-if !exists('g:gist_keep_selection')
-  let g:gist_keep_selection = 0
-endif
-
-if !exists('g:gist_browser_command')
-  if has('win32') || has('win64')
-    let g:gist_browser_command = "!start rundll32 url.dll,FileProtocolHandler %URL%"
-  elseif has('mac')
-    let g:gist_browser_command = "open %URL%"
-  elseif executable('xdg-open')
-    let g:gist_browser_command = "xdg-open %URL%"
-  else
-    let g:gist_browser_command = "firefox %URL% &"
+function! s:get_gist_browser_command()
+  let gist_browser_command = get(g:, 'gist_browser_command', '')
+  if gist_browser_command == ''
+    if has('win32') || has('win64')
+      let gist_browser_command = "!start rundll32 url.dll,FileProtocolHandler %URL%"
+    elseif has('mac')
+      let gist_browser_command = "open %URL%"
+    elseif executable('xdg-open')
+      let gist_browser_command = "xdg-open %URL%"
+    else
+      let gist_browser_command = "firefox %URL% &"
+    endif
   endif
-endif
-
-if !exists('g:gist_detect_filetype')
-  let g:gist_detect_filetype = 0
-endif
-
-if !exists('g:gist_private')
-  let g:gist_private = 0
-endif
-
-if !exists('g:gist_show_privates')
-  let g:gist_show_privates = 0
-endif
+  return gist_browser_command
+endfunction
 
 function! s:shellwords(str)
   let words = split(a:str, '\%(\([^ \t\''"]\+\)\|''\([^\'']*\)''\|"\(\%([^\"\\]\|\\.\)*\)"\)\zs\s*\ze')
@@ -175,9 +155,9 @@ let s:bufprefix = 'gist' . (has('unix') ? ':' : '_')
 function! s:GistList(gistls, page)
   if a:gistls == '-all'
     let url = 'https://api.github.com/gists/public'
-  elseif g:gist_show_privates && a:gistls == 'starred'
+  elseif get(g:, 'gist_show_privates', 0) && a:gistls == 'starred'
     let url = 'https://api.github.com/gists/starred'
-  elseif g:gist_show_privates || a:gistls == 'mine'
+  elseif get(g:, 'gist_show_privates') || a:gistls == 'mine'
     let url = 'https://api.github.com/gists'
   else
     let url = 'https://api.gist.github.com/gists/'.a:gistls
@@ -298,7 +278,8 @@ function! s:GistGet(gistid, clipboard)
   setlocal buftype=acwrite bufhidden=delete noswapfile
   setlocal nomodified
   doau StdinReadPost <buffer>
-  if (&ft == '' && g:gist_detect_filetype == 1) || g:gist_detect_filetype == 2
+  let gist_detect_filetype = get(g:, 'gist_detect_filetype', 0)
+  if (&ft == '' && gist_detect_filetype == 1) || gist_detect_filetype == 2
     call s:GistDetectFiletype(a:gistid)
   endif
   if a:clipboard
@@ -321,7 +302,7 @@ function! s:GistListAction(shift)
     let gistid = matchstr(line, mx)
     if a:shift
       let url = "https://gist.github.com/" . gistid
-      let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
+      let cmd = substitute(s:get_gist_browser_command(), '%URL%', url, 'g')
       if cmd =~ '^!'
         silent! exec cmd
       elseif cmd =~ '^:[A-Z]'
@@ -480,7 +461,7 @@ function! gist#Gist(count, line1, line2, ...)
   let gistls = ''
   let gistnm = ''
   let gistdesc = ' '
-  let private = g:gist_private
+  let private = get(g:, 'gist_show_private', 0)
   let multibuffer = 0
   let clipboard = 0
   let deletepost = 0
@@ -495,7 +476,7 @@ function! gist#Gist(count, line1, line2, ...)
     elseif arg =~ '^\(-ls\|--liststar\)$\C'
       let gistls = 'starred'
     elseif arg =~ '^\(-l\|--list\)$\C'
-      if g:gist_show_privates
+      if get(g:, 'gist_show_privates')
         let gistls = 'mine'
       else
         let gistls = g:github_user
@@ -601,13 +582,13 @@ function! gist#Gist(count, line1, line2, ...)
       else
         let url = s:GistPost(content, private, gistdesc)
       endif
-      if a:count >= 1 && g:gist_keep_selection
+      if a:count >= 1 && get(g:, 'gist_keep_selection', 0) == 1
         silent! normal! gv
       endif
     endif
     if len(url) > 0
-      if g:gist_open_browser_after_post
-        let cmd = substitute(g:gist_browser_command, '%URL%', url, 'g')
+      if get(g:, 'gist_open_browser_after_post', 0) == 1
+        let cmd = substitute(s:gist_browser_command(), '%URL%', url, 'g')
         if cmd =~ '^!'
           silent! exec cmd
         elseif cmd =~ '^:[A-Z]'
@@ -616,7 +597,7 @@ function! gist#Gist(count, line1, line2, ...)
           call system(cmd)
         endif
       endif
-      if g:gist_put_url_to_clipboard_after_post > 0
+      if get(g:, 'gist_put_url_to_clipboard_after_post', 1) > 0
         if g:gist_put_url_to_clipboard_after_post == 2
           let url = url . "\n"
         endif
