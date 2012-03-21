@@ -9,7 +9,7 @@
 "
 "   :Gist
 "     post current buffer to gist, using default privicy option
-"     (see g:gist_show_private)
+"     (see g:gist_post_private)
 "
 "   :'<,'>Gist
 "     post selected text to gist., using default privicy option
@@ -461,7 +461,7 @@ function! gist#Gist(count, line1, line2, ...)
   let gistls = ''
   let gistnm = ''
   let gistdesc = ' '
-  let private = get(g:, 'gist_show_private', 0)
+  let private = get(g:, 'gist_post_private', 0)
   let multibuffer = 0
   let clipboard = 0
   let deletepost = 0
