@@ -628,6 +628,9 @@ function! s:GetAuthHeader()
     return auth
   endif
 
+  echohl WarningMsg
+  echo 'Gist.vim need autholization to github API. This settings are stored in "~/.gist-vim". If you want to revoke, do "rm ~/.gist-vim".'
+  echohl None
   let api = inputlist(['Which API:', '1. basic auth', '2. oauth2'])
   if api == 1
     if !exists('g:github_user')
