@@ -32,9 +32,8 @@ USAGE                                                 *:Gist* *gist-vim-usage*
     :Gist -P
 <
 - Post whole text to gist as public.
-  This is only relevant if you've set gists to be private by default;
-  if you get an empty gist list, try ":Gist --abandon". >
-
+  This is only relevant if you've set gists to be private by default.
+>
     :Gist -P
 <
 - Post whole text to gist as public.
@@ -148,22 +147,9 @@ If you want to show your private gists with ":Gist -l": >
 
     let g:gist_show_privates = 1
 <
-If you get problems when creating gists try: >
-
-    :Gist --abandon
-<
 You need to either set global git config
 >
     $ git config --global github.user Username
-    $ git config --global github.token APIToken
-<
-or in your .vimrc
->
-    let g:github_token = 'XXXXX'
-<
-or by using an environment variable on *nix systems
->
-    let g:github_token = $GITHUB_TOKEN
 <
 ==============================================================================
 REQUIREMENTS                                           *gist-vim-requirements*
