@@ -157,10 +157,10 @@ function! s:GistList(gistls, page)
     let url = 'https://api.github.com/gists/public'
   elseif get(g:, 'gist_show_privates', 0) && a:gistls == 'starred'
     let url = 'https://api.github.com/gists/starred'
-  elseif get(g:, 'gist_show_privates') || a:gistls == 'mine'
+  elseif get(g:, 'gist_show_privates') && a:gistls == 'mine'
     let url = 'https://api.github.com/gists'
   else
-    let url = 'https://api.gist.github.com/gists/'.a:gistls
+    let url = 'https://api.github.com/users/'.a:gistls.'/gists'
   endif
   let winnum = bufwinnr(bufnr(s:bufprefix.a:gistls))
   if winnum != -1
@@ -177,7 +177,6 @@ function! s:GistList(gistls, page)
   endif
 
   setlocal modifiable
-  setlocal foldmethod=manual
   let old_undolevels = &undolevels
   let oldlines = []
   silent %d _
@@ -187,7 +186,7 @@ function! s:GistList(gistls, page)
   if v:shell_error != 0
     bw!
     redraw
-    echohl ErrorMsg | echomsg 'Gist not found' | echohl None
+    echohl ErrorMsg | echomsg 'Gists not found' | echohl None
     return
   endif
 
@@ -206,9 +205,6 @@ function! s:GistList(gistls, page)
   nnoremap <silent> <buffer> <s-cr> :call <SID>GistListAction(1)<cr>
 
   cal cursor(1+len(oldlines),1)
-  setlocal foldmethod=expr
-  setlocal foldexpr=getline(v:lnum)=~'^\\(gist:\\\|more\\)'?'>1':'='
-  setlocal foldtext=getline(v:foldstart)
   nohlsearch
   redraw | echo ''
 endfunction
