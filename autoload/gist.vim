@@ -519,7 +519,7 @@ function! gist#Gist(count, line1, line2, ...)
       let gistid = matchstr(bufname, bufnamemx)
     elseif arg =~ '^\(+1\|--star\)$\C' && bufname =~ bufnamemx
       let gistid = matchstr(bufname, bufnamemx)
-      let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', {}, 'PUT')
+      let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', { "Authorization": s:GetAuthHeader() }, 'PUT')
       let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
       if status =~ '^2'
         echomsg "Stared" gistid
@@ -529,7 +529,7 @@ function! gist#Gist(count, line1, line2, ...)
       return
     elseif arg =~ '^\(-1\|--unstar\)$\C' && bufname =~ bufnamemx
       let gistid = matchstr(bufname, bufnamemx)
-      let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', {}, 'DELETE')
+      let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
       if status =~ '^2'
         echomsg "Unstared" gistid
       else
