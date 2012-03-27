@@ -535,7 +535,7 @@ function! gist#Gist(count, line1, line2, ...)
       return
     elseif arg =~ '^\(-f\|--fork\)$\C' && bufname =~ bufnamemx
       let gistid = matchstr(bufname, bufnamemx)
-      let res = http#post("https://api.github.com/gists/".gistid."/fork", "")
+      let res = http#get('https://api.github.com/gists/'.gistid.'/fork', { "Authorization": s:GetAuthHeader() })
       let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
       if status =~ '^2'
         let obj = json#decode(res.content)
