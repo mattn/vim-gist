@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 26-Mar-2012.
+" Last Change: 27-Mar-2012.
 " Version: 5.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -258,8 +258,8 @@ function! s:GistGet(gistid, clipboard)
     try
       let gist = json#decode(res.content)
       let filename = sort(keys(gist.files))[0]
-      let content = obj.[filename].content
-      call setline(1, split(join(content, "\n"), "\n"))
+      let content = gist.files[filename].content
+      call setline(1, split(content, "\n"))
     catch
       let &undolevels = old_undolevels
       bw!
