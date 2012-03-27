@@ -183,7 +183,7 @@ function! s:GistList(gistls, page)
   silent %d _
 
   redraw | echon 'Listing gists... '
-  let res = http#get(url, "", { "Authorization": s:GetAuthHeader() })
+  let res = http#get(url, '', { "Authorization": s:GetAuthHeader() })
   if v:shell_error != 0
     bw!
     redraw
@@ -214,13 +214,13 @@ function! s:GistList(gistls, page)
 endfunction
 
 function! s:GistGetFileName(gistid)
-  let res = http#get('https://api.github.com/gists/'.a:gistid, "", { "Authorization": s:GetAuthHeader() })
+  let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
   let gist = json#decode(res.content)
   return sort(keys(gist.files))[0]
 endfunction
 
 function! s:GistDetectFiletype(gistid)
-  let res = http#get('https://api.github.com/gists/'.a:gistid, "", { "Authorization": s:GetAuthHeader() })
+  let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
   let gist = json#decode(res.content)
   let filename = sort(keys(gist.files))[0]
   let type = get(gist.files[filename], "type", "text")
@@ -251,7 +251,7 @@ function! s:GistGet(gistid, clipboard)
   set undolevels=-1
   filetype detect
   silent %d _
-  let res = http#get('https://api.github.com/gists/'.a:gistid, "", { "Authorization": s:GetAuthHeader() })
+  let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     call writefile(split(res.content, "\n"), "myjson.js")
@@ -519,7 +519,7 @@ function! gist#Gist(count, line1, line2, ...)
       let gistid = matchstr(bufname, bufnamemx)
     elseif arg =~ '^\(+1\|--star\)$\C' && bufname =~ bufnamemx
       let gistid = matchstr(bufname, bufnamemx)
-      let res = http#post("https://api.github.com/gists/".gistid."/star", "", {}, "PUT")
+      let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', {}, 'PUT')
       let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
       if status =~ '^2'
         echomsg "Stared" gistid
@@ -529,7 +529,7 @@ function! gist#Gist(count, line1, line2, ...)
       return
     elseif arg =~ '^\(-1\|--unstar\)$\C' && bufname =~ bufnamemx
       let gistid = matchstr(bufname, bufnamemx)
-      let res = http#post("https://api.github.com/gists/".gistid."/star", "", {}, "DELETE")
+      let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', {}, 'DELETE')
       if status =~ '^2'
         echomsg "Unstared" gistid
       else
