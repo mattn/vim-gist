@@ -260,6 +260,12 @@ function! s:GistGet(gistid, clipboard)
       let filename = sort(keys(gist.files))[0]
       let content = gist.files[filename].content
       call setline(1, split(content, "\n"))
+      let b:gist = {
+      \ "filename": filename,
+      \ "id": gist.id,
+      \ "description": gist.description,
+      \ "private": gist.public =~ 'true',
+      \}
     catch
       let &undolevels = old_undolevels
       bw!
@@ -324,18 +330,20 @@ endfunction
 function! s:GistUpdate(content, gistid, gistnm, desc)
   let gist = { "id": a:gistid, "files" : {}, "description": "","public": function('json#true') }
   if a:desc != ' ' | let gist["description"] = a:desc | endif
-  if a:private | let gist["public"] = function('json#false') | endif
+  if has('b:gist') && b:gist.private | let gist["public"] = function('json#false') | endif
   let filename = a:gistnm
-  if len(a:gistnm) == 0
+  if exists('b:gistnm') > 0
+    let filename = b:gistnm
+  elseif len(a:gistnm) == 0
     let filename = s:GistGetFileName(a:gistid)
   endif
-  elseif len(filename) == 0
+  if len(filename) == 0
     let filename = 'file1.txt'
   endif
   let gist.files[filename] = { "content": a:content }
 
   redraw | echon 'Posting it to gist... '
-  let res = http#post('https://api.github.com/gists',
+  let res = http#post('https://api.github.com/gists/' . a:gistid,
   \ json#encode(gist), { "Authorization": s:GetAuthHeader() })
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
@@ -343,6 +351,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
     let loc = obj["html_url"]
     redraw
     echomsg 'Done: '.loc
+    let b:gist = {"id": a:gistid, "filename": filename}
   else
     let loc = ''
     let status = matchstr(status, '^\d\+\s*\zs.*')
@@ -357,6 +366,7 @@ function! s:GistDelete(gistid)
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     redraw | echomsg 'Done: '
+    unlet b:gist
   else
     let status = matchstr(status, '^\d\+\s*\zs.*')
     echohl ErrorMsg | echomsg 'Delete failed: '.status | echohl None
@@ -397,6 +407,12 @@ function! s:GistPost(content, private, desc)
     let loc = obj["html_url"]
     redraw
     echomsg 'Done: '.loc
+    let b:gist = {
+    \ "filename": filename,
+    \ "id": matchstr(loc, '[^/]\+$'),
+    \ "description": gist['description'],
+    \ "private": a:private,
+    \}
   else
     let loc = ''
     let status = matchstr(status, '^\d\+\s*\zs.*')
@@ -440,6 +456,7 @@ function! s:GistPostBuffers(private, desc)
     let loc = obj["html_url"]
     redraw
     echomsg 'Done: '.loc
+    let b:gist = {"id": matchstr(loc, '[^/]\+$'), "filename": filename, "private": a:private}
   else
     let loc = ''
     let status = matchstr(status, '^\d\+\s*\zs.*')
