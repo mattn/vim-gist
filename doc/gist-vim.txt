@@ -96,7 +96,7 @@ USAGE                                                 *:Gist* *gist-vim-usage*
 
     :Gist -l mattn
 <
-- List all (public and private) of your gists. >
+- List everyone's gists. >
 
     :Gist -la
 <
