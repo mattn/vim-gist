@@ -388,7 +388,7 @@ endfunction
 "
 "       GistID: 123123
 "
-function! s:GistPost(content, private, desc)
+function! s:GistPost(content, private, desc, anonymous)
   let gist = { "files" : {}, "description": "","public": function('json#true') }
   if a:desc != ' ' | let gist["description"] = a:desc | endif
   if a:private | let gist["public"] = function('json#false') | endif
@@ -399,8 +399,8 @@ function! s:GistPost(content, private, desc)
   let gist.files[filename] = { "content": a:content }
 
   redraw | echon 'Posting it to gist... '
-  let res = http#post('https://api.github.com/gists',
-  \ json#encode(gist), { "Authorization": s:GetAuthHeader() })
+  let auth = a:anonymous ? {} : { "Authorization": s:GetAuthHeader() }
+  let res = http#post('https://api.github.com/gists', json#encode(gist), auth)
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     let obj = json#decode(res.content)
@@ -421,7 +421,7 @@ function! s:GistPost(content, private, desc)
   return loc
 endfunction
 
-function! s:GistPostBuffers(private, desc)
+function! s:GistPostBuffers(private, desc, anonymous)
   let bufnrs = range(1, bufnr("$"))
   let bn = bufnr('%')
   let query = []
@@ -448,8 +448,8 @@ function! s:GistPostBuffers(private, desc)
   silent! exec "buffer!" bn
 
   redraw | echon 'Posting it to gist... '
-  let res = http#post('https://api.github.com/gists',
-  \ json#encode(gist), { "Authorization": s:GetAuthHeader() })
+  let auth = a:anonymous ? {} : { "Authorization": s:GetAuthHeader() }
+  let res = http#post('https://api.github.com/gists', json#encode(gist), auth)
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     let obj = json#decode(res.content)
@@ -483,6 +483,7 @@ function! gist#Gist(count, line1, line2, ...)
   let clipboard = 0
   let deletepost = 0
   let editpost = 0
+  let anonymous = 0
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
   let bufnamemx = '^' . s:bufprefix .'\zs\([0-9a-f]\+\)\ze$'
 
@@ -504,6 +505,8 @@ function! gist#Gist(count, line1, line2, ...)
       let private = 1
     elseif arg =~ '^\(-P\|--public\)$\C'
       let private = 0
+    elseif arg =~ '^\(-a\|--anonymous\)$\C'
+      let anonymous = 1
     elseif arg =~ '^\(-s\|--description\)$\C'
       let gistdesc = ''
     elseif arg =~ '^\(-c\|--clipboard\)$\C'
@@ -535,7 +538,7 @@ function! gist#Gist(count, line1, line2, ...)
       return
     elseif arg =~ '^\(-f\|--fork\)$\C' && bufname =~ bufnamemx
       let gistid = matchstr(bufname, bufnamemx)
-      let res = http#get('https://api.github.com/gists/'.gistid.'/fork', { "Authorization": s:GetAuthHeader() })
+      let res = http#post('https://api.github.com/gists/'.gistid.'/fork', '', { "Authorization": s:GetAuthHeader() })
       let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
       if status =~ '^2'
         let obj = json#decode(res.content)
@@ -581,7 +584,7 @@ function! gist#Gist(count, line1, line2, ...)
   else
     let url = ''
     if multibuffer == 1
-      let url = s:GistPostBuffers(private, gistdesc)
+      let url = s:GistPostBuffers(private, gistdesc, anonymous)
     else
       if a:count < 1
         let content = join(getline(a:line1, a:line2), "\n")
@@ -597,7 +600,7 @@ function! gist#Gist(count, line1, line2, ...)
       elseif deletepost == 1
         call s:GistDelete(gistid)
       else
-        let url = s:GistPost(content, private, gistdesc)
+        let url = s:GistPost(content, private, gistdesc, anonymous)
       endif
       if a:count >= 1 && get(g:, 'gist_keep_selection', 0) == 1
         silent! normal! gv
