@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 27-Mar-2012.
+" Last Change: 28-Mar-2012.
 " Version: 5.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -219,7 +219,12 @@ function! s:GistDetectFiletype(gistid)
   let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
   let gist = json#decode(res.content)
   let filename = sort(keys(gist.files))[0]
-  let type = get(gist.files[filename], "type", "text")
+  let ext = fnamemodify(filename, ':e')
+  if has_key(s:extmap, ext)
+    let type = s:extmap[ext]
+  else
+    let type = get(gist.files[filename], "type", "text")
+  endif
   silent! exec "setlocal ft=".tolower(type)
 endfunction
 
@@ -334,9 +339,9 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
     let filename = s:GistGetFileName(a:gistid)
   endif
   if len(filename) == 0
-    let filename = 'file1.txt'
+    let filename = s:get_current_filename(1)
   endif
-  let gist.files[filename] = { "content": a:content }
+  let gist.files[filename] = { "content": a:content, "filename": filename }
 
   redraw | echon 'Posting it to gist... '
   let res = http#post('https://api.github.com/gists/' . a:gistid,
@@ -369,6 +374,20 @@ function! s:GistDelete(gistid)
   endif
 endfunction
 
+function! s:get_current_filename(no)
+  let filename = expand('%:t')
+  if len(filename) == 0 && &ft != ''
+    let pair = filter(items(s:extmap), 'v:val[1] == "ruby"')
+    if len(pair) > 0
+      let filename = printf('gistfile%d%s', a:no, pair[0][0])
+    endif
+  endif
+  if filename == ''
+    let filename = printf('gistfile%d.txt', a:no)
+  endif
+  return filename
+endfunction
+
 " GistPost function:
 "   Post new gist to github
 "
@@ -388,11 +407,8 @@ function! s:GistPost(content, private, desc, anonymous)
   let gist = { "files" : {}, "description": "","public": function('json#true') }
   if a:desc != ' ' | let gist["description"] = a:desc | endif
   if a:private | let gist["public"] = function('json#false') | endif
-  let filename = expand('%:t')
-  if len(filename) == 0
-    let filename = 'gistfile1.txt'
-  endif
-  let gist.files[filename] = { "content": a:content }
+  let filename = s:get_current_filename(1)
+  let gist.files[filename] = { "content": a:content, "filename": filename }
 
   redraw | echon 'Posting it to gist... '
   let auth = a:anonymous ? {} : { "Authorization": s:GetAuthHeader() }
@@ -434,11 +450,8 @@ function! s:GistPostBuffers(private, desc, anonymous)
     echo "Creating gist content".index."... "
     silent! exec "buffer!" bufnr
     let content = join(getline(1, line('$')), "\n")
-    let filename = expand('%:t')
-    if len(filename) == 0
-      let filename = 'file1.txt'
-    endif
-    let gist.files[filename] = { "content": content }
+    let filename = s:get_current_filename(index)
+    let gist.files[filename] = { "content": content, "filename": filename }
     let index = index + 1
   endfor
   silent! exec "buffer!" bn
@@ -689,6 +702,140 @@ function! s:GetAuthHeader()
   endif
   return ""
 endfunction
+
+let s:extmap = {
+\".adb": "ada",
+\".ahk": "ahk",
+\".arc": "arc",
+\".as": "actionscript",
+\".asm": "asm",
+\".asp": "asp",
+\".aw": "php",
+\".b": "b",
+\".bat": "bat",
+\".befunge": "befunge",
+\".bmx": "bmx",
+\".boo": "boo",
+\".c-objdump": "c-objdump",
+\".c": "c",
+\".cfg": "cfg",
+\".cfm": "cfm",
+\".ck": "ck",
+\".cl": "cl",
+\".clj": "clj",
+\".cmake": "cmake",
+\".coffee": "coffee",
+\".cpp": "cpp",
+\".cppobjdump": "cppobjdump",
+\".cs": "csharp",
+\".css": "css",
+\".cw": "cw",
+\".d-objdump": "d-objdump",
+\".d": "d",
+\".darcspatch": "darcspatch",
+\".diff": "diff",
+\".duby": "duby",
+\".dylan": "dylan",
+\".e": "e",
+\".ebuild": "ebuild",
+\".eclass": "eclass",
+\".el": "lisp",
+\".erb": "erb",
+\".erl": "erlang",
+\".f90": "f90",
+\".factor": "factor",
+\".feature": "feature",
+\".fs": "fs",
+\".fy": "fy",
+\".go": "go",
+\".groovy": "groovy",
+\".gs": "gs",
+\".gsp": "gsp",
+\".haml": "haml",
+\".hs": "haskell",
+\".html": "html",
+\".hx": "hx",
+\".ik": "ik",
+\".ino": "ino",
+\".io": "io",
+\".j": "j",
+\".java": "java",
+\".js": "javascript",
+\".json": "json",
+\".jsp": "jsp",
+\".kid": "kid",
+\".lhs": "lhs",
+\".lisp": "lisp",
+\".ll": "ll",
+\".lua": "lua",
+\".ly": "ly",
+\".m": "objc",
+\".mak": "mak",
+\".man": "man",
+\".mao": "mao",
+\".matlab": "matlab",
+\".md": "md",
+\".minid": "minid",
+\".ml": "ml",
+\".moo": "moo",
+\".mu": "mu",
+\".mustache": "mustache",
+\".mxt": "mxt",
+\".myt": "myt",
+\".n": "n",
+\".nim": "nim",
+\".nu": "nu",
+\".numpy": "numpy",
+\".objdump": "objdump",
+\".ooc": "ooc",
+\".parrot": "parrot",
+\".pas": "pas",
+\".pasm": "pasm",
+\".pd": "pd",
+\".phtml": "phtml",
+\".pir": "pir",
+\".pl": "perl",
+\".po": "po",
+\".py": "python",
+\".pytb": "pytb",
+\".pyx": "pyx",
+\".r": "r",
+\".raw": "raw",
+\".rb": "ruby",
+\".rhtml": "rhtml",
+\".rkt": "rkt",
+\".rs": "rs",
+\".rst": "rst",
+\".s": "s",
+\".sass": "sass",
+\".sc": "sc",
+\".scala": "scala",
+\".scm": "scheme",
+\".scpt": "scpt",
+\".scss": "scss",
+\".self": "self",
+\".sh": "sh",
+\".sml": "sml",
+\".sql": "sql",
+\".st": "smalltalk",
+\".tcl": "tcl",
+\".tcsh": "tcsh",
+\".tex": "tex",
+\".textile": "textile",
+\".tpl": "smarty",
+\".twig": "twig",
+\".txt" : "text",
+\".v": "verilog",
+\".vala": "vala",
+\".vb": "vbnet",
+\".vhd": "vhdl",
+\".vim": "vim",
+\".weechatlog": "weechatlog",
+\".xml": "xml",
+\".xq": "xquery",
+\".xs": "xs",
+\".yml": "yaml",
+\}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
