@@ -683,13 +683,13 @@ function! s:GetAuthHeader()
     let auth_url = "https://github.com/login/oauth/authorize"
     let access_token_url = "https://github.com/login/oauth/access_token"
     redraw | echo "\r"
-    let client_id = input("ClientID:")
+    let client_id = input("ClientID: ")
     redraw | echo "\r"
-    let client_secret = input("ClientSecret:")
+    let client_secret = input("ClientSecret: ")
     let url = auth_url."?scope=gist&client_id=".client_id
     call s:open_browser(url)
 
-    let pin = input("PIN:")
+    let pin = input("PIN: ")
     redraw | echo ''
     let res = http#post(access_token_url, {"client_id": client_id, "code": pin, "client_secret": client_secret})
     let secret = ''
