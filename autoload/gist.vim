@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 28-Mar-2012.
+" Last Change: 29-Mar-2012.
 " Version: 5.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -115,7 +115,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! s:get_gist_browser_command()
+function! s:get_browser_command()
   let gist_browser_command = get(g:, 'gist_browser_command', '')
   if gist_browser_command == ''
     if has('win32') || has('win64')
@@ -124,11 +124,30 @@ function! s:get_gist_browser_command()
       let gist_browser_command = "open %URL%"
     elseif executable('xdg-open')
       let gist_browser_command = "xdg-open %URL%"
-    else
+    elseif executable('firefox')
       let gist_browser_command = "firefox %URL% &"
+    else
+      let gist_browser_command = ""
     endif
   endif
   return gist_browser_command
+endfunction
+
+function! s:open_browser(url)
+  let cmd = substitute(s:get_browser_command(), '%URL%', '\=a:url', 'g')
+  if len(cmd) == 0
+    echohl WarningMsg
+    echo "It seems that you don't have general web browser. Open URL below."
+    echohl None
+    return
+  endif
+  if cmd =~ '^!'
+    silent! exec cmd
+  elseif cmd =~ '^:[A-Z]'
+    exec cmd
+  else
+    call system(cmd)
+  endif
 endfunction
 
 function! s:shellwords(str)
@@ -308,15 +327,7 @@ function! s:GistListAction(shift)
   if line =~# mx
     let gistid = matchstr(line, mx)
     if a:shift
-      let url = "https://gist.github.com/" . gistid
-      let cmd = substitute(s:get_gist_browser_command(), '%URL%', url, 'g')
-      if cmd =~ '^!'
-        silent! exec cmd
-      elseif cmd =~ '^:[A-Z]'
-        exec cmd
-      else
-        call system(cmd)
-      endif
+      call s:open_browser("https://gist.github.com/" . gistid)
     else
       call s:GistGet(gistid, 0)
     endif
@@ -617,14 +628,7 @@ function! gist#Gist(count, line1, line2, ...)
     endif
     if len(url) > 0
       if get(g:, 'gist_open_browser_after_post', 0) == 1
-        let cmd = substitute(s:get_gist_browser_command(), '%URL%', url, 'g')
-        if cmd =~ '^!'
-          silent! exec cmd
-        elseif cmd =~ '^:[A-Z]'
-          exec cmd
-        else
-          call system(cmd)
-        endif
+        call s:open_browser(url)
       endif
       let gist_put_url_to_clipboard_after_post = get(g:, 'gist_put_url_to_clipboard_after_post', 1)
       if gist_put_url_to_clipboard_after_post > 0
@@ -676,20 +680,19 @@ function! s:GetAuthHeader()
     call writefile([secret], configfile)
     return secret
   elseif api == 2
-    let auth_url =  "https://github.com/login/oauth/authorize"
+    let auth_url = "https://github.com/login/oauth/authorize"
     let access_token_url = "https://github.com/login/oauth/access_token"
     redraw | echo "\r"
     let client_id = input("ClientID:")
     redraw | echo "\r"
     let client_secret = input("ClientSecret:")
-    if has("win32") || has("win64")
-      silent exe "!start rundll32 url.dll,FileProtocolHandler ".auth_url."?scope=gist&client_id=".client_id
-    else
-      silent call system("xdg-open '".auth_url."?scope=gist&client_id=".client_id."'")
-    endif
+    let url = auth_url."?scope=gist&client_id=".client_id
+    call s:open_browser(url)
+
     let pin = input("PIN:")
     redraw | echo ''
     let res = http#post(access_token_url, {"client_id": client_id, "code": pin, "client_secret": client_secret})
+    let secret = ''
     for item in split(res.content, '&')
       let token = split(item, '=')
       if len(token) == 2 && token[0] == 'access_token'
