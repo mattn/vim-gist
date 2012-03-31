@@ -109,6 +109,8 @@ install_details: |
     3. click "Account Admin"
     4. you'll see it at following of 'API Token'.
 
+  See also: https://github.com/mattn/gist-vim/blob/master/README.mkd
+
 versions:
 - '6.0': |
    This is an upgrade for Gist.vim: changed to use github APIs. Note to remove cookies directory if you used.
