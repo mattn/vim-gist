@@ -11,7 +11,7 @@ if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
 endif
 let g:loaded_gist_vim = 1
 
-if (!exists('g:github_user') || !exists('g:github_token')) && !executable('git')
+if !exists('g:github_user') && !executable('git')
   echohl ErrorMsg | echomsg "Gist: require 'git' command" | echohl None
   finish
 endif
