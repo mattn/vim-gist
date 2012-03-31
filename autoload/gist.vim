@@ -153,8 +153,6 @@ function! s:open_browser(url)
   endif
 endfunction
 
-call s:open_browser("http://www.google.com/?foo=bar&client_id=bao")
-
 function! s:shellwords(str)
   let words = split(a:str, '\%(\([^ \t\''"]\+\)\|''\([^\'']*\)''\|"\(\%([^\"\\]\|\\.\)*\)"\)\zs\s*\ze')
   let words = map(words, 'substitute(v:val, ''\\\([\\ ]\)'', ''\1'', "g")')
