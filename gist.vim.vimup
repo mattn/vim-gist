@@ -112,6 +112,9 @@ install_details: |
   See also: https://github.com/mattn/gist-vim/blob/master/README.mkd
 
 versions:
+- '6.1': |
+   This is an upgrade for Gist.vim: fixed opening browser.
+
 - '6.0': |
    This is an upgrade for Gist.vim: changed to use github APIs. Note to remove cookies directory if you used.
 
