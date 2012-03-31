@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 31-Mar-2012.
+" Last Change: 01-Apr-2012.
 " Version: 6.0
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -119,22 +119,22 @@ function! s:get_browser_command()
   let gist_browser_command = get(g:, 'gist_browser_command', '')
   if gist_browser_command == ''
     if has('win32') || has('win64')
-      let gist_browser_command = "!start rundll32 url.dll,FileProtocolHandler %URL%"
+      let gist_browser_command = '!start rundll32 url.dll,FileProtocolHandler %URL%'
     elseif has('mac')
-      let gist_browser_command = "open %URL%"
+      let gist_browser_command = 'open %URL%'
     elseif executable('xdg-open')
-      let gist_browser_command = "xdg-open %URL%"
+      let gist_browser_command = 'xdg-open %URL%'
     elseif executable('firefox')
-      let gist_browser_command = "firefox %URL% &"
+      let gist_browser_command = 'firefox %URL% &'
     else
-      let gist_browser_command = ""
+      let gist_browser_command = ''
     endif
   endif
   return gist_browser_command
 endfunction
 
 function! s:open_browser(url)
-  let cmd = substitute(s:get_browser_command(), '%URL%', '\=a:url', 'g')
+  let cmd = s:get_browser_command()
   if len(cmd) == 0
     echohl WarningMsg
     echo "It seems that you don't have general web browser. Open URL below."
@@ -142,13 +142,18 @@ function! s:open_browser(url)
     return
   endif
   if cmd =~ '^!'
+    let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
     silent! exec cmd
   elseif cmd =~ '^:[A-Z]'
-    exec cmd
+    let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
+    exec cmd url
   else
+    let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
     call system(cmd)
   endif
 endfunction
+
+call s:open_browser("http://www.google.com/?foo=bar&client_id=bao")
 
 function! s:shellwords(str)
   let words = split(a:str, '\%(\([^ \t\''"]\+\)\|''\([^\'']*\)''\|"\(\%([^\"\\]\|\\.\)*\)"\)\zs\s*\ze')
