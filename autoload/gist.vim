@@ -291,7 +291,6 @@ function! s:GistGet(gistid, clipboard)
   let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
-    call writefile(split(res.content, "\n"), "myjson.js")
     try
       let gist = json#decode(res.content)
       let filename = sort(keys(gist.files))[0]
