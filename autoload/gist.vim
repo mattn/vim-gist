@@ -528,7 +528,7 @@ function! gist#Gist(count, line1, line2, ...)
   let editpost = 0
   let anonymous = 0
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
-  let bufnamemx = '^' . s:bufprefix .'\zs\([0-9a-f]\+\)\ze$'
+  let bufnamemx = '^' . s:bufprefix .'\zs\([0-9a-f]\+\|[0-9a-f]\+[/\\].*\)\ze$'
 
   let args = (a:0 > 0) ? s:shellwords(a:1) : []
   for arg in args
@@ -600,12 +600,12 @@ function! gist#Gist(count, line1, line2, ...)
       elseif arg =~ '^[0-9a-z]\+$\C'
         let gistid = arg
       else
-        echohl ErrorMsg | echomsg 'Invalid arguments' | echohl None
+        echohl ErrorMsg | echomsg 'Invalid arguments: '.arg | echohl None
         unlet args
         return 0
       endif
     elseif len(arg) > 0
-      echohl ErrorMsg | echomsg 'Invalid arguments' | echohl None
+      echohl ErrorMsg | echomsg 'Invalid arguments: '.arg | echohl None
       unlet args
       return 0
     endif
@@ -637,6 +637,12 @@ function! gist#Gist(count, line1, line2, ...)
         silent! normal! gvy
         let content = @"
         call setreg('"', save_regcont, save_regtype)
+      endif
+      " find GistID: in content , then we should just update
+      let id = matchstr(content, '\(GistID:\s*\)\@<=[0-9]\+')
+      if len(id) > 0
+        let gistid = id
+        let editpost = 1
       endif
       if editpost == 1
         let url = s:GistUpdate(content, gistid, gistnm, gistdesc)
