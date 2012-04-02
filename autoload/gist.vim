@@ -218,8 +218,15 @@ function! s:GistList(gistls, page)
     echohl ErrorMsg | echomsg 'Gists not found' | echohl None
     return
   endif
+  let content = json#decode(res.content)
+  if has_key(content, 'message') && len(content.message)
+    bw!
+    redraw
+    echohl ErrorMsg | echomsg content.message | echohl None
+    return
+  endif
 
-  let lines = map(json#decode(res.content), 's:format_gist(v:val)')
+  let lines = map(content, 's:format_gist(v:val)')
   call setline(1, split(join(lines, "\n"), "\n"))
 
   $put='more...'
@@ -498,7 +505,7 @@ endfunction
 function! gist#Gist(count, line1, line2, ...)
   redraw
   if strlen(g:github_user) == 0
-    echohl ErrorMsg | echomsg "You don't have github account. read ':help Gist.vim'." | echohl None
+    echohl ErrorMsg | echomsg "You don't have github account. read ':help gist-vim-setup'." | echohl None
     return
   endif
   let bufname = bufname("%")
@@ -657,6 +664,10 @@ function! gist#Gist(count, line1, line2, ...)
 endfunction
 
 function! s:GetAuthHeader()
+  if get(g:, 'gist_use_password_in_gitconfig', 0) != 0
+    let password = substitute(system('git config --global github.password'), "\n", '', '')
+    return printf("basic %s", base64#b64encode(g:github_user.":".password))
+  endif
   let auth = ""
   let configfile = expand('~/.gist-vim')
   if filereadable(configfile)

@@ -142,10 +142,6 @@ If you want to show your private gists with ":Gist -l": >
 
     let g:gist_show_privates = 1
 <
-You need to either set global git config
->
-    $ git config --global github.user Username
-<
 ==============================================================================
 REQUIREMENTS                                           *gist-vim-requirements*
 
@@ -201,7 +197,19 @@ gist-vim have two ways to access APIs.
 |BasicAuth|
 
   Require github user ID and password. This is easy but not secure.
-
+  You need to either set global git config
+>
+    $ git config --global github.user Username
+<
+  If you want to use password written in ~/.gitconfig like below:
+>
+    [github]
+        password = xxxxx
+<
+  Add following into your ~/.vimrc
+>
+    let g:gist_use_password_in_gitconfig = 1
+<
 |OAuth2|
 
  1. Register your application.
