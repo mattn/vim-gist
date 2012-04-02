@@ -142,6 +142,11 @@ You need to either set global git config
 
 	$ git config --global github.user Username
 
+
+If you want to edit all files for gists containing more than one:
+
+    let g:gist_get_multiplefile = 1
+
 ## Requirements:
 
 - curl command (http://curl.haxx.se/)
