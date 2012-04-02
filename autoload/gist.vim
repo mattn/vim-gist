@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 01-Apr-2012.
+" Last Change: 02-Apr-2012.
 " Version: 6.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -114,6 +114,13 @@
 
 let s:save_cpo = &cpo
 set cpo&vim
+
+if !exists('g:github_user')
+  let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
+  if strlen(g:github_user) == 0
+    let g:github_user = $GITHUB_USER
+  end
+endif
 
 function! s:get_browser_command()
   let gist_browser_command = get(g:, 'gist_browser_command', '')
@@ -490,11 +497,9 @@ endfunction
 
 function! gist#Gist(count, line1, line2, ...)
   redraw
-  if !exists('g:github_user')
-    let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
-    if strlen(g:github_user) == 0
-      let g:github_user = $GITHUB_USER
-    end
+  if strlen(g:github_user) == 0
+    echohl ErrorMsg | echomsg "You don't have github account. read ':help Gist.vim'." | echohl None
+    return
   endif
   let bufname = bufname("%")
   let gistid = ''
@@ -671,12 +676,6 @@ function! s:GetAuthHeader()
   echohl None
   let api = inputlist(['Which API:', '1. basic auth', '2. oauth2'])
   if api == 1
-    if !exists('g:github_user')
-      let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
-      if strlen(g:github_user) == 0
-        let g:github_user = $GITHUB_USER
-      end
-    endif
     redraw | echo "\r"
     let password = inputsecret("Password:")
     let secret = printf("basic %s", base64#b64encode(g:github_user.":".password))
