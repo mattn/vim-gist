@@ -111,6 +111,10 @@
 "
 "     default value is 1.
 "
+"   * if you want to edit all files for gists containing more than one:
+"
+"     let g:gist_get_multiplefile = 1
+"
 
 let s:save_cpo = &cpo
 set cpo&vim

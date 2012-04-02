@@ -142,6 +142,10 @@ If you want to show your private gists with ":Gist -l": >
 
     let g:gist_show_privates = 1
 <
+If you want to edit all files for gists containing more than one: >
+
+    let g:gist_get_multiplefile = 1
+<
 ==============================================================================
 REQUIREMENTS                                           *gist-vim-requirements*
 
