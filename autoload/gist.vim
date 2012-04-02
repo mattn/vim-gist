@@ -219,7 +219,7 @@ function! s:GistList(gistls, page)
     return
   endif
   let content = json#decode(res.content)
-  if has_key(content, 'message') && len(content.message)
+  if type(content) == 4 && has_key(content, 'message') && len(content.message)
     bw!
     redraw
     echohl ErrorMsg | echomsg content.message | echohl None
@@ -275,66 +275,75 @@ function! s:GistWrite(fname)
 endfunction
 
 function! s:GistGet(gistid, clipboard)
-  let winnum = bufwinnr(bufnr(s:bufprefix.a:gistid))
-  if winnum != -1
-    if winnum != bufwinnr('%')
-      exe winnum 'wincmd w'
-    endif
-    setlocal modifiable
-  else
-    exec 'silent noautocmd split' s:bufprefix.a:gistid
-  endif
-  let old_undolevels = &undolevels
-  set undolevels=-1
-  filetype detect
-  silent %d _
+  redraw | echon 'Getting gist... '
   let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
-    try
-      let gist = json#decode(res.content)
-      let filename = sort(keys(gist.files))[0]
-      let content = gist.files[filename].content
-      call setline(1, split(content, "\n"))
-      let b:gist = {
-      \ "filename": filename,
-      \ "id": gist.id,
-      \ "description": gist.description,
-      \ "private": gist.public =~ 'true',
-      \}
-    catch
+    let gist = json#decode(res.content)
+    if get(g:, 'gist_get_mutiplefile', 0) != 0
+      let num_file = len(keys(gist.files))
+    else
+      let num_file = 1
+    endif
+    for n in range(num_file)
+      try
+        let filename = sort(keys(gist.files))[n]
+
+        let winnum = bufwinnr(bufnr(s:bufprefix.a:gistid."/".filename))
+        if winnum != -1
+          if winnum != bufwinnr('%')
+            exe winnum 'wincmd w'
+          endif
+          setlocal modifiable
+        else
+          exec 'silent noautocmd split' s:bufprefix.a:gistid."/".filename
+        endif
+        let old_undolevels = &undolevels
+        set undolevels=-1
+        filetype detect
+        silent %d _
+
+        let content = gist.files[filename].content
+        call setline(1, split(content, "\n"))
+        let b:gist = {
+        \ "filename": filename,
+        \ "id": gist.id,
+        \ "description": gist.description,
+        \ "private": gist.public =~ 'true',
+        \}
+      catch
+        let &undolevels = old_undolevels
+        bw!
+        redraw
+        echohl ErrorMsg | echomsg 'Gist contains binary' | echohl None
+        return
+      endtry
       let &undolevels = old_undolevels
-      bw!
-      redraw
-      echohl ErrorMsg | echomsg 'Gist contains binary' | echohl None
-      return
-    endtry
+      setlocal buftype=acwrite bufhidden=delete noswapfile
+      setlocal nomodified
+      doau StdinReadPost <buffer>
+      let gist_detect_filetype = get(g:, 'gist_detect_filetype', 0)
+      if (&ft == '' && gist_detect_filetype == 1) || gist_detect_filetype == 2
+        call s:GistDetectFiletype(a:gistid)
+      endif
+      if a:clipboard
+        if exists('g:gist_clip_command')
+          exec 'silent w !'.g:gist_clip_command
+        elseif has('clipboard')
+          silent! %yank +
+        else
+          %yank
+        endif
+      endif
+      1
+      au! BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
+    endfor
   else
-    let &undolevels = old_undolevels
     bw!
     redraw
     echohl ErrorMsg | echomsg 'Gist not found' | echohl None
     return
   endif
-  let &undolevels = old_undolevels
-  setlocal buftype=acwrite bufhidden=delete noswapfile
-  setlocal nomodified
-  doau StdinReadPost <buffer>
-  let gist_detect_filetype = get(g:, 'gist_detect_filetype', 0)
-  if (&ft == '' && gist_detect_filetype == 1) || gist_detect_filetype == 2
-    call s:GistDetectFiletype(a:gistid)
-  endif
-  if a:clipboard
-    if exists('g:gist_clip_command')
-      exec 'silent w !'.g:gist_clip_command
-    elseif has('clipboard')
-      silent! %yank +
-    else
-      %yank
-    endif
-  endif
-  1
-  au! BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
 endfunction
 
 function! s:GistListAction(shift)
