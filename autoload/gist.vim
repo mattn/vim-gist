@@ -280,7 +280,7 @@ function! s:GistGet(gistid, clipboard)
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     let gist = json#decode(res.content)
-    if get(g:, 'gist_get_mutiplefile', 0) != 0
+    if get(g:, 'gist_get_multiplefile', 0) != 0
       let num_file = len(keys(gist.files))
     else
       let num_file = 1
