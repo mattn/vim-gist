@@ -498,7 +498,7 @@ endfunction
 function! gist#Gist(count, line1, line2, ...)
   redraw
   if strlen(g:github_user) == 0
-    echohl ErrorMsg | echomsg "You don't have github account. read ':help Gist.vim'." | echohl None
+    echohl ErrorMsg | echomsg "You don't have github account. read ':help gist-vim-user'." | echohl None
     return
   endif
   let bufname = bufname("%")

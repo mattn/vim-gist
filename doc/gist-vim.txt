@@ -142,6 +142,7 @@ If you want to show your private gists with ":Gist -l": >
 
     let g:gist_show_privates = 1
 <
+							       *gist-vim-user*
 You need to either set global git config
 >
     $ git config --global github.user Username
