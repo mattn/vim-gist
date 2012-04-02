@@ -116,7 +116,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 if !exists('g:github_user')
-  let g:github_user = substitute(system('git config --global github.user'), "\n", '', '')
+  let g:github_user = substitute(system('git config --get github.user'), "\n", '', '')
   if strlen(g:github_user) == 0
     let g:github_user = $GITHUB_USER
   end
@@ -673,7 +673,7 @@ endfunction
 
 function! s:GetAuthHeader()
   if get(g:, 'gist_use_password_in_gitconfig', 0) != 0
-    let password = substitute(system('git config --global github.password'), "\n", '', '')
+    let password = substitute(system('git config --get github.password'), "\n", '', '')
     return printf("basic %s", base64#b64encode(g:github_user.":".password))
   endif
   let auth = ""
