@@ -589,9 +589,9 @@ function! s:GetAuthHeader()
   endif
 
   echohl WarningMsg
-  echo 'Gist.vim need autholization to github API. This settings are stored in "~/.gist-vim". If you want to revoke, do "rm ~/.gist-vim".'
+  echo 'Gist.vim requires authorization to use the Github API. These settings are stored in "~/.gist-vim". If you want to revoke, do "rm ~/.gist-vim".'
   echohl ErrorMsg
-  echo 'Note to do "chmod 600 ~/.gist-vim" after this settings.'
+  echo 'Be sure to run "chmod 600 ~/.gist-vim" after finishing setup.'
   echohl None
   let api = inputlist(['Which API:', '1. basic auth', '2. oauth2'])
   if api == 1
