@@ -184,6 +184,7 @@ function! s:GistGet(gistid, clipboard)
     endif
     for n in range(num_file)
       try
+        let old_undolevels = &undolevels
         let filename = sort(keys(gist.files))[n]
 
         let winnum = bufwinnr(bufnr(s:bufprefix.a:gistid."/".filename))
@@ -193,9 +194,8 @@ function! s:GistGet(gistid, clipboard)
           endif
           setlocal modifiable
         else
-          exec 'silent noautocmd split' s:bufprefix.a:gistid."/".filename
+          exec 'silent noautocmd split' s:bufprefix.a:gistid."/".fnameescape(filename)
         endif
-        let old_undolevels = &undolevels
         set undolevels=-1
         filetype detect
         silent %d _
