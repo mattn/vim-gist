@@ -283,8 +283,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
   if status =~ '^2'
     let obj = json#decode(res.content)
     let loc = obj["html_url"]
-    redraw
-    echomsg 'Done: '.loc
+    redraw | echomsg 'Done: '.loc
     let b:gist = {"id": a:gistid, "filename": filename}
   else
     let loc = ''
@@ -297,6 +296,8 @@ endfunction
 function! s:GistDelete(gistid)
   redraw | echon 'Deleting to gist... '
   let res = http#post('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
+  echo a:gistid
+  let g:hoge = res
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     redraw | echomsg 'Done: '
@@ -352,8 +353,7 @@ function! s:GistPost(content, private, desc, anonymous)
   if status =~ '^2'
     let obj = json#decode(res.content)
     let loc = obj["html_url"]
-    redraw
-    echomsg 'Done: '.loc
+    redraw | echomsg 'Done: '.loc
     let b:gist = {
     \ "filename": filename,
     \ "id": matchstr(loc, '[^/]\+$'),
@@ -398,8 +398,7 @@ function! s:GistPostBuffers(private, desc, anonymous)
   if status =~ '^2'
     let obj = json#decode(res.content)
     let loc = obj["html_url"]
-    redraw
-    echomsg 'Done: '.loc
+    redraw | echomsg 'Done: '.loc
     let b:gist = {"id": matchstr(loc, '[^/]\+$'), "filename": filename, "private": a:private}
   else
     let loc = ''
@@ -428,7 +427,7 @@ function! gist#Gist(count, line1, line2, ...)
   let editpost = 0
   let anonymous = 0
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
-  let bufnamemx = '^' . s:bufprefix .'\zs\([0-9a-f]\+\|[0-9a-f]\+[/\\].*\)\ze$'
+  let bufnamemx = '^' . s:bufprefix .'\(\zs[0-9a-f]\+\ze\|\zs[0-9a-f]\+\ze[/\\].*\)$'
   if bufname =~ bufnamemx
     let gistidbuf = matchstr(bufname, bufnamemx)
   else
