@@ -138,7 +138,11 @@ If you want your gist to be private by default:
 
     let g:gist_post_private = 1
 
-You need to either set global git config
+If you want to manipulate multiple files in a gist:
+
+    let g:gist_get_multiplefile = 1
+
+You need to either set global git config:
 
 	$ git config --global github.user Username
 

@@ -142,6 +142,10 @@ If you want to show your private gists with ":Gist -l": >
 
     let g:gist_show_privates = 1
 <
+If you want to manipulate multiple files in a gist: >
+
+    let g:gist_get_multiplefile = 1
+<
 ==============================================================================
 REQUIREMENTS                                           *gist-vim-requirements*
 
@@ -197,7 +201,7 @@ gist-vim have two ways to access APIs.
 |BasicAuth|
 
   Require github user ID and password. This is easy but not secure.
-  You need to either set global git config
+  You need to either set global git config:
 >
     $ git config --global github.user Username
 <
