@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 03-Apr-2012.
+" Last Change: 04-Apr-2012.
 " Version: 6.3
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -583,6 +583,7 @@ endfunction
 function! s:GetAuthHeader()
   if get(g:, 'gist_use_password_in_gitconfig', 0) != 0
     let password = substitute(system('git config --get github.password'), "\n", '', '')
+    if password =~ '^!' | password = system(password[1:]) | endif
     return printf("basic %s", base64#b64encode(g:github_user.":".password))
   endif
   let auth = ""
