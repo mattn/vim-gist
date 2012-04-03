@@ -142,7 +142,10 @@ endfunction
 function! s:GistGetFileName(gistid)
   let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
   let gist = json#decode(res.content)
-  return sort(keys(gist.files))[0]
+  if has_key(gist, 'files')
+    return sort(keys(gist.files))[0]
+  endif
+  return ''
 endfunction
 
 function! s:GistDetectFiletype(gistid)
@@ -261,10 +264,10 @@ endfunction
 function! s:GistUpdate(content, gistid, gistnm, desc)
   let gist = { "id": a:gistid, "files" : {}, "description": "","public": function('json#true') }
   if a:desc != ' ' | let gist["description"] = a:desc | endif
-  if has('b:gist') && b:gist.private | let gist["public"] = function('json#false') | endif
+  if exists('b:gist') && b:gist.private | let gist["public"] = function('json#false') | endif
   let filename = a:gistnm
-  if exists('b:gistnm') > 0
-    let filename = b:gistnm
+  if exists('b:gist') && has_key(b:gist, 'filename')
+    let filename = b:gist.filename
   elseif len(a:gistnm) == 0
     let filename = s:GistGetFileName(a:gistid)
   endif
@@ -273,7 +276,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
   endif
   let gist.files[filename] = { "content": a:content, "filename": filename }
 
-  redraw | echon 'Posting it to gist... '
+  redraw | echon 'Updating gist... '
   let res = http#post('https://api.github.com/gists/' . a:gistid,
   \ json#encode(gist), { "Authorization": s:GetAuthHeader() })
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
@@ -297,7 +300,9 @@ function! s:GistDelete(gistid)
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     redraw | echomsg 'Done: '
-    unlet b:gist
+    if exists('b:gist')
+      unlet b:gist
+    endif
   else
     let status = matchstr(status, '^\d\+\s*\zs.*')
     echohl ErrorMsg | echomsg 'Delete failed: '.status | echohl None
@@ -411,6 +416,7 @@ function! gist#Gist(count, line1, line2, ...)
     return
   endif
   let bufname = bufname("%")
+  " find GistID: in content , then we should just update
   let gistid = ''
   let gistls = ''
   let gistnm = ''
@@ -423,6 +429,11 @@ function! gist#Gist(count, line1, line2, ...)
   let anonymous = 0
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
   let bufnamemx = '^' . s:bufprefix .'\zs\([0-9a-f]\+\|[0-9a-f]\+[/\\].*\)\ze$'
+  if bufname =~ bufnamemx
+    let gistidbuf = matchstr(bufname, bufnamemx)
+  else
+    let gistidbuf = matchstr(join(getline(a:line1, a:line2), "\n"), '\(GistID:\s*\)\@<=[0-9]\+')
+  endif
 
   let args = (a:0 > 0) ? s:shellwords(a:1) : []
   for arg in args
@@ -448,14 +459,14 @@ function! gist#Gist(count, line1, line2, ...)
       let gistdesc = ''
     elseif arg =~ '^\(-c\|--clipboard\)$\C'
       let clipboard = 1
-    elseif arg =~ '^\(-d\|--delete\)$\C' && bufname =~ bufnamemx
+    elseif arg =~ '^\(-d\|--delete\)$\C' && gistidbuf != ''
+      let gistid = gistidbuf
       let deletepost = 1
-      let gistid = matchstr(bufname, bufnamemx)
-    elseif arg =~ '^\(-e\|--edit\)$\C' && bufname =~ bufnamemx
+    elseif arg =~ '^\(-e\|--edit\)$\C' && gistidbuf != ''
+      let gistid = gistidbuf
       let editpost = 1
-      let gistid = matchstr(bufname, bufnamemx)
-    elseif arg =~ '^\(+1\|--star\)$\C' && bufname =~ bufnamemx
-      let gistid = matchstr(bufname, bufnamemx)
+    elseif arg =~ '^\(+1\|--star\)$\C' && gistidbuf != ''
+      let gistid = gistidbuf
       let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', { "Authorization": s:GetAuthHeader() }, 'PUT')
       let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
       if status =~ '^2'
@@ -464,8 +475,8 @@ function! gist#Gist(count, line1, line2, ...)
         echohl ErrorMsg | echomsg 'Star failed' | echohl None
       endif
       return
-    elseif arg =~ '^\(-1\|--unstar\)$\C' && bufname =~ bufnamemx
-      let gistid = matchstr(bufname, bufnamemx)
+    elseif arg =~ '^\(-1\|--unstar\)$\C' && gistidbuf != ''
+      let gistid = gistidbuf
       let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
       if status =~ '^2'
         echomsg "Unstared" gistid
@@ -473,8 +484,8 @@ function! gist#Gist(count, line1, line2, ...)
         echohl ErrorMsg | echomsg 'Unstar failed' | echohl None
       endif
       return
-    elseif arg =~ '^\(-f\|--fork\)$\C' && bufname =~ bufnamemx
-      let gistid = matchstr(bufname, bufnamemx)
+    elseif arg =~ '^\(-f\|--fork\)$\C' && gistidbuf != ''
+      let gistid = gistidbuf
       let res = http#post('https://api.github.com/gists/'.gistid.'/fork', '', { "Authorization": s:GetAuthHeader() })
       let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
       if status =~ '^2'
@@ -514,6 +525,11 @@ function! gist#Gist(count, line1, line2, ...)
   "echo "editpost=".editpost
   "echo "deletepost=".deletepost
 
+  if gistidbuf != '' && gistid == '' && editpost == 0 && deletepost == 0
+    let editpost = 1
+    let gistid = gistidbuf
+  endif
+
   if len(gistls) > 0
     call s:GistList(gistls, 1)
   elseif len(gistid) > 0 && editpost == 0 && deletepost == 0
@@ -531,12 +547,6 @@ function! gist#Gist(count, line1, line2, ...)
         silent! normal! gvy
         let content = @"
         call setreg('"', save_regcont, save_regtype)
-      endif
-      " find GistID: in content , then we should just update
-      let id = matchstr(content, '\(GistID:\s*\)\@<=[0-9]\+')
-      if len(id) > 0
-        let gistid = id
-        let editpost = 1
       endif
       if editpost == 1
         let url = s:GistUpdate(content, gistid, gistnm, gistdesc)
