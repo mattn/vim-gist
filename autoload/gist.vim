@@ -583,7 +583,7 @@ endfunction
 function! s:GetAuthHeader()
   if get(g:, 'gist_use_password_in_gitconfig', 0) != 0
     let password = substitute(system('git config --get github.password'), "\n", '', '')
-    if password =~ '^!' | password = system(password[1:]) | endif
+    if password =~ '^!' | let password = system(password[1:]) | endif
     return printf("basic %s", base64#b64encode(g:github_user.":".password))
   endif
   let auth = ""
