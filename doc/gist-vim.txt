@@ -201,7 +201,7 @@ gist-vim have two ways to access APIs.
 |BasicAuth|
 
   Require github user ID and password. This is easy but not secure.
-  You need to either set global git config:
+  You need to set global git config:
 >
     $ git config --global github.user Username
 <
@@ -227,7 +227,12 @@ gist-vim have two ways to access APIs.
    Callback URL should be http://mattn.github.com/gist-vim
    If you don't want to point this site, use URL parameter 'code' as PIN.
 
-  2. Start `:Gist -l`
+  2. If you haven't already set up your github user in .gitconfig:
+>
+    $ git config --global github.user Username
+<
+
+  3. Start `:Gist -l`
 
     You'll see some prompts. fill ClientID/CilentSecret. Then you can see
     browser show up.
