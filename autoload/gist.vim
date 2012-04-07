@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 07-Apr-2012.
+" Last Change: 08-Apr-2012.
 " Version: 6.3
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -263,16 +263,15 @@ endfunction
 
 function! s:GistUpdate(content, gistid, gistnm, desc)
   let gist = { "id": a:gistid, "files" : {}, "description": "","public": function('json#true') }
-  if a:desc != ' ' | let gist["description"] = a:desc | endif
-  if exists('b:gist') && b:gist.private | let gist["public"] = function('json#false') | endif
-  let filename = a:gistnm
-  if exists('b:gist') && has_key(b:gist, 'filename')
-    let filename = b:gist.filename
-  elseif len(a:gistnm) == 0
-    let filename = s:GistGetFileName(a:gistid)
-  endif
-  if len(filename) == 0
-    let filename = s:get_current_filename(1)
+  if exists('b:gist')
+    if has_key(b:gist, 'private') && b:gist.private | let gist["public"] = function('json#false') | endif
+    if has_key(b:gist, 'description') | let gist["description"] = b:gist.description | endif
+    if has_key(b:gist, 'filename') | let filename = b:gist.filename | endif
+  else
+    if a:desc != ' ' | let gist["description"] = a:desc | endif
+    let filename = a:gistnm
+    if len(filename) == 0 | let filename = s:GistGetFileName(a:gistid) | endif
+    if len(filename) == 0 | let filename = s:get_current_filename(1) | endif
   endif
   let gist.files[filename] = { "content": a:content, "filename": filename }
 
