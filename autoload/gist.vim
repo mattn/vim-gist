@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 04-Apr-2012.
+" Last Change: 07-Apr-2012.
 " Version: 6.3
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -296,8 +296,6 @@ endfunction
 function! s:GistDelete(gistid)
   redraw | echon 'Deleting to gist... '
   let res = http#post('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
-  echo a:gistid
-  let g:hoge = res
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     redraw | echomsg 'Done: '
