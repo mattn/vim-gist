@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 08-Apr-2012.
+" Last Change: 09-Apr-2012.
 " Version: 6.4
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -105,14 +105,14 @@ function! s:GistList(gistls, page)
   silent %d _
 
   redraw | echon 'Listing gists... '
-  let res = http#get(url, '', { "Authorization": s:GetAuthHeader() })
+  let res = webapi#http#get(url, '', { "Authorization": s:GetAuthHeader() })
   if v:shell_error != 0
     bw!
     redraw
     echohl ErrorMsg | echomsg 'Gists not found' | echohl None
     return
   endif
-  let content = json#decode(res.content)
+  let content = webapi#json#decode(res.content)
   if type(content) == 4 && has_key(content, 'message') && len(content.message)
     bw!
     redraw
@@ -140,8 +140,8 @@ function! s:GistList(gistls, page)
 endfunction
 
 function! s:GistGetFileName(gistid)
-  let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
-  let gist = json#decode(res.content)
+  let res = webapi#http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
+  let gist = webapi#json#decode(res.content)
   if has_key(gist, 'files')
     return sort(keys(gist.files))[0]
   endif
@@ -149,8 +149,8 @@ function! s:GistGetFileName(gistid)
 endfunction
 
 function! s:GistDetectFiletype(gistid)
-  let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
-  let gist = json#decode(res.content)
+  let res = webapi#http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
+  let gist = webapi#json#decode(res.content)
   let filename = sort(keys(gist.files))[0]
   let ext = fnamemodify(filename, ':e')
   if has_key(s:extmap, ext)
@@ -173,10 +173,10 @@ endfunction
 
 function! s:GistGet(gistid, clipboard)
   redraw | echon 'Getting gist... '
-  let res = http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
+  let res = webapi#http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
-    let gist = json#decode(res.content)
+    let gist = webapi#json#decode(res.content)
     if get(g:, 'gist_get_multiplefile', 0) != 0
       let num_file = len(keys(gist.files))
     else
@@ -262,9 +262,9 @@ function! s:GistListAction(shift)
 endfunction
 
 function! s:GistUpdate(content, gistid, gistnm, desc)
-  let gist = { "id": a:gistid, "files" : {}, "description": "","public": function('json#true') }
+  let gist = { "id": a:gistid, "files" : {}, "description": "","public": function('webapi#json#true') }
   if exists('b:gist')
-    if has_key(b:gist, 'private') && b:gist.private | let gist["public"] = function('json#false') | endif
+    if has_key(b:gist, 'private') && b:gist.private | let gist["public"] = function('webapi#json#false') | endif
     if has_key(b:gist, 'description') | let gist["description"] = b:gist.description | endif
     if has_key(b:gist, 'filename') | let filename = b:gist.filename | endif
   else
@@ -276,11 +276,11 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
   let gist.files[filename] = { "content": a:content, "filename": filename }
 
   redraw | echon 'Updating gist... '
-  let res = http#post('https://api.github.com/gists/' . a:gistid,
-  \ json#encode(gist), { "Authorization": s:GetAuthHeader() })
+  let res = webapi#http#post('https://api.github.com/gists/' . a:gistid,
+  \ webapi#json#encode(gist), { "Authorization": s:GetAuthHeader() })
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
-    let obj = json#decode(res.content)
+    let obj = webapi#json#decode(res.content)
     let loc = obj["html_url"]
     redraw | echomsg 'Done: '.loc
     let b:gist = {"id": a:gistid, "filename": filename}
@@ -294,7 +294,7 @@ endfunction
 
 function! s:GistDelete(gistid)
   redraw | echon 'Deleting to gist... '
-  let res = http#post('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
+  let res = webapi#http#post('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     redraw | echomsg 'Done: '
@@ -337,18 +337,18 @@ endfunction
 "       GistID: 123123
 "
 function! s:GistPost(content, private, desc, anonymous)
-  let gist = { "files" : {}, "description": "","public": function('json#true') }
+  let gist = { "files" : {}, "description": "","public": function('webapi#json#true') }
   if a:desc != ' ' | let gist["description"] = a:desc | endif
-  if a:private | let gist["public"] = function('json#false') | endif
+  if a:private | let gist["public"] = function('webapi#json#false') | endif
   let filename = s:get_current_filename(1)
   let gist.files[filename] = { "content": a:content, "filename": filename }
 
   redraw | echon 'Posting it to gist... '
   let auth = a:anonymous ? {} : { "Authorization": s:GetAuthHeader() }
-  let res = http#post('https://api.github.com/gists', json#encode(gist), auth)
+  let res = webapi#http#post('https://api.github.com/gists', webapi#json#encode(gist), auth)
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
-    let obj = json#decode(res.content)
+    let obj = webapi#json#decode(res.content)
     let loc = obj["html_url"]
     redraw | echomsg 'Done: '.loc
     let b:gist = {
@@ -370,9 +370,9 @@ function! s:GistPostBuffers(private, desc, anonymous)
   let bn = bufnr('%')
   let query = []
 
-  let gist = { "files" : {}, "description": "","public": function('json#true') }
+  let gist = { "files" : {}, "description": "","public": function('webapi#json#true') }
   if a:desc != ' ' | let gist["description"] = a:desc | endif
-  if a:private | let gist["public"] = function('json#false') | endif
+  if a:private | let gist["public"] = function('webapi#json#false') | endif
 
   let index = 1
   for bufnr in bufnrs
@@ -390,10 +390,10 @@ function! s:GistPostBuffers(private, desc, anonymous)
 
   redraw | echon 'Posting it to gist... '
   let auth = a:anonymous ? {} : { "Authorization": s:GetAuthHeader() }
-  let res = http#post('https://api.github.com/gists', json#encode(gist), auth)
+  let res = webapi#http#post('https://api.github.com/gists', webapi#json#encode(gist), auth)
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
-    let obj = json#decode(res.content)
+    let obj = webapi#json#decode(res.content)
     let loc = obj["html_url"]
     redraw | echomsg 'Done: '.loc
     let b:gist = {"id": matchstr(loc, '[^/]\+$'), "filename": filename, "private": a:private}
@@ -463,7 +463,7 @@ function! gist#Gist(count, line1, line2, ...)
       let editpost = 1
     elseif arg =~ '^\(+1\|--star\)$\C' && gistidbuf != ''
       let gistid = gistidbuf
-      let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', { "Authorization": s:GetAuthHeader() }, 'PUT')
+      let res = webapi#http#post('https://api.github.com/gists/'.gistid.'/star', '', { "Authorization": s:GetAuthHeader() }, 'PUT')
       let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
       if status =~ '^2'
         echomsg "Stared" gistid
@@ -473,7 +473,7 @@ function! gist#Gist(count, line1, line2, ...)
       return
     elseif arg =~ '^\(-1\|--unstar\)$\C' && gistidbuf != ''
       let gistid = gistidbuf
-      let res = http#post('https://api.github.com/gists/'.gistid.'/star', '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
+      let res = webapi#http#post('https://api.github.com/gists/'.gistid.'/star', '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
       if status =~ '^2'
         echomsg "Unstared" gistid
       else
@@ -482,10 +482,10 @@ function! gist#Gist(count, line1, line2, ...)
       return
     elseif arg =~ '^\(-f\|--fork\)$\C' && gistidbuf != ''
       let gistid = gistidbuf
-      let res = http#post('https://api.github.com/gists/'.gistid.'/fork', '', { "Authorization": s:GetAuthHeader() })
+      let res = webapi#http#post('https://api.github.com/gists/'.gistid.'/fork', '', { "Authorization": s:GetAuthHeader() })
       let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
       if status =~ '^2'
-        let obj = json#decode(res.content)
+        let obj = webapi#json#decode(res.content)
         let gistid = obj["id"]
       else
         echohl ErrorMsg | echomsg 'Fork failed' | echohl None
@@ -581,7 +581,7 @@ function! s:GetAuthHeader()
   if get(g:, 'gist_use_password_in_gitconfig', 0) != 0
     let password = substitute(system('git config --get github.password'), "\n", '', '')
     if password =~ '^!' | let password = system(password[1:]) | endif
-    return printf("basic %s", base64#b64encode(g:github_user.":".password))
+    return printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
   endif
   let auth = ""
   let configfile = expand('~/.gist-vim')
@@ -604,7 +604,7 @@ function! s:GetAuthHeader()
   if api == 1
     redraw | echo "\r"
     let password = inputsecret("Password:")
-    let secret = printf("basic %s", base64#b64encode(g:github_user.":".password))
+    let secret = printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
     call writefile([secret], configfile)
     return secret
   elseif api == 2
@@ -619,12 +619,12 @@ function! s:GetAuthHeader()
 
     let pin = input("PIN: ")
     redraw | echo ''
-    let res = http#post(access_token_url, {"client_id": client_id, "code": pin, "client_secret": client_secret})
+    let res = webapi#http#post(access_token_url, {"client_id": client_id, "code": pin, "client_secret": client_secret})
     let secret = ''
     for item in split(res.content, '&')
       let token = split(item, '=')
       if len(token) == 2 && token[0] == 'access_token'
-        let secret = printf("token %s", http#decodeURI(token[1]))
+        let secret = printf("token %s", webapi#http#decodeURI(token[1]))
         break
       endif
     endfor
