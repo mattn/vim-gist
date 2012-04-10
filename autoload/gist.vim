@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 09-Apr-2012.
+" Last Change: 10-Apr-2012.
 " Version: 6.4
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -36,10 +36,13 @@ endfunction
 
 function! s:open_browser(url)
   let cmd = s:get_browser_command()
+  let cmd = ''
   if len(cmd) == 0
+    redraw
     echohl WarningMsg
     echo "It seems that you don't have general web browser. Open URL below."
     echohl None
+    echo a:url
     return
   endif
   if cmd =~ '^!'
@@ -595,6 +598,7 @@ function! s:GetAuthHeader()
     return auth
   endif
 
+  redraw
   echohl WarningMsg
   echo 'Gist.vim requires authorization to use the Github API. These settings are stored in "~/.gist-vim". If you want to revoke, do "rm ~/.gist-vim".'
   echohl ErrorMsg
