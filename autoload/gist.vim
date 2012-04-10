@@ -36,7 +36,6 @@ endfunction
 
 function! s:open_browser(url)
   let cmd = s:get_browser_command()
-  let cmd = ''
   if len(cmd) == 0
     redraw
     echohl WarningMsg
