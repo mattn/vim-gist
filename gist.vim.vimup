@@ -2,7 +2,7 @@ script_name: Gist.vim
 script_id: '2423'
 script_type: utility
 script_package: gist-vim.zip
-script_version: '6.4'
+script_version: '6.5'
 required_vim_version: '7.0'
 summary: vimscript for gist
 
@@ -112,6 +112,9 @@ install_details: |
   See also: https://github.com/mattn/gist-vim/blob/master/README.mkd
 
 versions:
+- '6.5': |
+   This is an upgrade for Gist.vim: use webapi namespace. NOTE: please upgrade webapi-vim also.
+
 - '6.4': |
    This is an upgrade for Gist.vim: fixed updating with description.
 
