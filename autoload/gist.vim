@@ -286,6 +286,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
     let loc = obj["html_url"]
     redraw | echomsg 'Done: '.loc
     let b:gist = {"id": a:gistid, "filename": filename}
+    setlocal nomodified
   else
     let loc = ''
     let status = matchstr(status, '^\d\+\s*\zs.*')
