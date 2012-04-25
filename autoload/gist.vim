@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 16-Apr-2012.
+" Last Change: 26-Apr-2012.
 " Version: 6.5
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -220,7 +220,7 @@ function! s:GistGet(gistid, clipboard)
       let &undolevels = old_undolevels
       setlocal buftype=acwrite bufhidden=delete noswapfile
       setlocal nomodified
-      doau StdinReadPost <buffer>
+      doau StdinReadPost,BufRead,BufReadPost
       let gist_detect_filetype = get(g:, 'gist_detect_filetype', 0)
       if (&ft == '' && gist_detect_filetype == 1) || gist_detect_filetype == 2
         call s:GistDetectFiletype(a:gistid)
