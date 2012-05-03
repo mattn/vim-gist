@@ -431,7 +431,7 @@ function! gist#Gist(count, line1, line2, ...)
   if bufname =~ bufnamemx
     let gistidbuf = matchstr(bufname, bufnamemx)
   else
-    let gistidbuf = matchstr(join(getline(a:line1, a:line2), "\n"), '\(GistID:\s*\)\@<=[0-9]\+')
+    let gistidbuf = matchstr(join(getline(a:line1, a:line2), "\n"), '\(GistID:\s*\)\@<=\S\+')
   endif
 
   let args = (a:0 > 0) ? s:shellwords(a:1) : []
