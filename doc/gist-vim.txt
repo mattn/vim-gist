@@ -146,6 +146,15 @@ If you want to edit all files for gists containing more than one: >
 
     let g:gist_get_multiplefile = 1
 <
+
+If you want to update a gist, embed >
+
+    GistID: xxxxx
+>
+in your local file, then call >
+
+    :Gist
+>
 ==============================================================================
 REQUIREMENTS                                           *gist-vim-requirements*
 
