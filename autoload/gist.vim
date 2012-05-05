@@ -296,7 +296,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
 endfunction
 
 function! s:GistDelete(gistid)
-  redraw | echon 'Deleting to gist... '
+  redraw | echon 'Deleting gist... '
   let res = webapi#http#post('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
