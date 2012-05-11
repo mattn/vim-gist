@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 05-May-2012.
+" Last Change: 11-May-2012.
 " Version: 6.5
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -313,7 +313,7 @@ endfunction
 function! s:get_current_filename(no)
   let filename = expand('%:t')
   if len(filename) == 0 && &ft != ''
-    let pair = filter(items(s:extmap), 'v:val[1] == "ruby"')
+    let pair = filter(items(s:extmap), 'v:val[1] == &ft')
     if len(pair) > 0
       let filename = printf('gistfile%d%s', a:no, pair[0][0])
     endif
