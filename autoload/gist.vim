@@ -274,7 +274,20 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
     if len(filename) == 0 | let filename = s:GistGetFileName(a:gistid) | endif
     if len(filename) == 0 | let filename = s:get_current_filename(1) | endif
   endif
-  if a:desc != ' ' | let gist["description"] = a:desc | endif
+
+  " Update description
+  " If no new description specified, keep the old description
+  if a:desc != ' '
+    let gist["description"] = a:desc
+  else
+    let res = webapi#http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
+    let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
+    if status =~ '^2'
+      let old_gist = webapi#json#decode(res.content)
+      let gist["description"] = old_gist.description
+    endif
+  endif
+
   let gist.files[filename] = { "content": a:content, "filename": filename }
 
   redraw | echon 'Updating gist... '
