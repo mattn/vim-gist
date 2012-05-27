@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 11-May-2012.
+" Last Change: 2012-05-27.
 " Version: 6.5
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -49,7 +49,7 @@ function! s:open_browser(url)
     silent! exec cmd
   elseif cmd =~ '^:[A-Z]'
     let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
-    exec cmd url
+    exec cmd
   else
     let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
     call system(cmd)
