@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 28-May-2012.
+" Last Change: 20-Jun-2012.
 " Version: 6.7
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -125,7 +125,7 @@ function! s:GistList(gistls, page)
     return
   endif
 
-  let lines = map(content, 's:format_gist(v:val)')
+  let lines = map(filter(content, '!empty(v:val.files)'), 's:format_gist(v:val)')
   call setline(1, split(join(lines, "\n"), "\n"))
 
   $put='more...'
@@ -186,6 +186,11 @@ function! s:GistGet(gistid, clipboard)
       let num_file = len(keys(gist.files))
     else
       let num_file = 1
+    endif
+    if num_file > len(keys(gist.files))
+      redraw
+      echohl ErrorMsg | echomsg 'Gist not found' | echohl None
+      return
     endif
     for n in range(num_file)
       try
