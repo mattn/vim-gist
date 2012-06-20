@@ -65,6 +65,9 @@ endfunction
 
 function! s:format_gist(gist)
   let files = sort(keys(a:gist.files))
+  if empty(files)
+    return ""
+  endif
   let file = a:gist.files[files[0]]
   if has_key(file, "content")
     let code = file.content
@@ -75,7 +78,7 @@ function! s:format_gist(gist)
   return printf("gist: %s %s%s", a:gist.id, type(a:gist.description)==0?"": a:gist.description, code)
 endfunction
 
-" Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it. 
+" Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it.
 let s:bufprefix = 'gist' . (has('unix') ? ':' : '_')
 function! s:GistList(gistls, page)
   if a:gistls == '-all'
