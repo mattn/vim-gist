@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 20-Jun-2012.
+" Last Change: 22-Jun-2012.
 " Version: 6.7
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -452,7 +452,7 @@ function! gist#Gist(count, line1, line2, ...)
   if bufname =~ bufnamemx
     let gistidbuf = matchstr(bufname, bufnamemx)
   else
-    let gistidbuf = matchstr(join(getline(a:line1, a:line2), "\n"), '\(GistID:\s*\)\@<=\S\+')
+    let gistidbuf = matchstr(join(getline(a:line1, a:line2), "\n"), 'GistID:\s*\zs\w\+')
   endif
 
   let args = (a:0 > 0) ? s:shellwords(a:1) : []
