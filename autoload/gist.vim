@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 22-Jun-2012.
+" Last Change: 29-Jun-2012.
 " Version: 6.7
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -300,7 +300,10 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
 
   redraw | echon 'Updating gist... '
   let res = webapi#http#post('https://api.github.com/gists/' . a:gistid,
-  \ webapi#json#encode(gist), { "Authorization": s:GetAuthHeader() })
+  \ webapi#json#encode(gist), {
+  \   "Authorization": s:GetAuthHeader(),
+  \   "Content-Type": "application/javascript",
+  \})
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     let obj = webapi#json#decode(res.content)
@@ -318,7 +321,11 @@ endfunction
 
 function! s:GistDelete(gistid)
   redraw | echon 'Deleting gist... '
-  let res = webapi#http#post('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() }, 'DELETE')
+  let res = webapi#http#post('https://api.github.com/gists/'.a:gistid, '',
+  \ webapi#json#encode(gist), {
+  \   "Authorization": s:GetAuthHeader(),
+  \   "Content-Type": "application/javascript",
+  \}, 'DELETE')
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     redraw | echomsg 'Done: '
@@ -368,8 +375,11 @@ function! s:GistPost(content, private, desc, anonymous)
   let gist.files[filename] = { "content": a:content, "filename": filename }
 
   redraw | echon 'Posting it to gist... '
-  let auth = a:anonymous ? {} : { "Authorization": s:GetAuthHeader() }
-  let res = webapi#http#post('https://api.github.com/gists', webapi#json#encode(gist), auth)
+  let header = {"Content-Type": "application/javascript"}
+  if !a:anonymous
+    let header["Authorization"] = s:GetAuthHeader()
+  endif
+  let res = webapi#http#post('https://api.github.com/gists', webapi#json#encode(gist), header)
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     let obj = webapi#json#decode(res.content)
@@ -413,8 +423,11 @@ function! s:GistPostBuffers(private, desc, anonymous)
   silent! exec "buffer!" bn
 
   redraw | echon 'Posting it to gist... '
-  let auth = a:anonymous ? {} : { "Authorization": s:GetAuthHeader() }
-  let res = webapi#http#post('https://api.github.com/gists', webapi#json#encode(gist), auth)
+  let header = {"Content-Type": "application/javascript"}
+  if !a:anonymous
+    let header["Authorization"] = s:GetAuthHeader()
+  endif
+  let res = webapi#http#post('https://api.github.com/gists', webapi#json#encode(gist), header)
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     let obj = webapi#json#decode(res.content)
