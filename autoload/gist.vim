@@ -125,6 +125,7 @@ function! s:GistList(gistls, page)
     return
   endif
 
+  let g:hoge = deepcopy(content)
   let lines = map(filter(content, '!empty(v:val.files)'), 's:format_gist(v:val)')
   call setline(1, split(join(lines, "\n"), "\n"))
 
@@ -302,7 +303,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
   let res = webapi#http#post('https://api.github.com/gists/' . a:gistid,
   \ webapi#json#encode(gist), {
   \   "Authorization": s:GetAuthHeader(),
-  \   "Content-Type": "application/javascript",
+  \   "Content-Type": "application/json",
   \})
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
@@ -324,7 +325,7 @@ function! s:GistDelete(gistid)
   let res = webapi#http#post('https://api.github.com/gists/'.a:gistid, '',
   \ webapi#json#encode(gist), {
   \   "Authorization": s:GetAuthHeader(),
-  \   "Content-Type": "application/javascript",
+  \   "Content-Type": "application/json",
   \}, 'DELETE')
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
@@ -375,7 +376,7 @@ function! s:GistPost(content, private, desc, anonymous)
   let gist.files[filename] = { "content": a:content, "filename": filename }
 
   redraw | echon 'Posting it to gist... '
-  let header = {"Content-Type": "application/javascript"}
+  let header = {"Content-Type": "application/json"}
   if !a:anonymous
     let header["Authorization"] = s:GetAuthHeader()
   endif
@@ -423,7 +424,7 @@ function! s:GistPostBuffers(private, desc, anonymous)
   silent! exec "buffer!" bn
 
   redraw | echon 'Posting it to gist... '
-  let header = {"Content-Type": "application/javascript"}
+  let header = {"Content-Type": "application/json"}
   if !a:anonymous
     let header["Authorization"] = s:GetAuthHeader()
   endif
