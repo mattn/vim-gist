@@ -125,7 +125,6 @@ function! s:GistList(gistls, page)
     return
   endif
 
-  let g:hoge = deepcopy(content)
   let lines = map(filter(content, '!empty(v:val.files)'), 's:format_gist(v:val)')
   call setline(1, split(join(lines, "\n"), "\n"))
 
