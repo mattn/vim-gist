@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 29-Jun-2012.
+" Last Change: 03-Jul-2012.
 " Version: 6.7
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -321,8 +321,7 @@ endfunction
 
 function! s:GistDelete(gistid)
   redraw | echon 'Deleting gist... '
-  let res = webapi#http#post('https://api.github.com/gists/'.a:gistid, '',
-  \ webapi#json#encode(gist), {
+  let res = webapi#http#post('https://api.github.com/gists/'.a:gistid, '', {
   \   "Authorization": s:GetAuthHeader(),
   \   "Content-Type": "application/json",
   \}, 'DELETE')
