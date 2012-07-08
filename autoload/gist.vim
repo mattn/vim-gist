@@ -9,6 +9,8 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:configfile = expand('~/.gist-vim')
+
 if !exists('g:github_user')
   let g:github_user = substitute(system('git config --get github.user'), "\n", '', '')
   if strlen(g:github_user) == 0
@@ -122,6 +124,9 @@ function! s:GistList(gistls, page)
     bw!
     redraw
     echohl ErrorMsg | echomsg content.message | echohl None
+    if content.message == 'Bad credentials'
+      call delete(s:configfile)
+    endif
     return
   endif
 
@@ -620,9 +625,8 @@ function! s:GetAuthHeader()
     return printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
   endif
   let auth = ""
-  let configfile = expand('~/.gist-vim')
-  if filereadable(configfile)
-    let str = join(readfile(configfile), "")
+  if filereadable(s:configfile)
+    let str = join(readfile(s:configfile), "")
     if type(str) == 1
       let auth = str
     endif
@@ -634,41 +638,25 @@ function! s:GetAuthHeader()
   redraw
   echohl WarningMsg
   echo 'Gist.vim requires authorization to use the Github API. These settings are stored in "~/.gist-vim". If you want to revoke, do "rm ~/.gist-vim".'
-  echohl ErrorMsg
-  echo 'Be sure to run "chmod 600 ~/.gist-vim" after finishing setup.'
   echohl None
-  let api = inputlist(['Which API:', '1. basic auth', '2. oauth2'])
-  if api == 1
-    redraw | echo "\r"
-    let password = inputsecret("Password:")
-    let secret = printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
-    call writefile([secret], configfile)
-    return secret
-  elseif api == 2
-    let auth_url = "https://github.com/login/oauth/authorize"
-    let access_token_url = "https://github.com/login/oauth/access_token"
-    redraw | echo "\r"
-    let client_id = input("ClientID: ")
-    redraw | echo "\r"
-    let client_secret = input("ClientSecret: ")
-    let url = auth_url."?scope=gist&client_id=".client_id
-    call s:open_browser(url)
-
-    let pin = input("PIN: ")
-    redraw | echo ''
-    let res = webapi#http#post(access_token_url, {"client_id": client_id, "code": pin, "client_secret": client_secret})
-    let secret = ''
-    for item in split(res.content, '&')
-      let token = split(item, '=')
-      if len(token) == 2 && token[0] == 'access_token'
-        let secret = printf("token %s", webapi#http#decodeURI(token[1]))
-        break
-      endif
-    endfor
-    call writefile([secret], configfile)
-    return secret
+  redraw | echo "\r"
+  let password = inputsecret("Github Password for ".g:github_user.":")
+  let insecureSecret = printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
+  let res = webapi#http#post('https://api.github.com/authorizations', webapi#json#encode({
+              \  "scopes"   : ["gist"],
+              \  "note"     : "Gist.vim on ".hostname(),
+              \  "note_url" : "http://www.vim.org/scripts/script.php?script_id=2423"
+              \}), {
+              \  "Content-Type"  : "application/json",
+              \  "Authorization" : insecureSecret,
+              \})
+  let authorization = webapi#json#decode(res.content)
+  let secret = printf("token %s", authorization.token)
+  call writefile([secret], s:configfile)
+  if !(has('win32') || has('win64'))
+    call system("chmod go= ".s:configfile)
   endif
-  return ""
+  return secret
 endfunction
 
 let s:extmap = {
