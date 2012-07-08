@@ -207,46 +207,27 @@ SETUP                                                       *gist-vim-setup*
 This plugin uses github API v3. Setting value is stored in `~/.gist.vim`.
 gist-vim have two ways to access APIs.
 
-|BasicAuth|
-
-  Require github user ID and password. This is easy but not secure.
-  You need to set global git config:
+First, you need to set your Github username in global git config:
 >
     $ git config --global github.user Username
 <
-  If you want to use password written in ~/.gitconfig like below:
+Then, gist.vim will ask for your password to create an authorization when you
+first use it.  The password is not stored and only the OAuth access token will
+be kept for later use.  You can revoke the token at any time from the list of
+"Authorized applications" on Github's "Account Settings" page.
+(https://github.com/settings/applications)
+
+If you happen to have your password already written in ~/.gitconfig like
+below:
 >
     [github]
         password = xxxxx
 <
-  Add following into your ~/.vimrc
+Then, add following into your ~/.vimrc
 >
     let g:gist_use_password_in_gitconfig = 1
 <
-|OAuth2|
-
- 1. Register your application.
-
-   Note that you must set `Callback URL` as same as following.
-
-   https://github.com/settings/applications/new
-
-   fill like following
-
-   Callback URL should be http://mattn.github.com/gist-vim
-   If you don't want to point this site, use URL parameter 'code' as PIN.
-
-  2. If you haven't already set up your github user in .gitconfig:
->
-    $ git config --global github.user Username
-<
-
-  3. Start `:Gist -l`
-
-    You'll see some prompts. fill ClientID/CilentSecret. Then you can see
-    browser show up.
-    If you set Callback URL above, you can see PIN code.
-    Copy this value and paste to prompt `PIN:`.
+This is not secure at all, so strongly discouraged.
 
 ==============================================================================
 THANKS                                                     *gist-vim-thanks*
@@ -265,5 +246,6 @@ THANKS                                                     *gist-vim-thanks*
   steve
   tyru
   Will Gray
+  netj
 
  vim:tw=78:ts=8:ft=help:norl:

@@ -190,31 +190,14 @@ If you want to uninstall gist.vim, remember to also remove `~/.gist-vim`.
 
 ## Setup:
 
-This plugin uses github API v3. Setting value is stored in `~/.gist.vim`.
+This plugin uses github API v3. Setting value is stored in `~/.gist-vim`.
 gist-vim have two ways to access APIs.
 
-### Basic Auth
+First, you need to set your Github username in global git config:
 
-Require github user ID and password. This is easy but not secure.
+    $ git config --global github.user Username
 
-### OAuth2
-
-1. Register your application.
-
-Note that you must set `Callback URL` as same as following.
-
-https://github.com/settings/applications/new
-
-fill like following
-
-![](http://mattn.github.com/gist-vim/static/image/setting1.png)
-
-2. Start `:Gist -l`
-
-You'll see some prompts. fill ClientID/CilentSecret. Then you can see browser show up.
-
-![](http://mattn.github.com/gist-vim/static/image/setting2.png)
-
-This is a PIN code.
-
-Copy this value and paste to prompt `PIN:`.
+Then, gist.vim will ask for your password to create an authorization when you
+first use it.  The password is not stored and only the OAuth access token will
+be kept for later use.  You can revoke the token at any time from the list of
+["Authorized applications" on Github's "Account Settings" page](https://github.com/settings/applications).
