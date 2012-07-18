@@ -12,7 +12,8 @@ set cpo&vim
 let s:configfile = expand('~/.gist-vim')
 
 if !exists('g:github_user')
-  let g:github_user = substitute(system('git config --get github.user'), "\n", '', '')
+  let s:system = function(get(g:, 'webapi#system_function', 'system'))
+  let g:github_user = substitute(s:system('git config --get github.user'), "\n", '', '')
   if strlen(g:github_user) == 0
     let g:github_user = $GITHUB_USER
   end
