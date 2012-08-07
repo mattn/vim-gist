@@ -24,7 +24,7 @@ function! s:get_browser_command()
   if gist_browser_command == ''
     if has('win32') || has('win64')
       let gist_browser_command = '!start rundll32 url.dll,FileProtocolHandler %URL%'
-    elseif has('mac')
+    elseif system('uname') =~ 'Darwin'
       let gist_browser_command = 'open %URL%'
     elseif executable('xdg-open')
       let gist_browser_command = 'xdg-open %URL%'
