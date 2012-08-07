@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 18-Jul-2012.
+" Last Change: 07-Aug-2012.
 " Version: 6.8
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -24,7 +24,7 @@ function! s:get_browser_command()
   if gist_browser_command == ''
     if has('win32') || has('win64')
       let gist_browser_command = '!start rundll32 url.dll,FileProtocolHandler %URL%'
-    elseif has('mac')
+    elseif has('mac') || has('macunix') || has('gui_macvim') || system('uname') =~? '^darwin'
       let gist_browser_command = 'open %URL%'
     elseif executable('xdg-open')
       let gist_browser_command = 'xdg-open %URL%'
