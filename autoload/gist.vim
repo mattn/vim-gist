@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 07-Aug-2012.
+" Last Change: 07-Sep-2012.
 " Version: 6.8
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -225,7 +225,8 @@ function! s:GistGet(gistid, clipboard)
           endif
           setlocal modifiable
         else
-          exec 'silent noautocmd split' s:bufprefix.a:gistid."/".fnameescape(filename)
+          exec 'silent noautocmd new'
+          exec 'noautocmd file' s:bufprefix.a:gistid."/".fnameescape(filename)
         endif
         set undolevels=-1
         filetype detect
