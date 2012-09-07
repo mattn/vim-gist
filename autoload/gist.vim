@@ -226,6 +226,7 @@ function! s:GistGet(gistid, clipboard)
           setlocal modifiable
         else
           exec 'silent noautocmd new'
+          setlocal noswapfile
           exec 'noautocmd file' s:bufprefix.a:gistid."/".fnameescape(filename)
         endif
         set undolevels=-1
