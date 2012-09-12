@@ -228,8 +228,8 @@ function! s:GistGet(gistid, clipboard)
     else
       let num_file = 1
     endif
+    redraw
     if num_file > len(keys(gist.files))
-      redraw
       echohl ErrorMsg | echomsg 'Gist not found' | echohl None
       return
     endif
