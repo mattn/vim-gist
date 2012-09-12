@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 07-Sep-2012.
+" Last Change: 12-Sep-2012.
 " Version: 6.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -113,7 +113,7 @@ function! s:GistList(gistls, page)
   silent %d _
 
   redraw | echon 'Listing gists... '
-  let auth = s:GetAuthHeader()
+  let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     bw!
     redraw
@@ -157,8 +157,28 @@ function! s:GistList(gistls, page)
   redraw | echo ''
 endfunction
 
+function! gist#list(user, ...)
+  let page = get(a:000, 0, 0)
+  if a:user == '-all'
+    let url = 'https://api.github.com/gists/public'
+  elseif get(g:, 'gist_show_privates', 0) && a:user == 'starred'
+    let url = 'https://api.github.com/gists/starred'
+  elseif get(g:, 'gist_show_privates') && a:user == 'mine'
+    let url = 'https://api.github.com/gists'
+  else
+    let url = 'https://api.github.com/users/'.a:user.'/gists'
+  endif
+
+  let auth = s:GistGetAuthHeader()
+  if len(auth) == 0
+    return []
+  endif
+  let res = webapi#http#get(url, '', { "Authorization": auth })
+  return webapi#json#decode(res.content)
+endfunction
+
 function! s:GistGetFileName(gistid)
-  let auth = s:GetAuthHeader()
+  let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     return ''
   endif
@@ -171,7 +191,7 @@ function! s:GistGetFileName(gistid)
 endfunction
 
 function! s:GistDetectFiletype(gistid)
-  let auth = s:GetAuthHeader()
+  let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     return ''
   endif
@@ -199,7 +219,7 @@ endfunction
 
 function! s:GistGet(gistid, clipboard)
   redraw | echon 'Getting gist... '
-  let res = webapi#http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GetAuthHeader() })
+  let res = webapi#http#get('https://api.github.com/gists/'.a:gistid, '', { "Authorization": s:GistGetAuthHeader() })
   let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
   if status =~ '^2'
     let gist = webapi#json#decode(res.content)
@@ -306,7 +326,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
     if len(filename) == 0 | let filename = s:get_current_filename(1) | endif
   endif
 
-  let auth = s:GetAuthHeader()
+  let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     redraw
     echohl ErrorMsg | echomsg 'Canceled' | echohl None
@@ -350,7 +370,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
 endfunction
 
 function! s:GistDelete(gistid)
-  let auth = s:GetAuthHeader()
+  let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     redraw
     echohl ErrorMsg | echomsg 'Canceled' | echohl None
@@ -412,7 +432,7 @@ function! s:GistPost(content, private, desc, anonymous)
 
   let header = {"Content-Type": "application/json"}
   if !a:anonymous
-    let auth = s:GetAuthHeader()
+    let auth = s:GistGetAuthHeader()
     if len(auth) == 0
       redraw
       echohl ErrorMsg | echomsg 'Canceled' | echohl None
@@ -551,7 +571,7 @@ function! gist#Gist(count, line1, line2, ...)
       let gistid = gistidbuf
       let editpost = 1
     elseif arg =~ '^\(+1\|--star\)$\C' && gistidbuf != ''
-      let auth = s:GetAuthHeader()
+      let auth = s:GistGetAuthHeader()
       if len(auth) == 0
         echohl ErrorMsg | echomsg 'Canceled' | echohl None
       else
@@ -566,7 +586,7 @@ function! gist#Gist(count, line1, line2, ...)
       endif
       return
     elseif arg =~ '^\(-1\|--unstar\)$\C' && gistidbuf != ''
-      let auth = s:GetAuthHeader()
+      let auth = s:GistGetAuthHeader()
       if len(auth) == 0
         echohl ErrorMsg | echomsg 'Canceled' | echohl None
       else
@@ -580,7 +600,7 @@ function! gist#Gist(count, line1, line2, ...)
       endif
       return
     elseif arg =~ '^\(-f\|--fork\)$\C' && gistidbuf != ''
-      let auth = s:GetAuthHeader()
+      let auth = s:GistGetAuthHeader()
       if len(auth) == 0
         echohl ErrorMsg | echomsg 'Canceled' | echohl None
         return
@@ -682,7 +702,7 @@ function! gist#Gist(count, line1, line2, ...)
   return 1
 endfunction
 
-function! s:GetAuthHeader()
+function! s:GistGetAuthHeader()
   if get(g:, 'gist_use_password_in_gitconfig', 0) != 0
     let password = substitute(system('git config --get github.password'), "\n", '', '')
     if password =~ '^!' | let password = system(password[1:]) | endif
