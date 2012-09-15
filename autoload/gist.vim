@@ -26,10 +26,13 @@ function! s:get_browser_command()
       let gist_browser_command = '!start rundll32 url.dll,FileProtocolHandler %URL%'
     elseif has('mac') || has('macunix') || has('gui_macvim') || system('uname') =~? '^darwin'
       let gist_browser_command = 'open %URL%'
-    elseif executable('xdg-open')
-      let gist_browser_command = 'xdg-open %URL%'
-    elseif executable('firefox')
-      let gist_browser_command = 'firefox %URL% &'
+    elseif exists('$DISPLAY')
+      " http://vim.1045645.n5.nabble.com/Determining-if-Vim-is-running-in-text-console-mode-or-X-Windows-td3365870.html
+      if executable('xdg-open')
+        let gist_browser_command = 'xdg-open %URL%'
+      elseif executable('firefox')
+        let gist_browser_command = 'firefox %URL% &'
+      endif
     else
       let gist_browser_command = ''
     endif
@@ -42,7 +45,7 @@ function! s:open_browser(url)
   if len(cmd) == 0
     redraw
     echohl WarningMsg
-    echo "It seems that you don't have general web browser. Open URL below."
+    echo "It seems that you don't have general web browser or GUI environment. Open URL below."
     echohl None
     echo a:url
     return
