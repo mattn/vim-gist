@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 12-Sep-2012.
+" Last Change: 20-Sep-2012.
 " Version: 6.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -824,7 +824,7 @@ let s:extmap = {
 \".man": "man",
 \".mao": "mao",
 \".matlab": "matlab",
-\".md": "md",
+\".md": "markdown",
 \".minid": "minid",
 \".ml": "ml",
 \".moo": "moo",
