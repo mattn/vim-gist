@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 20-Sep-2012.
+" Last Change: 26-Sep-2012.
 " Version: 6.9
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -487,6 +487,7 @@ function! s:GistPostBuffers(private, desc, anonymous)
 
   let header = {"Content-Type": "application/json"}
   if !a:anonymous
+    let auth = s:GistGetAuthHeader()
     if len(auth) == 0
       redraw
       echohl ErrorMsg | echomsg 'Canceled' | echohl None
