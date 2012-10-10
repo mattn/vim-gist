@@ -147,6 +147,11 @@ If you want to edit all files for gists containing more than one: >
     let g:gist_get_multiplefile = 1
 <
 
+If you want to use on Github Enterprise: >
+
+    let g:github_api_url = 'http://your-github-enterprise-domain/api/v3'
+<
+
 If you want to update a gist, embed >
 
     GistID: xxxxx
