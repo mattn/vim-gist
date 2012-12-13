@@ -1,8 +1,8 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 03-Dec-2012.
-" Version: 7.0
+" Last Change: 13-Dec-2012.
+" Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 
