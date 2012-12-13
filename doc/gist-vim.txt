@@ -196,16 +196,13 @@ LICENSE                                                     *gist-vim-license*
 ==============================================================================
 INSTALL                                                     *gist-vim-install*
 
-Copy gist.vim to your plugin directory.
-
-gist.vim will create a curl cookie-jar file in your runtimepath.
+Copy following files into your plugin directory.
 
 rtp:
+  - autoload/gist.vim
   - plugin/gist.vim
-  - cookies/github
 
-If you want to uninstall gist.vim, remember to also remove "cookies/github".
-
+If you want to uninstall gist.vim, remember to also remove `~/.gist-vim`.
 ==============================================================================
 SETUP                                                       *gist-vim-setup*
 

@@ -187,8 +187,8 @@ Copy it to your plugin directory.
 gist.vim will create a curl cookie-jar file in your runtimepath.
 
 - rtp:
+  - autoload/gist.vim
   - plugin/gist.vim
-  - cookies/github
 
 If you want to uninstall gist.vim, remember to also remove `~/.gist-vim`.
 
