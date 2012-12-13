@@ -1,13 +1,23 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 27-Sep-2012.
+" Last Change: 03-Dec-2012.
 " Version: 7.0
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
 
 let s:save_cpo = &cpo
 set cpo&vim
+
+if !exists('g:github_user') && !executable('git')
+  echohl ErrorMsg | echomsg "Gist: require 'git' command" | echohl None
+  finish
+endif
+
+if !executable('curl')
+  echohl ErrorMsg | echomsg "Gist: require 'curl' command" | echohl None
+  finish
+endif
 
 let s:configfile = expand('~/.gist-vim')
 
