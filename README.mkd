@@ -192,6 +192,14 @@ gist.vim will create a curl cookie-jar file in your runtimepath.
 
 If you want to uninstall gist.vim, remember to also remove `~/.gist-vim`.
 
+You need to install webapi-vim also:
+
+  http://www.vim.org/scripts/script.php?script_id=4019
+
+If you want to use latest one:
+
+  https://github.com/mattn/webapi-vim
+
 ## Setup:
 
 This plugin uses github API v3. Setting value is stored in `~/.gist-vim`.
