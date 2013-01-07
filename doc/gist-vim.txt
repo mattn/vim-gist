@@ -160,6 +160,18 @@ in your local file, then call >
 
     :Gist
 >
+
+If you want to update a gist when only |:w!|: >
+
+    " :w and :w! update a gist.
+    let g:gist_update_on_write = 1
+
+    " Only :w! updates a gist.
+    let g:gist_update_on_write = 2
+>
+All other values are treated as 1.
+This variable's value is 1 by default.
+
 ==============================================================================
 LICENSE                                                     *gist-vim-license*
 
