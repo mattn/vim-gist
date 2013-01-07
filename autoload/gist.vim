@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 06-Jan-2013.
+" Last Change: 07-Jan-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -229,6 +229,13 @@ function! s:GistWrite(fname)
   if substitute(a:fname, '\\', '/', 'g') == expand("%:p:gs@\\@/@")
     if g:gist_update_on_write != 2 || v:cmdbang
       Gist -e
+    else
+      setlocal nomodifiable
+      try
+        normal! i
+      finally
+        setlocal modifiable
+      endtry
     endif
   else
     exe "w".(v:cmdbang ? "!" : "") fnameescape(v:cmdarg) fnameescape(a:fname)
