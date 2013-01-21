@@ -193,6 +193,15 @@ You need to install webapi-vim also:
 If you want to use latest one:
 
   https://github.com/mattn/webapi-vim
+  
+### Install with [Vundle](https://github.com/gmarik/vundle)
+
+Add the following lines to your `.vimrc`.
+
+    Bundle 'mattn/webapi-vim'
+    Bundle 'mattn/gist-vim'
+    
+Now restart Vim and run `:BundleInstall`.
 
 ## Requirements:
 

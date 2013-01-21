@@ -33,6 +33,10 @@ if !exists('g:github_api_url')
   let g:github_api_url = 'https://api.github.com'
 endif
 
+if !exists('g:gist_update_on_write')
+  let g:gist_update_on_write = 1
+endif
+
 function! s:get_browser_command()
   let gist_browser_command = get(g:, 'gist_browser_command', '')
   if gist_browser_command == ''
@@ -223,7 +227,11 @@ endfunction
 
 function! s:GistWrite(fname)
   if substitute(a:fname, '\\', '/', 'g') == expand("%:p:gs@\\@/@")
-    Gist -e
+    if g:gist_update_on_write != 2 || v:cmdbang
+      Gist -e
+    else
+      echohl ErrorMsg | echomsg 'Please type ":w!" to update a gist.' | echohl None
+    endif
   else
     exe "w".(v:cmdbang ? "!" : "") fnameescape(v:cmdarg) fnameescape(a:fname)
     silent! exe "file" fnameescape(a:fname)
