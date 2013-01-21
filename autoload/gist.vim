@@ -587,6 +587,10 @@ function! gist#Gist(count, line1, line2, ...)
       let gistdesc = ''
     elseif arg =~ '^\(-c\|--clipboard\)$\C'
       let clipboard = 1
+    elseif arg =~ '^--rawurl$\C' && gistidbuf != '' && g:github_api_url == 'https://api.github.com'
+      let gistid = gistidbuf
+      echo 'https://gist.github.com/raw/'.gistid
+      return
     elseif arg =~ '^\(-d\|--delete\)$\C' && gistidbuf != ''
       let gistid = gistidbuf
       let deletepost = 1
