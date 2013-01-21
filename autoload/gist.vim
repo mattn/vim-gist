@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 08-Jan-2013.
+" Last Change: 21-Jan-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -135,7 +135,7 @@ function! s:GistList(gistls, page)
   if len(auth) == 0
     bw!
     redraw
-    echohl ErrorMsg | echomsg 'Canceled' | echohl None
+    echohl ErrorMsg | echomsg v:errmsg | echohl None
     return
   endif
   let res = webapi#http#get(url, '', { "Authorization": auth })
@@ -351,7 +351,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
   let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     redraw
-    echohl ErrorMsg | echomsg 'Canceled' | echohl None
+    echohl ErrorMsg | echomsg v:errmsg | echohl None
     return
   endif
 
@@ -395,7 +395,7 @@ function! s:GistDelete(gistid)
   let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     redraw
-    echohl ErrorMsg | echomsg 'Canceled' | echohl None
+    echohl ErrorMsg | echomsg v:errmsg | echohl None
     return
   endif
 
@@ -457,7 +457,7 @@ function! s:GistPost(content, private, desc, anonymous)
     let auth = s:GistGetAuthHeader()
     if len(auth) == 0
       redraw
-      echohl ErrorMsg | echomsg 'Canceled' | echohl None
+      echohl ErrorMsg | echomsg v:errmsg | echohl None
       return
     endif
     let header["Authorization"] = auth
@@ -512,7 +512,7 @@ function! s:GistPostBuffers(private, desc, anonymous)
     let auth = s:GistGetAuthHeader()
     if len(auth) == 0
       redraw
-      echohl ErrorMsg | echomsg 'Canceled' | echohl None
+      echohl ErrorMsg | echomsg v:errmsg | echohl None
       return
     endif
     let header["Authorization"] = auth
@@ -596,7 +596,7 @@ function! gist#Gist(count, line1, line2, ...)
     elseif arg =~ '^\(+1\|--star\)$\C' && gistidbuf != ''
       let auth = s:GistGetAuthHeader()
       if len(auth) == 0
-        echohl ErrorMsg | echomsg 'Canceled' | echohl None
+        echohl ErrorMsg | echomsg v:errmsg | echohl None
       else
         let gistid = gistidbuf
         let res = webapi#http#post(g:github_api_url.'/gists/'.gistid.'/star', '', { "Authorization": auth }, 'PUT')
@@ -611,7 +611,7 @@ function! gist#Gist(count, line1, line2, ...)
     elseif arg =~ '^\(-1\|--unstar\)$\C' && gistidbuf != ''
       let auth = s:GistGetAuthHeader()
       if len(auth) == 0
-        echohl ErrorMsg | echomsg 'Canceled' | echohl None
+        echohl ErrorMsg | echomsg v:errmsg | echohl None
       else
         let gistid = gistidbuf
         let res = webapi#http#post(g:github_api_url.'/gists/'.gistid.'/star', '', { "Authorization": auth }, 'DELETE')
@@ -625,7 +625,7 @@ function! gist#Gist(count, line1, line2, ...)
     elseif arg =~ '^\(-f\|--fork\)$\C' && gistidbuf != ''
       let auth = s:GistGetAuthHeader()
       if len(auth) == 0
-        echohl ErrorMsg | echomsg 'Canceled' | echohl None
+        echohl ErrorMsg | echomsg v:errmsg | echohl None
         return
       else
         let gistid = gistidbuf
@@ -765,13 +765,12 @@ function! s:GistGetAuthHeader()
         call system("chmod go= ".s:configfile)
       endif
     elseif has_key(authorization, 'message')
-      echohl WarningMsg
-      echo authorization.message
-      echohl None
       let secret = ''
+      let v:errmsg = authorization.message
     endif
   else
     let secret = ''
+    let v:errmsg = 'Canceled'
   endif
   return secret
 endfunction
