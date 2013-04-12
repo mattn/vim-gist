@@ -48,8 +48,8 @@ For the latest version please see https://github.com/mattn/gist-vim.
 - Post/Edit with the description " (you need to have opened the gist buffer
   first). >
 
-    :Gist -s something
-    :Gist -e -s something
+        :Gist -s something
+        :Gist -e -s something
 
 - Delete the gist (you need to have opened the gist buffer first).
   Password authentication is needed.
