@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 21-Jan-2013.
+" Last Change: 21-Apr-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -712,7 +712,7 @@ function! gist#Gist(count, line1, line2, ...)
         call s:open_browser(url)
       endif
       let gist_put_url_to_clipboard_after_post = get(g:, 'gist_put_url_to_clipboard_after_post', 1)
-      if gist_put_url_to_clipboard_after_post > 0
+      if gist_put_url_to_clipboard_after_post > 0 || clipboard
         if gist_put_url_to_clipboard_after_post == 2
           let url = url . "\n"
         endif
