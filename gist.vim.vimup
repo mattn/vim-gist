@@ -28,11 +28,11 @@ detailed_description: |
       post multi buffer to gist.
 
     :Gist -e
-      edit the gist. (shoud be work on gist buffer)
+      edit the gist. (should be work on gist buffer)
       you can update the gist with :w command on gist buffer.
 
     :Gist -e foo.js
-      edit the gist with name 'foo.js'. (shoud be work on gist buffer)
+      edit the gist with name 'foo.js'. (should be work on gist buffer)
 
     :Gist -d
       delete the gist. (should be work on gist buffer)
