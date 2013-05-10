@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 21-Apr-2013.
+" Last Change: 10-May-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -242,8 +242,7 @@ endfunction
 function! s:GistGet(gistid, clipboard)
   redraw | echon 'Getting gist... '
   let res = webapi#http#get(g:github_api_url.'/gists/'.a:gistid, '', { "Authorization": s:GistGetAuthHeader() })
-  let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
-  if status =~ '^2'
+  if res.status =~ '^2'
     let gist = webapi#json#decode(res.content)
     if get(g:, 'gist_get_multiplefile', 0) != 0
       let num_file = len(keys(gist.files))
@@ -361,8 +360,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
     let gist["description"] = a:desc
   else
     let res = webapi#http#get(g:github_api_url.'/gists/'.a:gistid, '', { "Authorization": auth })
-    let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
-    if status =~ '^2'
+    if res.status =~ '^2'
       let old_gist = webapi#json#decode(res.content)
       let gist["description"] = old_gist.description
     endif
@@ -376,8 +374,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
   \   "Authorization": auth,
   \   "Content-Type": "application/json",
   \})
-  let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
-  if status =~ '^2'
+  if res.status =~ '^2'
     let obj = webapi#json#decode(res.content)
     let loc = obj["html_url"]
     redraw | echomsg 'Done: '.loc
@@ -385,8 +382,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
     setlocal nomodified
   else
     let loc = ''
-    let status = matchstr(status, '^\d\+\s*\zs.*')
-    echohl ErrorMsg | echomsg 'Post failed: '.status | echohl None
+    echohl ErrorMsg | echomsg 'Post failed: ' . res.message | echohl None
   endif
   return loc
 endfunction
@@ -404,15 +400,13 @@ function! s:GistDelete(gistid)
   \   "Authorization": auth,
   \   "Content-Type": "application/json",
   \}, 'DELETE')
-  let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
-  if status =~ '^2'
+  if res.status =~ '^2'
     redraw | echomsg 'Done: '
     if exists('b:gist')
       unlet b:gist
     endif
   else
-    let status = matchstr(status, '^\d\+\s*\zs.*')
-    echohl ErrorMsg | echomsg 'Delete failed: '.status | echohl None
+    echohl ErrorMsg | echomsg 'Delete failed: ' . res.message | echohl None
   endif
 endfunction
 
@@ -465,8 +459,7 @@ function! s:GistPost(content, private, desc, anonymous)
 
   redraw | echon 'Posting it to gist... '
   let res = webapi#http#post(g:github_api_url.'/gists', webapi#json#encode(gist), header)
-  let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
-  if status =~ '^2'
+  if res.status =~ '^2'
     let obj = webapi#json#decode(res.content)
     let loc = obj["html_url"]
     redraw | echomsg 'Done: '.loc
@@ -478,8 +471,7 @@ function! s:GistPost(content, private, desc, anonymous)
     \}
   else
     let loc = ''
-    let status = matchstr(status, '^\d\+\s*\zs.*')
-    echohl ErrorMsg | echomsg 'Post failed: '.status | echohl None
+    echohl ErrorMsg | echomsg 'Post failed: '. res.message | echohl None
   endif
   return loc
 endfunction
@@ -520,16 +512,14 @@ function! s:GistPostBuffers(private, desc, anonymous)
 
   redraw | echon 'Posting it to gist... '
   let res = webapi#http#post(g:github_api_url.'/gists', webapi#json#encode(gist), header)
-  let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
-  if status =~ '^2'
+  if res.status =~ '^2'
     let obj = webapi#json#decode(res.content)
     let loc = obj["html_url"]
     redraw | echomsg 'Done: '.loc
     let b:gist = {"id": matchstr(loc, '[^/]\+$'), "filename": filename, "private": a:private}
   else
     let loc = ''
-    let status = matchstr(status, '^\d\+\s*\zs.*')
-    echohl ErrorMsg | echomsg 'Post failed: '.status | echohl None
+    echohl ErrorMsg | echomsg 'Post failed: ' . res.message | echohl None
   endif
   return loc
 endfunction
@@ -604,8 +594,7 @@ function! gist#Gist(count, line1, line2, ...)
       else
         let gistid = gistidbuf
         let res = webapi#http#post(g:github_api_url.'/gists/'.gistid.'/star', '', { "Authorization": auth }, 'PUT')
-        let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
-        if status =~ '^2'
+        if res.status =~ '^2'
           echomsg "Stared" gistid
         else
           echohl ErrorMsg | echomsg 'Star failed' | echohl None
@@ -619,7 +608,7 @@ function! gist#Gist(count, line1, line2, ...)
       else
         let gistid = gistidbuf
         let res = webapi#http#post(g:github_api_url.'/gists/'.gistid.'/star', '', { "Authorization": auth }, 'DELETE')
-        if status =~ '^2'
+        if res.status =~ '^2'
           echomsg "Unstared" gistid
         else
           echohl ErrorMsg | echomsg 'Unstar failed' | echohl None
@@ -634,8 +623,7 @@ function! gist#Gist(count, line1, line2, ...)
       else
         let gistid = gistidbuf
         let res = webapi#http#post(g:github_api_url.'/gists/'.gistid.'/fork', '', { "Authorization": auth })
-        let status = matchstr(matchstr(res.header, '^Status:'), '^[^:]\+: \zs.*')
-        if status =~ '^2'
+        if res.status =~ '^2'
           let obj = webapi#json#decode(res.content)
           let gistid = obj["id"]
         else
