@@ -20,9 +20,9 @@ if !executable('curl')
 endif
 
 let s:configfile = expand('~/.gist-vim')
+let s:system = function(get(g:, 'webapi#system_function', 'system'))
 
 if !exists('g:github_user')
-  let s:system = function(get(g:, 'webapi#system_function', 'system'))
   let g:github_user = substitute(s:system('git config --get github.user'), "\n", '', '')
   if strlen(g:github_user) == 0
     let g:github_user = $GITHUB_USER
@@ -30,7 +30,6 @@ if !exists('g:github_user')
 endif
 
 if !exists('g:github_api_url')
-  let s:system = function(get(g:, 'webapi#system_function', 'system'))
   let g:github_api_url = substitute(s:system('git config --get github.apiurl'), "\n", '', '')
   if strlen(g:github_api_url) == 0
     let g:github_api_url = 'https://api.github.com'
