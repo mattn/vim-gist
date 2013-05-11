@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 10-May-2013.
+" Last Change: 11-May-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -30,7 +30,11 @@ if !exists('g:github_user')
 endif
 
 if !exists('g:github_api_url')
-  let g:github_api_url = 'https://api.github.com'
+  let s:system = function(get(g:, 'webapi#system_function', 'system'))
+  let g:github_api_url = substitute(s:system('git config --get github.apiurl'), "\n", '', '')
+  if strlen(g:github_api_url) == 0
+    let g:github_api_url = 'https://api.github.com'
+  end
 endif
 
 if !exists('g:gist_update_on_write')
