@@ -93,13 +93,14 @@ function! s:format_gist(gist)
     return ""
   endif
   let file = a:gist.files[files[0]]
+  let name = file.filename
   if has_key(file, "content")
     let code = file.content
     let code = "\n".join(map(split(code, "\n"), '"  ".v:val'), "\n")
   else
     let code = ""
   endif
-  return printf("gist: %s %s%s", a:gist.id, type(a:gist.description)==0?"": a:gist.description, code)
+  return printf("gist: %s %s %s%s", a:gist.id, name, type(a:gist.description)==0 || a:gist.description==""?"":'('.a:gist.description.')', code)
 endfunction
 
 " Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it.
