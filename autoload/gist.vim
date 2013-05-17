@@ -100,7 +100,7 @@ function! s:format_gist(gist)
   else
     let code = ""
   endif
-  return printf("gist: %s %s %s%s", a:gist.id, name, type(a:gist.description)==0?"":'('.a:gist.description.')', code)
+  return printf("gist: %s %s %s%s", a:gist.id, name, type(a:gist.description)==0 || a:gist.description==""?"":'('.a:gist.description.')', code)
 endfunction
 
 " Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it.
