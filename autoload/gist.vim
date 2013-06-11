@@ -568,6 +568,8 @@ function! gist#Gist(count, line1, line2, ...)
   let bufnamemx = '^' . s:bufprefix .'\(\zs[0-9a-f]\+\ze\|\zs[0-9a-f]\+\ze[/\\].*\)$'
   if bufname =~ bufnamemx
     let gistidbuf = matchstr(bufname, bufnamemx)
+  elseif exists('b:gist') && has_key(b:gist, 'id')
+    let gistidbuf = b:gist['id']
   else
     let gistidbuf = matchstr(join(getline(a:line1, a:line2), "\n"), 'GistID:\s*\zs\w\+')
   endif
