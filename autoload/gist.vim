@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 11-May-2013.
+" Last Change: 11-Jun-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -428,6 +428,17 @@ function! s:get_current_filename(no)
   return filename
 endfunction
 
+function s:update_GistID(id)
+  let view = winsaveview()
+  normal! gg
+  if search('\<GistID\>:\s*$')
+    let line = getline('.')
+    let line = substitute(line, '\s\+$', '', 'g')
+    call setline('.', line . ' ' . a:id)
+  endif
+  call winrestview(view)
+endfunction
+
 " GistPost function:
 "   Post new gist to github
 "
@@ -473,6 +484,7 @@ function! s:GistPost(content, private, desc, anonymous)
     \ "description": gist['description'],
     \ "private": a:private,
     \}
+    call s:update_GistID(b:gist["id"])
   else
     let loc = ''
     echohl ErrorMsg | echomsg 'Post failed: '. res.message | echohl None
@@ -520,7 +532,13 @@ function! s:GistPostBuffers(private, desc, anonymous)
     let obj = webapi#json#decode(res.content)
     let loc = obj["html_url"]
     redraw | echomsg 'Done: '.loc
-    let b:gist = {"id": matchstr(loc, '[^/]\+$'), "filename": filename, "private": a:private}
+    let b:gist = {
+    \ "filename": filename,
+    \ "id": matchstr(loc, '[^/]\+$'),
+    \ "description": gist['description'],
+    \ "private": a:private,
+    \}
+    call s:update_GistID(b:gist["id"])
   else
     let loc = ''
     echohl ErrorMsg | echomsg 'Post failed: ' . res.message | echohl None
