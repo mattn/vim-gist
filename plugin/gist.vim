@@ -11,6 +11,10 @@ if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
 endif
 let g:loaded_gist_vim = 1
 
-command! -nargs=? -range=% Gist :call gist#Gist(<count>, <line1>, <line2>, <f-args>)
+function! s:CompleteArgs(arg_lead,cmdline,cursor_pos)
+    return ["-p", "-P", "-a", "-m", "-e", "-s", "-d", "-f", "-c", "-l", "-la", "-ls"]
+endfunction
+
+command! -nargs=? -range=% -complete=customlist,s:CompleteArgs Gist :call gist#Gist(<count>, <line1>, <line2>, <f-args>)
 
 " vim:set et:
