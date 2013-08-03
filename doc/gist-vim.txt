@@ -6,6 +6,7 @@ License                                        |gist-vim-license|
 Install                                        |gist-vim-install| 
 Requirements                                   |gist-vim-requirements| 
 Setup                                          |gist-vim-setup| 
+FAQ                                            |gist-vim-faq| 
 
 This is a vimscript for creating gists (http://gist.github.com) 
 
@@ -256,6 +257,12 @@ Then, add following into your ~/.vimrc
     let g:gist_use_password_in_gitconfig = 1
 <
 This is not secure at all, so strongly discouraged.
+
+==============================================================================
+FAQ                                                           *gist-vim-faq*
+
+Q. :Gist give Forbidden error
+A. Try to delete ~/.gist-vim. And authenticate again.
 
 ==============================================================================
 THANKS                                                     *gist-vim-thanks*
