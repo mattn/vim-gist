@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 11-May-2013.
+" Last Change: 03-Aug-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -558,6 +558,12 @@ function! gist#Gist(count, line1, line2, ...)
   for arg in args
     if arg =~ '^\(-h\|--help\)$\C'
       help :Gist
+      return
+    elseif arg =~ '^\(-g\|--git\)$\C' && gistidbuf != '' && g:github_api_url == 'https://api.github.com' && has_key(b:, 'gist') && has_key(b:gist, 'id')
+      echo printf('git clone git@github.com:%s', b:gist['id'])
+      return
+    elseif arg =~ '^\(-G\|--gitclone\)$\C' && gistidbuf != '' && g:github_api_url == 'https://api.github.com' && has_key(b:, 'gist') && has_key(b:gist, 'id')
+      exe '!' printf('git clone git@github.com:%s', b:gist['id'])
       return
     elseif arg =~ '^\(-la\|--listall\)$\C'
       let gistls = '-all'
