@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 03-Aug-2013.
+" Last Change: 29-Aug-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -247,7 +247,13 @@ function! s:GistGet(gistid, clipboard)
   redraw | echon 'Getting gist... '
   let res = webapi#http#get(g:github_api_url.'/gists/'.a:gistid, '', { "Authorization": s:GistGetAuthHeader() })
   if res.status =~ '^2'
-    let gist = webapi#json#decode(res.content)
+    try
+      let gist = webapi#json#decode(res.content)
+    catch
+      redraw
+      echohl ErrorMsg | echomsg 'Gist seems to be broken' | echohl None
+      return
+    endtry
     if get(g:, 'gist_get_multiplefile', 0) != 0
       let num_file = len(keys(gist.files))
     else
