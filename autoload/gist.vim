@@ -288,11 +288,11 @@ function! s:GistGet(gistid, clipboard)
           endif
           setlocal modifiable
         else
+          silent only!
           if get(g:, 'gist_list_vsplit', 0)
-            exec 'only!'
             exec 'silent noautocmd rightbelow vnew'
           else
-            exec 'silent noautocmd new'
+            exec 'silent noautocmd rightbelow new'
           endif
           setlocal noswapfile
           exec 'noautocmd file' s:bufprefix.a:gistid."/".fnameescape(filename)
