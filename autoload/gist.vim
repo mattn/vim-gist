@@ -19,7 +19,7 @@ if !executable('curl')
   finish
 endif
 
-let s:configfile = expand('~/.gist-vim')
+let s:gist_token_file = expand(get(g:, 'gist_token_file', '~/.gist-vim'))
 let s:system = function(get(g:, 'webapi#system_function', 'system'))
 
 if !exists('g:github_user')
@@ -161,7 +161,7 @@ function! s:GistList(gistls, page)
     redraw
     echohl ErrorMsg | echomsg content.message | echohl None
     if content.message == 'Bad credentials'
-      call delete(s:configfile)
+      call delete(s:gist_token_file)
     endif
     return
   endif
@@ -772,8 +772,8 @@ function! s:GistGetAuthHeader()
     return printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
   endif
   let auth = ""
-  if filereadable(s:configfile)
-    let str = join(readfile(s:configfile), "")
+  if filereadable(s:gist_token_file)
+    let str = join(readfile(s:gist_token_file), "")
     if type(str) == 1
       let auth = str
     endif
@@ -800,9 +800,9 @@ function! s:GistGetAuthHeader()
     let authorization = webapi#json#decode(res.content)
     if has_key(authorization, 'token')
       let secret = printf("token %s", authorization.token)
-      call writefile([secret], s:configfile)
+      call writefile([secret], s:gist_token_file)
       if !(has('win32') || has('win64'))
-        call system("chmod go= ".s:configfile)
+        call system("chmod go= ".s:gist_token_file)
       endif
     elseif has_key(authorization, 'message')
       let secret = ''
