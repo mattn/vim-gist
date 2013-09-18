@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 29-Aug-2013.
+" Last Change: 18-Sep-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -122,7 +122,13 @@ function! s:GistList(gistls, page)
     endif
     setlocal modifiable
   else
-    exec 'silent noautocmd split' s:bufprefix.a:gistls
+    if get(g:, 'gist_list_vsplit', 0)
+      exec 'silent noautocmd vsplit +set\ winfixwidth ' s:bufprefix.a:gistls
+    elseif get(g:, 'gist_list_rightbelow', 0)
+      exec 'silent noautocmd rightbelow 5 split +set\ winfixheight ' s:bufprefix.a:gistls
+    else
+      exec 'silent noautocmd split' s:bufprefix.a:gistls
+    endif
   endif
   if a:page > 1
     let oldlines = getline(0, line('$'))
@@ -171,6 +177,7 @@ function! s:GistList(gistls, page)
   setlocal nomodified
   setlocal nomodifiable
   syntax match SpecialKey /^gist:/he=e-1
+  syntax match Title /^gist: \S\+/hs=s+5 contains=ALL
   nnoremap <silent> <buffer> <cr> :call <SID>GistListAction(0)<cr>
   nnoremap <silent> <buffer> <s-cr> :call <SID>GistListAction(1)<cr>
 
@@ -276,7 +283,12 @@ function! s:GistGet(gistid, clipboard)
           endif
           setlocal modifiable
         else
-          exec 'silent noautocmd new'
+          if get(g:, 'gist_list_vsplit', 0)
+            exec 'only!'
+            exec 'silent noautocmd rightbelow vnew'
+          else
+            exec 'silent noautocmd new'
+          endif
           setlocal noswapfile
           exec 'noautocmd file' s:bufprefix.a:gistid."/".fnameescape(filename)
         endif
