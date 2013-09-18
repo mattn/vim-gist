@@ -100,7 +100,12 @@ function! s:format_gist(gist)
   else
     let code = ""
   endif
-  return printf("gist: %s %s %s%s", a:gist.id, name, type(a:gist.description)==0 || a:gist.description==""?"":'('.a:gist.description.')', code)
+  let desc = type(a:gist.description)==0 || a:gist.description == "" ? "" : '('.a:gist.description.')'
+  let name = substitute(name, '[\r\n\t]', ' ', 'g')
+  let name = substitute(name, '  ', ' ', 'g')
+  let desc = substitute(desc, '[\r\n\t]', ' ', 'g')
+  let desc = substitute(desc, '  ', ' ', 'g')
+  return printf("gist: %s %s %s%s", a:gist.id, name, desc, code)
 endfunction
 
 " Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it.
@@ -446,7 +451,7 @@ function! s:get_current_filename(no)
   return filename
 endfunction
 
-function s:update_GistID(id)
+function! s:update_GistID(id)
   let view = winsaveview()
   normal! gg
   if search('\<GistID\>:\s*$')
