@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 18-Sep-2013.
+" Last Change: 07-Oct-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -454,12 +454,15 @@ endfunction
 function! s:update_GistID(id)
   let view = winsaveview()
   normal! gg
+  let ret = 0
   if search('\<GistID\>:\s*$')
     let line = getline('.')
     let line = substitute(line, '\s\+$', '', 'g')
     call setline('.', line . ' ' . a:id)
+    let ret = 1
   endif
   call winrestview(view)
+  return ret
 endfunction
 
 " GistPost function:
@@ -507,7 +510,9 @@ function! s:GistPost(content, private, desc, anonymous)
     \ "description": gist['description'],
     \ "private": a:private,
     \}
-    call s:update_GistID(b:gist["id"])
+    if s:update_GistID(b:gist["id"])
+      Gist -e
+    endif
   else
     let loc = ''
     echohl ErrorMsg | echomsg 'Post failed: '. res.message | echohl None
@@ -561,7 +566,9 @@ function! s:GistPostBuffers(private, desc, anonymous)
     \ "description": gist['description'],
     \ "private": a:private,
     \}
-    call s:update_GistID(b:gist["id"])
+    if s:update_GistID(b:gist["id"])
+      Gist -e
+    endif
   else
     let loc = ''
     echohl ErrorMsg | echomsg 'Post failed: ' . res.message | echohl None
