@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 07-Oct-2013.
+" Last Change: 15-Oct-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -288,14 +288,16 @@ function! s:GistGet(gistid, clipboard)
           endif
           setlocal modifiable
         else
-          silent only!
+          if num_file == 1
+            silent only!
+          endif
           if get(g:, 'gist_list_vsplit', 0)
             exec 'silent noautocmd rightbelow vnew'
           else
             exec 'silent noautocmd rightbelow new'
           endif
           setlocal noswapfile
-          exec 'noautocmd file' s:bufprefix.a:gistid."/".fnameescape(filename)
+          silent exec 'noautocmd file' s:bufprefix.a:gistid."/".fnameescape(filename)
         endif
         set undolevels=-1
         filetype detect
@@ -471,10 +473,6 @@ endfunction
 "   if there is an embedded gist url or gist id in your file,
 "   it will just update it.
 "                                                   -- by c9s
-"
-"   embedded gist url format:
-"
-"       Gist: https://gist.github.com/123123
 "
 "   embedded gist id format:
 "
