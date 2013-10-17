@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 15-Oct-2013.
+" Last Change: 17-Oct-2013.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -16,6 +16,11 @@ endif
 
 if !executable('curl')
   echohl ErrorMsg | echomsg "Gist: require 'curl' command" | echohl None
+  finish
+endif
+
+if globpath(&rtp, 'autoload/webapi/http.vim') == ''
+  echohl ErrorMsg | echomsg "Gist: require 'webapi', install https://github.com/mattn/webapi-vim" | echohl None
   finish
 endif
 
