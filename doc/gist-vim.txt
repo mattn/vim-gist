@@ -246,6 +246,14 @@ be kept for later use.  You can revoke the token at any time from the list of
 "Authorized applications" on GitHub's "Account Settings" page.
 (https://github.com/settings/applications)
 
+If you have two-factor authentication enabled on GitHub, you'll see the message
+"Must specify two-factor authentication OTP code." In this case, you need to
+create a "Personal Access Token" on GitHub's "Account Settings" page
+(https://github.com/settings/applications) and place it in a file 
+named ~/.gist-vim like this:
+>
+    token xxxxx
+<
 If you happen to have your password already written in ~/.gitconfig like
 below:
 >
