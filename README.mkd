@@ -142,7 +142,7 @@ If you want to manipulate multiple files in a gist:
 
     let g:gist_get_multiplefile = 1
 
-If you want to use on Github Enterprise:
+If you want to use on GitHub Enterprise:
 
     let g:github_api_url = 'http://your-github-enterprise-domain/api/v3'
 
@@ -211,7 +211,7 @@ Now restart Vim and run `:BundleInstall`.
 
 ## Setup:
 
-This plugin uses github API v3. Setting value is stored in `~/.gist-vim`.
+This plugin uses GitHub API v3. Setting value is stored in `~/.gist-vim`.
 gist-vim have two ways to access APIs.
 
 First, you need to set your Github username in global git config:
@@ -221,4 +221,4 @@ First, you need to set your Github username in global git config:
 Then, gist.vim will ask for your password to create an authorization when you
 first use it.  The password is not stored and only the OAuth access token will
 be kept for later use.  You can revoke the token at any time from the list of
-["Authorized applications" on Github's "Account Settings" page](https://github.com/settings/applications).
+["Authorized applications" on GitHub's "Account Settings" page](https://github.com/settings/applications).
