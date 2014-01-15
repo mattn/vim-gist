@@ -233,7 +233,7 @@ REQUIREMENTS                                           *gist-vim-requirements*
 ==============================================================================
 SETUP                                                       *gist-vim-setup*
 
-This plugin uses GitHub API v3. Setting value is stored in `~/.gist.vim`.
+This plugin uses GitHub API v3. Setting value is stored in `~/.gist-vim`.
 gist-vim have two ways to access APIs.
 
 First, you need to set your GitHub username in global git config:
