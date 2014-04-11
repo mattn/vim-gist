@@ -799,11 +799,31 @@ function! s:GistGetAuthHeader()
 
   redraw
   echohl WarningMsg
-  echo 'Gist.vim requires authorization to use the Github API. These settings are stored in "~/.gist-vim". If you want to revoke, do "rm ~/.gist-vim".'
+  echo 'Gist.vim requires authorization to use the GitHub API. These settings are stored in "~/.gist-vim". If you want to revoke, do "rm ~/.gist-vim".'
   echohl None
-  let password = inputsecret("Github Password for ".g:github_user.":")
-  if len(password) > 0
-    let insecureSecret = printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
+  let password = inputsecret("GitHub Password for ".g:github_user.":")
+  if len(password) == 0
+    let secret = ''
+    let v:errmsg = 'Canceled'
+    return secrert
+  endif
+  let insecureSecret = printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
+  let res = webapi#http#post(g:github_api_url.'/authorizations', webapi#json#encode({
+              \  "scopes"   : ["gist"],
+              \  "note"     : "Gist.vim on ".hostname(),
+              \  "note_url" : "http://www.vim.org/scripts/script.php?script_id=2423"
+              \}), {
+              \  "Content-Type"  : "application/json",
+              \  "Authorization" : insecureSecret,
+              \})
+  let h = filter(res.header, 'v:val =~ "^X-GitHub-OTP: require"')
+  if len(h)
+    let otp = inputsecret("OTP:")
+    if len(otp) == 0
+      let secret = ''
+      let v:errmsg = 'Canceled'
+      return secrert
+    endif
     let res = webapi#http#post(g:github_api_url.'/authorizations', webapi#json#encode({
                 \  "scopes"   : ["gist"],
                 \  "note"     : "Gist.vim on ".hostname(),
@@ -811,21 +831,19 @@ function! s:GistGetAuthHeader()
                 \}), {
                 \  "Content-Type"  : "application/json",
                 \  "Authorization" : insecureSecret,
+                \  "X-GitHub-OTP"  : otp,
                 \})
-    let authorization = webapi#json#decode(res.content)
-    if has_key(authorization, 'token')
-      let secret = printf("token %s", authorization.token)
-      call writefile([secret], s:gist_token_file)
-      if !(has('win32') || has('win64'))
-        call system("chmod go= ".s:gist_token_file)
-      endif
-    elseif has_key(authorization, 'message')
-      let secret = ''
-      let v:errmsg = authorization.message
+  endif
+  let authorization = webapi#json#decode(res.content)
+  if has_key(authorization, 'token')
+    let secret = printf("token %s", authorization.token)
+    call writefile([secret], s:gist_token_file)
+    if !(has('win32') || has('win64'))
+      call system("chmod go= ".s:gist_token_file)
     endif
-  else
+  elseif has_key(authorization, 'message')
     let secret = ''
-    let v:errmsg = 'Canceled'
+    let v:errmsg = authorization.message
   endif
   return secret
 endfunction
