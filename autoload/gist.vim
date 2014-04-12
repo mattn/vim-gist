@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 17-Oct-2013.
+" Last Change: 13-Apr-2014.
 " Version: 7.1
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -803,9 +803,8 @@ function! s:GistGetAuthHeader()
   echohl None
   let password = inputsecret("GitHub Password for ".g:github_user.":")
   if len(password) == 0
-    let secret = ''
     let v:errmsg = 'Canceled'
-    return secrert
+    return ''
   endif
   let insecureSecret = printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
   let res = webapi#http#post(g:github_api_url.'/authorizations', webapi#json#encode({
