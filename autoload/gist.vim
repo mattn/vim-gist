@@ -815,13 +815,12 @@ function! s:GistGetAuthHeader()
               \  "Content-Type"  : "application/json",
               \  "Authorization" : insecureSecret,
               \})
-  let h = filter(res.header, 'v:val =~ "^X-GitHub-OTP: require"')
+  let h = filter(res.header, 'stridx(v:val, "X-GitHub-OTP:") == 0')
   if len(h)
     let otp = inputsecret("OTP:")
     if len(otp) == 0
-      let secret = ''
       let v:errmsg = 'Canceled'
-      return secrert
+      return ''
     endif
     let res = webapi#http#post(g:github_api_url.'/authorizations', webapi#json#encode({
                 \  "scopes"   : ["gist"],
