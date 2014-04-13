@@ -211,38 +211,22 @@ Now restart Vim and run `:BundleInstall`.
 
 ## Setup:
 
-### Basic Authentication
+This plugin supports both basic and two-factor authentication using GitHub
+API v3. The plugin stores its credentials in `~/.gist-vim`.
 
-If you don't have two-factor authentication enabled, follow the
-instructions in this section.
+First, you need to set your GitHub username in git's global configuration:
 
-This plugin uses GitHub API v3. Setting value is stored in `~/.gist-vim`.
-gist-vim have two ways to access APIs.
+    $ git config --global github.user <username>
 
-First, you need to set your Github username in global git config:
+Then gist-vim will ask for your password in order to create an access
+token. If you have two-factor authentication enabled, gist-vim will also
+prompt you to enter the two-factor key you receive.
 
-    $ git config --global github.user Username
-
-Then, gist.vim will ask for your password to create an authorization when you
-first use it.  The password is not stored and only the OAuth access token will
-be kept for later use.  You can revoke the token at any time from the list of
-["Authorized applications" on GitHub's "Account Settings" page][uas].
-
-### Two-factor Authentication
-
-If you use two-factor authentication, you will need to set things up
-slightly differently. Luckily, it's not hard at all.
-
-First, go to your [user application settings page][uas] on GitHub. In the
-section 'Personal access tokens', click the button to 'Generate new
-token'. Name the token something easy to remember, like 'gist-vim', and
-then copy the token itself. Finally paste the token you just made into
-`~/.gist-vim`. (Create that file, if it doesn't already exist.) The final
-result should look like this:
-
-    token <paste-your-token-here>
-
-Done! You can revoke this token at any time from your [application
-settings][uas].
+Whichever type of authentication you use, your GitHub password will not be
+stored, only a OAuth access token produced specifically for gist-vim. The
+token is stored in `~/.gist-vim`. If you stop using the plugin, you can
+easily remove this file. To revoke the associated  GitHub token, go to the
+list of ["Authorized applications" on GitHub's "Account Settings"
+page][uas].
 
 [uas]: https://github.com/settings/applications
