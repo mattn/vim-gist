@@ -9,6 +9,12 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+if exists('g:gist_disabled') && g:gist_disabled == 1
+  function gist#Gist(...)
+  endfunction
+  finish
+endif
+
 if !exists('g:github_user') && !executable('git')
   echohl ErrorMsg | echomsg "Gist: require 'git' command" | echohl None
   finish
@@ -39,6 +45,20 @@ if !exists('g:gist_api_url')
   if strlen(g:gist_api_url) == 0
     let g:gist_api_url = 'https://api.github.com/'
   end
+  if exists('g:github_api_url') && !exists('g:gist_shutup_issue154')
+    if matchstr(g:gist_api_url, 'https\?://\zs[^/]\+\ze') != matchstr(g:github_api_url, 'https\?://\zs[^/]\+\ze')
+      echohl WarningMsg
+      echo "--- Warning ---"
+      echo "It seems that you set different URIs for github_api_url/gist_api_url."
+      echo "If you want to remove this message: let g:gist_shutup_issue154 = 1"
+      echohl None
+      if confirm("Continue?", "&Yes\n&No") != 1
+        let g:gist_disabled = 1
+        finish
+      endif
+      redraw!
+    endif
+  endif
 endif
 
 if !exists('g:gist_update_on_write')
@@ -115,7 +135,7 @@ endfunction
 
 " Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it.
 let s:bufprefix = 'gist' . (has('unix') ? ':' : '_')
-function! s:GistList(gistls, page)
+function! s:GistList(gistls, page) abort
   if a:gistls == '-all'
     let url = g:gist_api_url.'gists/public'
   elseif get(g:, 'gist_show_privates', 0) && a:gistls == 'starred'
@@ -216,7 +236,7 @@ function! gist#list(user, ...)
   return webapi#json#decode(res.content)
 endfunction
 
-function! s:GistGetFileName(gistid)
+function! s:GistGetFileName(gistid) abort
   let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     return ''
@@ -229,7 +249,7 @@ function! s:GistGetFileName(gistid)
   return ''
 endfunction
 
-function! s:GistDetectFiletype(gistid)
+function! s:GistDetectFiletype(gistid) abort
   let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     return ''
@@ -246,7 +266,7 @@ function! s:GistDetectFiletype(gistid)
   silent! exec "setlocal ft=".tolower(type)
 endfunction
 
-function! s:GistWrite(fname)
+function! s:GistWrite(fname) abort
   if substitute(a:fname, '\\', '/', 'g') == expand("%:p:gs@\\@/@")
     if g:gist_update_on_write != 2 || v:cmdbang
       Gist -e
@@ -260,7 +280,7 @@ function! s:GistWrite(fname)
   endif
 endfunction
 
-function! s:GistGet(gistid, clipboard)
+function! s:GistGet(gistid, clipboard) abort
   redraw | echon 'Getting gist... '
   let res = webapi#http#get(g:gist_api_url.'gists/'.a:gistid, '', { "Authorization": s:GistGetAuthHeader() })
   if res.status =~ '^2'
@@ -351,7 +371,7 @@ function! s:GistGet(gistid, clipboard)
   endif
 endfunction
 
-function! s:GistListAction(shift)
+function! s:GistListAction(shift) abort
   let line = getline('.')
   let mx = '^gist:\s*\zs\(\w\+\)\ze.*'
   if line =~# mx
@@ -369,7 +389,7 @@ function! s:GistListAction(shift)
   endif
 endfunction
 
-function! s:GistUpdate(content, gistid, gistnm, desc)
+function! s:GistUpdate(content, gistid, gistnm, desc) abort
   let gist = { "id": a:gistid, "files" : {}, "description": "","public": function('webapi#json#true') }
   if exists('b:gist')
     if has_key(b:gist, 'private') && b:gist.private | let gist["public"] = function('webapi#json#false') | endif
@@ -421,7 +441,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc)
   return loc
 endfunction
 
-function! s:GistDelete(gistid)
+function! s:GistDelete(gistid) abort
   let auth = s:GistGetAuthHeader()
   if len(auth) == 0
     redraw
@@ -483,7 +503,7 @@ endfunction
 "
 "       GistID: 123123
 "
-function! s:GistPost(content, private, desc, anonymous)
+function! s:GistPost(content, private, desc, anonymous) abort
   let gist = { "files" : {}, "description": "","public": function('webapi#json#true') }
   if a:desc != ' ' | let gist["description"] = a:desc | endif
   if a:private | let gist["public"] = function('webapi#json#false') | endif
@@ -523,7 +543,7 @@ function! s:GistPost(content, private, desc, anonymous)
   return loc
 endfunction
 
-function! s:GistPostBuffers(private, desc, anonymous)
+function! s:GistPostBuffers(private, desc, anonymous) abort
   let bufnrs = range(1, bufnr("$"))
   let bn = bufnr('%')
   let query = []
@@ -579,7 +599,7 @@ function! s:GistPostBuffers(private, desc, anonymous)
   return loc
 endfunction
 
-function! gist#Gist(count, line1, line2, ...)
+function! gist#Gist(count, line1, line2, ...) abort
   redraw
   if strlen(g:github_user) == 0
     echohl ErrorMsg | echomsg "You don't have github account. read ':help gist-vim-setup'." | echohl None
@@ -780,7 +800,7 @@ function! gist#Gist(count, line1, line2, ...)
   return 1
 endfunction
 
-function! s:GistGetAuthHeader()
+function! s:GistGetAuthHeader() abort
   if get(g:, 'gist_use_password_in_gitconfig', 0) != 0
     let password = substitute(system('git config --get github.password'), "\n", '', '')
     if password =~ '^!' | let password = system(password[1:]) | endif
