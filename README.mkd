@@ -95,6 +95,10 @@ For the latest version please see https://github.com/mattn/gist-vim.
 
         :Gist -ls
 
+- Open the gist on browser after you post or update it.
+
+        :Gist -b
+
 ## Tips:
 
 If you set g:gist_clip_command, gist.vim will copy the gist code with option
