@@ -106,6 +106,10 @@ USAGE                                                 *:Gist* *gist-vim-usage*
 >
     :Gist -ls
 <
+- Open the gist on browser after you post or update it.
+>
+    :Gist -b
+<
 ==============================================================================
 TIPS                                                           *gist-vim-tips*
 

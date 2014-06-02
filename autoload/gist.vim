@@ -617,6 +617,7 @@ function! gist#Gist(count, line1, line2, ...) abort
   let deletepost = 0
   let editpost = 0
   let anonymous = 0
+  let openbrowser = 0
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
   let bufnamemx = '^' . s:bufprefix .'\(\zs[0-9a-f]\+\ze\|\zs[0-9a-f]\+\ze[/\\].*\)$'
   if bufname =~ bufnamemx
@@ -714,6 +715,8 @@ function! gist#Gist(count, line1, line2, ...) abort
           return
         endif
       endif
+    elseif arg =~ '^\(-b\|--browser\)$\C'
+      let openbrowser = 1
     elseif arg !~ '^-' && len(gistnm) == 0
       if gistdesc != ' '
         let gistdesc = matchstr(arg, '^\s*\zs.*\ze\s*$')
@@ -779,7 +782,7 @@ function! gist#Gist(count, line1, line2, ...) abort
       endif
     endif
     if len(url) > 0
-      if get(g:, 'gist_open_browser_after_post', 0) == 1
+      if get(g:, 'gist_open_browser_after_post', 0) == 1 || openbrowser
         call s:open_browser(url)
       endif
       let gist_put_url_to_clipboard_after_post = get(g:, 'gist_put_url_to_clipboard_after_post', 1)
