@@ -60,6 +60,9 @@ if !exists('g:gist_api_url')
     endif
   endif
 endif
+if g:gist_api_url !~ '/$'
+  let g:gist_api_url .= '/'
+endif
 
 if !exists('g:gist_update_on_write')
   let g:gist_update_on_write = 1
