@@ -159,7 +159,7 @@ If you want to edit all files for gists containing more than one: >
 
 If you want to use on GitHub Enterprise: >
 
-    let g:gist_api_url = 'http://your-github-enterprise-domain/api/v3'
+    let g:gist_api_url = 'http://your-github-enterprise-domain/api/v3/'
 <
 
 If you want to update a gist, embed >
