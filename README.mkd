@@ -207,6 +207,12 @@ Add the following lines to your `.vimrc`.
     
 Now restart Vim and run `:BundleInstall`.
 
+### Install with [NeoBundle](https://github.com/Shougo/neobundle.vim)
+
+Add the following line to your `.vimrc`.
+
+    NeoBundle 'mattn/gist-vim', {'depends': 'mattn/webapi-vim'}
+
 ## Requirements:
 
 - curl command (http://curl.haxx.se/)
