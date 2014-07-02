@@ -741,16 +741,16 @@ function! gist#Gist(count, line1, line2, ...) abort
     endif
   endfor
   unlet args
-  "echo "gistid=".gistid
-  "echo "gistls=".gistls
-  "echo "gistnm=".gistnm
-  "echo "gistdesc=".gistdesc
-  "echo "private=".private
-  "echo "clipboard=".clipboard
-  "echo "editpost=".editpost
-  "echo "deletepost=".deletepost
+  "echom "gistid=".gistid
+  "echom "gistls=".gistls
+  "echom "gistnm=".gistnm
+  "echom "gistdesc=".gistdesc
+  "echom "private=".private
+  "echom "clipboard=".clipboard
+  "echom "editpost=".editpost
+  "echom "deletepost=".deletepost
 
-  if gistidbuf != '' && gistid == '' && editpost == 0 && deletepost == 0
+  if gistidbuf != '' && gistid == '' && editpost == 0 && deletepost == 0 && anonymous == 0
     let editpost = 1
     let gistid = gistidbuf
   endif
