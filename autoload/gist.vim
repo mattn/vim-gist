@@ -675,7 +675,7 @@ function! gist#Gist(count, line1, line2, ...) abort
   let clipboard = 0
   let deletepost = 0
   let editpost = 0
-  let anonymous = 0
+  let anonymous = get(g:, 'gist_post_anonymous', 0)
   let openbrowser = 0
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
   let bufnamemx = '^' . s:bufprefix .'\(\zs[0-9a-f]\+\ze\|\zs[0-9a-f]\+\ze[/\\].*\)$'
