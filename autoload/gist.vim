@@ -660,10 +660,6 @@ endfunction
 
 function! gist#Gist(count, line1, line2, ...) abort
   redraw
-  if strlen(g:github_user) == 0
-    echohl ErrorMsg | echomsg "You don't have github account. read ':help gist-vim-setup'." | echohl None
-    return
-  endif
   let bufname = bufname("%")
   " find GistID: in content , then we should just update
   let gistid = ''
@@ -679,6 +675,10 @@ function! gist#Gist(count, line1, line2, ...) abort
   let openbrowser = 0
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
   let bufnamemx = '^' . s:bufprefix .'\(\zs[0-9a-f]\+\ze\|\zs[0-9a-f]\+\ze[/\\].*\)$'
+  if strlen(g:github_user) == 0 && anonymous == 0
+    echohl ErrorMsg | echomsg "You don't have github account. read ':help gist-vim-setup'." | echohl None
+    return
+  endif
   if bufname =~ bufnamemx
     let gistidbuf = matchstr(bufname, bufnamemx)
   elseif exists('b:gist') && has_key(b:gist, 'id')
