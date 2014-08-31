@@ -142,6 +142,10 @@ If you want your gist to be private by default:
 
     let g:gist_post_private = 1
 
+If you want your gist to be anonymous by default:
+
+    let g:gist_post_anonymous = 1
+
 If you want to manipulate multiple files in a gist:
 
     let g:gist_get_multiplefile = 1
@@ -240,3 +244,5 @@ list of ["Authorized applications" on GitHub's "Account Settings"
 page][uas].
 
 [uas]: https://github.com/settings/applications
+
+**Note:** the username is optional if you only send anonymous gists.
