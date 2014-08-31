@@ -150,7 +150,10 @@ If you want to show your private gists with ":Gist -l": >
 If you want your gist to be private by default: >
 
     let g:gist_post_private = 1
+<
+If you want your gist to be anonymous by default: >
 
+    let g:gist_post_anonymous = 1
 <
 If you want to edit all files for gists containing more than one: >
 
@@ -269,6 +272,8 @@ Then, add following into your ~/.vimrc
     let g:gist_use_password_in_gitconfig = 1
 <
 This is not secure at all, so strongly discouraged.
+
+NOTE: the username is optional if you only send anonymous gists.
 
 ==============================================================================
 FAQ                                                           *gist-vim-faq*
