@@ -906,7 +906,7 @@ function! s:GistGetAuthHeader() abort
     endif
     let res = webapi#http#post(g:gist_api_url.'authorizations', webapi#json#encode({
                 \  "scopes"   : ["gist"],
-                \  "note"     : "Gist.vim on ".hostname(),
+                \  "note"     : "Gist.vim on ".hostname().'-'.localtime(),
                 \  "note_url" : "http://www.vim.org/scripts/script.php?script_id=2423"
                 \}), {
                 \  "Content-Type"  : "application/json",
