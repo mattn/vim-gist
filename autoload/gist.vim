@@ -889,7 +889,7 @@ function! s:GistGetAuthHeader() abort
     return ''
   endif
   let note = "Gist.vim on ".hostname()
-  let note_url "http://www.vim.org/scripts/script.php?script_id=2423"
+  let note_url = "http://www.vim.org/scripts/script.php?script_id=2423"
   let insecureSecret = printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
   let res = webapi#http#post(g:gist_api_url.'authorizations', webapi#json#encode({
               \  "scopes"   : ["gist"],
