@@ -888,11 +888,13 @@ function! s:GistGetAuthHeader() abort
     let v:errmsg = 'Canceled'
     return ''
   endif
+  let note = "Gist.vim on ".hostname()
+  let note_url "http://www.vim.org/scripts/script.php?script_id=2423"
   let insecureSecret = printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
   let res = webapi#http#post(g:gist_api_url.'authorizations', webapi#json#encode({
               \  "scopes"   : ["gist"],
-              \  "note"     : "Gist.vim on ".hostname(),
-              \  "note_url" : "http://www.vim.org/scripts/script.php?script_id=2423"
+              \  "note"     : note,
+              \  "note_url" : note_url,
               \}), {
               \  "Content-Type"  : "application/json",
               \  "Authorization" : insecureSecret,
@@ -906,8 +908,8 @@ function! s:GistGetAuthHeader() abort
     endif
     let res = webapi#http#post(g:gist_api_url.'authorizations', webapi#json#encode({
                 \  "scopes"   : ["gist"],
-                \  "note"     : "Gist.vim on ".hostname().'-'.localtime(),
-                \  "note_url" : "http://www.vim.org/scripts/script.php?script_id=2423"
+                \  "note"     : note,
+                \  "note_url" : note_url,
                 \}), {
                 \  "Content-Type"  : "application/json",
                 \  "Authorization" : insecureSecret,
