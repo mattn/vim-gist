@@ -888,7 +888,7 @@ function! s:GistGetAuthHeader() abort
     let v:errmsg = 'Canceled'
     return ''
   endif
-  let note = "Gist.vim on ".hostname()
+  let note = "Gist.vim on ".hostname()." ".strftime("%Y/%m/%d-%H:%M:%S")
   let note_url = "http://www.vim.org/scripts/script.php?script_id=2423"
   let insecureSecret = printf("basic %s", webapi#base64#b64encode(g:github_user.":".password))
   let res = webapi#http#post(g:gist_api_url.'authorizations', webapi#json#encode({
