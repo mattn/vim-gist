@@ -101,6 +101,9 @@ install_details: |
   See also: https://github.com/mattn/gist-vim/blob/master/README.mkd
 
 versions:
+- '7.2': |
+   This is an upgrade for Gist.vim: fixed many bugs.
+
 - '7.1': |
    This is an upgrade for Gist.vim: updated installation notes.
 
