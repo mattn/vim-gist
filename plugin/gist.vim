@@ -6,7 +6,7 @@
 " GetLatestVimScripts: 2423 1 :AutoInstall: gist.vim
 " script type: plugin
 
-if &cp || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
+if &compatible || (exists('g:loaded_gist_vim') && g:loaded_gist_vim)
   finish
 endif
 let g:loaded_gist_vim = 1
