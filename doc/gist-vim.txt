@@ -240,8 +240,8 @@ REQUIREMENTS                                           *gist-vim-requirements*
 ==============================================================================
 SETUP                                                       *gist-vim-setup*
 
-This plugin uses GitHub API v3. Setting value is stored in `~/.gist-vim`.
-gist-vim have two ways to access APIs.
+This plugin uses GitHub API v3. The authentication value is stored in `~/.gist-vim`.
+gist-vim provides two ways to authenticate against the GitHub APIs.
 
 First, you need to set your GitHub username in global git config:
 >
@@ -278,8 +278,8 @@ NOTE: the username is optional if you only send anonymous gists.
 ==============================================================================
 FAQ                                                           *gist-vim-faq*
 
-Q. :Gist give Forbidden error
-A. Try to delete ~/.gist-vim. And authenticate again.
+Q. :Gist returns a Forbidden error
+A. Try deleting ~/.gist-vim and authenticating again.
 
 ==============================================================================
 THANKS                                                     *gist-vim-thanks*
