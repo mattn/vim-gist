@@ -741,7 +741,7 @@ function! gist#Gist(count, line1, line2, ...) abort
         let gistid = gistidbuf
         let res = webapi#http#post(g:gist_api_url.'gists/'.gistid.'/star', '', { "Authorization": auth }, 'PUT')
         if res.status =~# '^2'
-          echomsg 'Stared' gistid
+          echomsg 'Starred' gistid
         else
           echohl ErrorMsg | echomsg 'Star failed' | echohl None
         endif
@@ -755,7 +755,7 @@ function! gist#Gist(count, line1, line2, ...) abort
         let gistid = gistidbuf
         let res = webapi#http#post(g:gist_api_url.'gists/'.gistid.'/star', '', { "Authorization": auth }, 'DELETE')
         if res.status =~# '^2'
-          echomsg 'Unstared' gistid
+          echomsg 'Unstarred' gistid
         else
           echohl ErrorMsg | echomsg 'Unstar failed' | echohl None
         endif
