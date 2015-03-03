@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 19-Oct-2014.
+" Last Change: 04-Mar-2015.
 " Version: 7.2
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -373,7 +373,7 @@ function! s:GistGet(gistid, clipboard) abort
           setlocal modifiable
         else
           if num_file == 1
-            if get(g:, 'gist_edith_with_buffers', 0)
+            if get(g:, 'gist_edit_with_buffers', 0)
               let found = -1
               for wnr in range(1, winnr('$'))
                 let bnr = winbufnr(wnr)
