@@ -373,12 +373,39 @@ function! s:GistGet(gistid, clipboard) abort
           setlocal modifiable
         else
           if num_file == 1
-            silent only!
-          endif
-          if get(g:, 'gist_list_vsplit', 0)
-            exec 'silent noautocmd rightbelow vnew'
+            if get(g:, 'gist_edith_with_buffers', 0)
+              let found = -1
+              for wnr in range(1, winnr('$'))
+                let bnr = winbufnr(wnr)
+                if bnr != -1 && !empty(getbufvar(bnr, 'gist'))
+                  let found = wnr
+                  break
+                endif
+              endfor
+              if found != -1
+                exe found 'wincmd w'
+                setlocal modifiable
+              else
+                if get(g:, 'gist_list_vsplit', 0)
+                  exec 'silent noautocmd rightbelow vnew'
+                else
+                  exec 'silent noautocmd rightbelow new'
+                endif
+              endif
+            else
+              silent only!
+              if get(g:, 'gist_list_vsplit', 0)
+                exec 'silent noautocmd rightbelow vnew'
+              else
+                exec 'silent noautocmd rightbelow new'
+              endif
+            endif
           else
-            exec 'silent noautocmd rightbelow new'
+            if get(g:, 'gist_list_vsplit', 0)
+              exec 'silent noautocmd rightbelow vnew'
+            else
+              exec 'silent noautocmd rightbelow new'
+            endif
           endif
           setlocal noswapfile
           silent exec 'noautocmd file' s:bufprefix.a:gistid.'/'.fnameescape(filename)
