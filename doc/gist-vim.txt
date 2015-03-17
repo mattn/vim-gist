@@ -110,6 +110,10 @@ USAGE                                                 *:Gist* *gist-vim-usage*
 >
     :Gist -b
 <
+- Post as new gist after editing on the buffer.
+>
+    :Gist!
+<
 ==============================================================================
 TIPS                                                           *gist-vim-tips*
 
