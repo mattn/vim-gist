@@ -688,7 +688,7 @@ function! s:GistPostBuffers(private, desc, anonymous) abort
   return loc
 endfunction
 
-function! gist#Gist(count, line1, line2, ...) abort
+function! gist#Gist(count, bang, line1, line2, ...) abort
   redraw
   let bufname = bufname('%')
   " find GistID: in content , then we should just update
@@ -709,7 +709,9 @@ function! gist#Gist(count, line1, line2, ...) abort
     echohl ErrorMsg | echomsg 'You don''t have github account. read '':help gist-vim-setup''.' | echohl None
     return
   endif
-  if bufname =~# bufnamemx
+  if a:bang == '!'
+    let gistidbuf = ''
+  elseif bufname =~# bufnamemx
     let gistidbuf = matchstr(bufname, bufnamemx)
   elseif exists('b:gist') && has_key(b:gist, 'id')
     let gistidbuf = b:gist['id']
