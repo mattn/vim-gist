@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 04-Mar-2015.
+" Last Change: 21-Mar-2015.
 " Version: 7.2
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -28,6 +28,8 @@ endif
 if globpath(&rtp, 'autoload/webapi/http.vim') ==# ''
   echohl ErrorMsg | echomsg 'Gist: require ''webapi'', install https://github.com/mattn/webapi-vim' | echohl None
   finish
+else
+  call webapi#json#true()
 endif
 
 let s:gist_token_file = expand(get(g:, 'gist_token_file', '~/.gist-vim'))
