@@ -110,6 +110,10 @@ USAGE                                                 *:Gist* *gist-vim-usage*
 >
     :Gist -b
 <
+- Post as new gist after editing on the buffer.
+>
+    :Gist!
+<
 ==============================================================================
 TIPS                                                           *gist-vim-tips*
 
@@ -159,11 +163,21 @@ If you want to edit all files for gists containing more than one: >
 
     let g:gist_get_multiplefile = 1
 <
-
 If you want to use on GitHub Enterprise: >
 
     let g:gist_api_url = 'http://your-github-enterprise-domain/api/v3'
 <
+If you want to open gist with current editing buffers: >
+
+    let g:gist_edit_with_buffers = 1
+
+If you want to open gist with current editing buffers: >
+
+    let g:gist_edit_with_buffers = 1
+
+If you want to open gist list/buffer as vertical split: >
+
+    let g:gist_list_vsplit = 1
 
 If you want to update a gist, embed >
 
