@@ -483,6 +483,10 @@ endfunction
 function! s:GistUpdate(content, gistid, gistnm, desc) abort
   let gist = { "id": a:gistid, "files" : {}, "description": "","public": function('webapi#json#true') }
   if exists('b:gist')
+    if has_key(b:gist, 'filename') && len(a:gistnm) > 0
+      let gist.files[b:gist.filename] = { "content": '', "filename": b:gist.filename }
+      let b:gist.filename = a:gistnm
+    endif
     if has_key(b:gist, 'private') && b:gist.private | let gist['public'] = function('webapi#json#false') | endif
     if has_key(b:gist, 'description') | let gist['description'] = b:gist.description | endif
     if has_key(b:gist, 'filename') | let filename = b:gist.filename | endif
@@ -761,8 +765,10 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
     elseif arg =~# '^\(-d\|--delete\)$\C' && gistidbuf !=# ''
       let gistid = gistidbuf
       let deletepost = 1
-    elseif arg =~# '^\(-e\|--edit\)$\C' && gistidbuf !=# ''
-      let gistid = gistidbuf
+    elseif arg =~# '^\(-e\|--edit\)$\C'
+      if gistidbuf !=# ''
+        let gistid = gistidbuf
+      endif
       let editpost = 1
     elseif arg =~# '^\(+1\|--star\)$\C' && gistidbuf !=# ''
       let auth = s:GistGetAuthHeader()
