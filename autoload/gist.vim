@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 21-Mar-2015.
+" Last Change: 03-May-2015.
 " Version: 7.2
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -880,7 +880,7 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
         silent! normal! gv
       endif
     endif
-    if len(url) > 0
+    if type(url) == 1 && len(url) > 0
       if get(g:, 'gist_open_browser_after_post', 0) == 1 || openbrowser
         call s:open_browser(url)
       endif
