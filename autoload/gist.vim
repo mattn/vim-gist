@@ -970,7 +970,7 @@ function! s:GistGetAuthHeader() abort
   return secret
 endfunction
 
-let s:extmap = {
+let s:extmap = extend({
 \".adb": "ada",
 \".ahk": "ahk",
 \".arc": "arc",
@@ -1102,7 +1102,7 @@ let s:extmap = {
 \".xq": "xquery",
 \".xs": "xs",
 \".yml": "yaml",
-\}
+\}, get(g:, 'gist_extmap', {}))
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
