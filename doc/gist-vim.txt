@@ -179,6 +179,13 @@ If you want to open gist list/buffer as vertical split: >
 
     let g:gist_list_vsplit = 1
 
+If you want to modify filetype for the file on github, or add mapping of
+filetype/file-extension: >
+
+    let g:gist_extmap = { ".swift": "swift" }
+<
+    key is file-extension, value is filetype.
+
 If you want to update a gist, embed >
 
     GistID: xxxxx
