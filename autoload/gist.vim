@@ -1085,6 +1085,7 @@ let s:extmap = extend({
 \".sml": "sml",
 \".sql": "sql",
 \".st": "smalltalk",
+\".switf": "switf",
 \".tcl": "tcl",
 \".tcsh": "tcsh",
 \".tex": "tex",
