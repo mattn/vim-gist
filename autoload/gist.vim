@@ -891,10 +891,10 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
         endif
         if exists('g:gist_clip_command')
           call system(g:gist_clip_command, url)
-        elseif has('unix') && !has('xterm_clipboard')
-          let @" = url
-        else
+        elseif has('clipboard')
           let @+ = url
+        else
+          let @" = url
         endif
       endif
     endif
