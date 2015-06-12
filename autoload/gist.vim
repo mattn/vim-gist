@@ -583,6 +583,12 @@ function! s:update_GistID(id) abort
     call setline('.', line . ' ' . a:id)
     let ret = 1
   endif
+  if search('\<GistURL\>:\s*$')
+    let line = getline('.')
+    let line = substitute(line, '\s\+$', '', 'g')
+    call setline('.', line . ' https://gist.github.com/' . a:id)
+    let ret = 1
+  endif
   call winrestview(view)
   return ret
 endfunction
