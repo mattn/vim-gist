@@ -27,11 +27,13 @@ USAGE                                                 *:Gist* *gist-vim-usage*
 - Create a private gist. >
 
     :Gist -p
+    :Gist --private
 <
 - Create a public gist.
   (Only relevant if you've set gists to be private by default.) >
 
     :Gist -P
+    :Gist --public
 <
 - Post whole text to gist as public.
   This is only relevant if you've set gists to be private by default.
@@ -41,15 +43,18 @@ USAGE                                                 *:Gist* *gist-vim-usage*
 - Create a gist anonymously. >
 
     :Gist -a
+    :Gist --anonymous
 <
 - Create a gist with all open buffers. >
 
     :Gist -m
+    :Gist --multibuffer
 <
 - Edit the gist (you need to have opened the gist buffer first).
   You can update the gist with the {:w} command within the gist buffer. >
 
     :Gist -e
+    :Gist --edit
 <
 - Edit the gist with name "foo.js" (you need to have opened the gist buffer
   first). >
@@ -60,18 +65,21 @@ USAGE                                                 *:Gist* *gist-vim-usage*
   first). >
 
     :Gist -s something
+    :Gist --description something
     :Gist -e -s something
 <
 - Delete the gist (you need to have opened the gist buffer first).
   Password authentication is needed. >
 
     :Gist -d
+    :Gist --delete
 <
 - Fork the gist (you need to have opened the gist buffer first).
   Password authentication is needed. >
 
     :Gist -f
-< 
+    :Gist --fork
+<
 - Star the gist (you need to have opened the gist buffer first).
   Password authentication is needed.
 >
@@ -93,6 +101,7 @@ USAGE                                                 *:Gist* *gist-vim-usage*
 - List your public gists. >
 
     :Gist -l
+    :Gist --list
 <
 - List gists from user "mattn". >
 
@@ -101,14 +110,17 @@ USAGE                                                 *:Gist* *gist-vim-usage*
 - List everyone's gists. >
 
     :Gist -la
+    :Gist --listall
 <
 - List gists from your starred gists.
 >
     :Gist -ls
+    :Gist --liststar
 <
 - Open the gist on browser after you post or update it.
 >
     :Gist -b
+    :Gist --browser
 <
 - Post as new gist after editing on the buffer.
 >
