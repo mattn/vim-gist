@@ -183,10 +183,6 @@ If you want to open gist with current editing buffers: >
 
     let g:gist_edit_with_buffers = 1
 
-If you want to open gist with current editing buffers: >
-
-    let g:gist_edit_with_buffers = 1
-
 If you want to open gist list/buffer as vertical split: >
 
     let g:gist_list_vsplit = 1
