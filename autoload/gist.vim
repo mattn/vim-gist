@@ -1,7 +1,7 @@
 "=============================================================================
 " File: gist.vim
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
-" Last Change: 03-May-2015.
+" Last Change: 04-Jul-2015.
 " Version: 7.2
 " WebPage: http://github.com/mattn/gist-vim
 " License: BSD
@@ -362,6 +362,9 @@ function! s:GistGet(gistid, clipboard) abort
       echohl ErrorMsg | echomsg 'Gist not found' | echohl None
       return
     endif
+    augroup GistWrite
+      au!
+    augroup END
     for n in range(num_file)
       try
         let old_undolevels = &undolevels
@@ -450,7 +453,6 @@ function! s:GistGet(gistid, clipboard) abort
       endif
       1
       augroup GistWrite
-        au!
         au! BufWriteCmd <buffer> call s:GistWrite(expand("<amatch>"))
       augroup END
     endfor
