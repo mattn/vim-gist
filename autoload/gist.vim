@@ -99,13 +99,17 @@ function! s:open_browser(url) abort
     return
   endif
   if cmd =~# '^!'
-    let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
+    let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
     silent! exec cmd
   elseif cmd =~# '^:[A-Z]'
     let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
     exec cmd
   else
-    let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
+    if has("win32") || has("win64")
+      let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
+    else
+      let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
+    endif
     call system(cmd)
   endif
 endfunction
