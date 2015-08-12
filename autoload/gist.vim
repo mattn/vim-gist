@@ -98,6 +98,14 @@ function! s:open_browser(url) abort
     echo a:url
     return
   endif
+  if exists('+shellslash')
+    let old_ssl = &shellslash
+    if fnamemodify(&shell, ':t') == 'cmd.exe'
+      set noshellslash
+    else
+      set shellslash
+    endif
+  endif
   if cmd =~# '^!'
     let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
     silent! exec cmd
@@ -105,12 +113,11 @@ function! s:open_browser(url) abort
     let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
     exec cmd
   else
-    if has("win32") || has("win64")
-      let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
-    else
-      let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
-    endif
+    let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
     call system(cmd)
+  endif
+  if exists('old_ssl')
+    let &shellslash = old_ssl
   endif
 endfunction
 
