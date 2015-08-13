@@ -98,14 +98,16 @@ function! s:open_browser(url) abort
     echo a:url
     return
   endif
+  let quote = &shellxquote == '"' ?  "'" : '"'
   if cmd =~# '^!'
-    let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
+    let cmd = substitute(cmd, '%URL%', '\=quote.a:url.quote', 'g')
+    let g:hoge = cmd
     silent! exec cmd
   elseif cmd =~# '^:[A-Z]'
     let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
     exec cmd
   else
-    let cmd = substitute(cmd, '%URL%', '\=shellescape(a:url)', 'g')
+    let cmd = substitute(cmd, '%URL%', '\=quote.a:url.quote', 'g')
     call system(cmd)
   endif
 endfunction
