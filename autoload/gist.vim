@@ -716,7 +716,7 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
   let bufnamemx = '^' . s:bufprefix .'\(\zs[0-9a-f]\+\ze\|\zs[0-9a-f]\+\ze[/\\].*\)$'
   if strlen(g:github_user) == 0 && anonymous == 0
-    echohl ErrorMsg | echomsg 'You don''t have configured a Github account. Read '':help gist-vim-setup''.' | echohl None
+    echohl ErrorMsg | echomsg 'You have not configured a Github account. Read '':help gist-vim-setup''.' | echohl None
     return
   endif
   if a:bang == '!'
