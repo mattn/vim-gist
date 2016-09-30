@@ -132,12 +132,23 @@ function! s:format_gist(gist) abort
   else
     let code = ''
   endif
-  let desc = type(a:gist.description)==0 || a:gist.description ==# '' ? '' : '('.a:gist.description.')'
+  let desc = type(a:gist.description)==0 || a:gist.description ==# '' ? '' : a:gist.description
   let name = substitute(name, '[\r\n\t]', ' ', 'g')
   let name = substitute(name, '  ', ' ', 'g')
   let desc = substitute(desc, '[\r\n\t]', ' ', 'g')
   let desc = substitute(desc, '  ', ' ', 'g')
-  return printf('gist: %s %s %s%s', a:gist.id, name, desc, code)
+  " return printf('gist: %-32s %s %s%s', a:gist.id, name, desc, code)
+  " Display a nice formatted (and truncated if needed) table of gists on screen
+  " Calculate field lengths for gist-listing formatting on screen
+  redir =>a |exe "sil sign place buffer=".bufnr('')|redir end
+  let signlist = split(a, '\n')
+  let width = winwidth(0) - ((&number||&relativenumber) ? &numberwidth : 0) - &foldcolumn - (len(signlist) > 2 ? 2 : 0)
+  let s:gistlen = 33
+  if !exists("g:gist_namelength")
+      let g:gist_namelength=30
+  endif
+  let s:desclen = width-(s:gistlen+g:gist_namelength+10)
+  return printf('gist: %-*s %-*s %-*s', s:gistlen, a:gist.id, g:gist_namelength+1, strpart(name, 0, g:gist_namelength), s:desclen+1, strpart(desc, 0, s:desclen))
 endfunction
 
 " Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it.
@@ -206,17 +217,38 @@ function! s:GistList(gistls, page) abort
   let lines = map(filter(content, '!empty(v:val.files)'), 's:format_gist(v:val)')
   call setline(1, split(join(lines, "\n"), "\n"))
 
-  $put='more...'
+  let numlines = line('$')
+  if numlines > 1
+      let plural='s'
+  else
+      let plural=''
+  endif
+  " $put='more...'.line('$').' gist'.plural.' shown.'
+  call append(0, '      '.a:gistls.': '.numlines.' gist'.plural) 
+  
+  if numlines+1 > 11
+      let listheight = 11
+  else
+      let listheight = numlines+1
+  endif
+  execute 'resize ' . listheight 
 
   let b:gistls = a:gistls
   let b:page = a:page
   setlocal buftype=nofile bufhidden=hide noswapfile
+  setlocal cursorline
   setlocal nomodified
   setlocal nomodifiable
-  syntax match SpecialKey /^gist:/he=e-1
+  syntax match SpecialKey /^gist:/he=e
   syntax match Title /^gist: \S\+/hs=s+5 contains=ALL
   nnoremap <silent> <buffer> <cr> :call <SID>GistListAction(0)<cr>
-  nnoremap <silent> <buffer> <s-cr> :call <SID>GistListAction(1)<cr>
+  nnoremap <silent> <buffer> o :call <SID>GistListAction(0)<cr>
+  nnoremap <silent> <buffer> b :call <SID>GistListAction(1)<cr> 
+  nnoremap <silent> <buffer> y :call <SID>GistListAction(2)<cr>
+  nnoremap <silent> <buffer> p :call <SID>GistListAction(3)<cr> 
+  nnoremap <silent> <buffer> <esc> :bw<cr>
+  " Next line (in original code) only works on GUI VIM
+  nnoremap <silent> <buffer> <s-cr> :call <SID>GistListAction(1)<cr> 
 
   cal cursor(1+len(oldlines),1)
   nohlsearch
@@ -401,6 +433,7 @@ function! s:GistGet(gistid, clipboard) abort
               endif
             else
               silent only!
+              " exec 'silent noautocmd edit'
               if get(g:, 'gist_list_vsplit', 0)
                 exec 'silent noautocmd rightbelow vnew'
               else
@@ -437,7 +470,8 @@ function! s:GistGet(gistid, clipboard) abort
         return
       endtry
       let &undolevels = old_undolevels
-      setlocal buftype=acwrite bufhidden=delete noswapfile
+      " setlocal buftype=acwrite bufhidden=delete noswapfile
+      setlocal buftype=acwrite bufhidden=hide noswapfile
       setlocal nomodified
       doau StdinReadPost,BufRead,BufReadPost
       let gist_detect_filetype = get(g:, 'gist_detect_filetype', 0)
@@ -471,10 +505,22 @@ function! s:GistListAction(shift) abort
   let mx = '^gist:\s*\zs\(\w\+\)\ze.*'
   if line =~# mx
     let gistid = matchstr(line, mx)
-    if a:shift
+    if a:shift == 1
       call s:open_browser('https://gist.github.com/' . gistid)
-    else
+    elseif a:shift == 0
       call s:GistGet(gistid, 0)
+      wincmd w
+      " bdelete
+      bw
+    elseif a:shift == 2 
+      call s:GistGet(gistid, 1)
+      bdelete
+      bdelete
+    elseif a:shift == 3
+      call s:GistGet(gistid, 1)
+      bdelete
+      bdelete
+      normal! "+p
     endif
     return
   endif
