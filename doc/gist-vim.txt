@@ -116,7 +116,21 @@ USAGE                                                 *:Gist* *gist-vim-usage*
 >
     :Gist -ls
     :Gist --liststar
-<
+
+- While the gist list is visible, the following mappings apply:
+
+  - 'o' or 'Enter' will open the selected gist file in a new buffer
+    and close the gist-vim listing split.
+  - 'b' will open the selected gist file in a browser. If you are in
+    GUI vim you can also achieve this by pressing 'Shift-Enter'.
+  - 'y' will copy the contents of the selected gist to the clipboard,
+    and close the gist-vim listing split.
+  - 'p' will (copy and) paste the contents of the selected gist to the
+    buffer from which gist-vim was called, and close the gist-vim 
+    listing split.
+  - 'Esc' will close the gist-vim listing split without performing any
+    further action.
+
 - Open the gist on browser after you post or update it.
 >
     :Gist -b
@@ -201,7 +215,19 @@ If you want to update a gist, embed >
 in your local file, then call >
 
     :Gist
->
+
+The gist-vim listing split lists gists ids, names (filenames) as well as
+their description. This is done following a table layout, with fixed space
+for each column. For offering quick browsing, gist-vim will truncate all
+output exceeding the available horizontal space, assuring that every gist
+listed only takes one line on the table. Although the gist id field width is
+fixed internally, the user can define the length of the (file)name field on
+the gist-vim listing. This can be done by the following declaration:
+
+    let g:gist_namelength = 20
+
+Note that the default value for gist_namelength is 30. Again, if the gist
+(file)name exceeds the specified number of characters, it will be truncated.
 
 If you want to update a gist when only |:w!|: >
 
