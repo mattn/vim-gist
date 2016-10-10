@@ -503,23 +503,23 @@ function! s:GistGet(gistid, clipboard) abort
   endif
 endfunction
 
-function! s:GistListAction(shift) abort
+function! s:GistListAction(mode) abort
   let line = getline('.')
   let mx = '^gist:\s*\zs\(\w\+\)\ze.*'
   if line =~# mx
     let gistid = matchstr(line, mx)
-    if a:shift == 1
+    if a:mode == 1
       call s:open_browser('https://gist.github.com/' . gistid)
-    elseif a:shift == 0
+    elseif a:mode == 0
       call s:GistGet(gistid, 0)
       wincmd w
       " bdelete
       bw
-    elseif a:shift == 2
+    elseif a:mode == 2
       call s:GistGet(gistid, 1)
       bdelete
       bdelete
-    elseif a:shift == 3
+    elseif a:mode == 3
       call s:GistGet(gistid, 1)
       bdelete
       bdelete
