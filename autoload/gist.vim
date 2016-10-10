@@ -252,7 +252,6 @@ function! s:GistList(gistls, page) abort
   nnoremap <silent> <buffer> y :call <SID>GistListAction(2)<cr>
   nnoremap <silent> <buffer> p :call <SID>GistListAction(3)<cr>
   nnoremap <silent> <buffer> <esc> :bw<cr>
-  " Next line (in original code) only works on GUI VIM
   nnoremap <silent> <buffer> <s-cr> :call <SID>GistListAction(1)<cr>
 
   cal cursor(1+len(oldlines),1)
