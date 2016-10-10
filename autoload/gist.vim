@@ -236,21 +236,7 @@ function! s:GistList(gistls, page) abort
   let lines = map(filter(content, '!empty(v:val.files)'), 's:format_gist(v:val)')
   call setline(1, split(join(lines, "\n"), "\n"))
 
-  let numlines = line('$')
-  if numlines > 1
-      let plural='s'
-  else
-      let plural=''
-  endif
-  " $put='more...'.line('$').' gist'.plural.' shown.'
-  call append(0, '      '.a:gistls.': '.numlines.' gist'.plural)
-
-  if numlines+1 > 11
-      let listheight = 11
-  else
-      let listheight = numlines+1
-  endif
-  execute 'resize ' . listheight
+  $put='more...'
 
   let b:gistls = a:gistls
   let b:page = a:page
