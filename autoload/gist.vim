@@ -475,7 +475,6 @@ function! s:GistGet(gistid, clipboard) abort
         return
       endtry
       let &undolevels = old_undolevels
-      " setlocal buftype=acwrite bufhidden=delete noswapfile
       setlocal buftype=acwrite bufhidden=hide noswapfile
       setlocal nomodified
       doau StdinReadPost,BufRead,BufReadPost
