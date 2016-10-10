@@ -438,7 +438,6 @@ function! s:GistGet(gistid, clipboard) abort
               endif
             else
               silent only!
-              " exec 'silent noautocmd edit'
               if get(g:, 'gist_list_vsplit', 0)
                 exec 'silent noautocmd rightbelow vnew'
               else
