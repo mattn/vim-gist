@@ -513,14 +513,15 @@ function! s:GistListAction(mode) abort
     elseif a:mode == 0
       call s:GistGet(gistid, 0)
       wincmd w
-      " bdelete
       bw
     elseif a:mode == 2
       call s:GistGet(gistid, 1)
+      " TODO close with buffe rname
       bdelete
       bdelete
     elseif a:mode == 3
       call s:GistGet(gistid, 1)
+      " TODO close with buffe rname
       bdelete
       bdelete
       normal! "+p
