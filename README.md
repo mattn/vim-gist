@@ -99,9 +99,9 @@ For the latest version please see https://github.com/mattn/gist-vim.
 
         :Gist -b
 
-## List Action
+## List Feature
 
-- New mappings on the gist-listing buffer:
+- Useful mappings on the gist-listing buffer:
     - Both `o` or `Enter` open the gist file in a new buffer, and close the
       gist-vim listing one.
     - `b` opens the gist file in a browser; this is necessary because
@@ -111,6 +111,7 @@ For the latest version please see https://github.com/mattn/gist-vim.
     - `p` pastes the contents of the selected gist to the buffer from where
       gist-vim was called, and closes the gist-vim buffer.
     - Hitting `Escape` or `Tab` at the gist-vim buffer closes it.
+
 - Gist listing has fixed-length columns now, more amenable to eye inspection.
   Every line on the gist-listing buffer contains the gist id, name and
   description, in that order. Columns are now padded and truncated to offer a
@@ -127,17 +128,6 @@ For the latest version please see https://github.com/mattn/gist-vim.
     of the line, avoiding wrapped lines that mess up the table layout.
   - Note that the gist listing buffer now does not show the field 'code'
     (not sure what that did in the first place).
-
-- Now the listing is complete (no need to select 'more' to see the following
-  gists on the list), in this way the user can later perform a search (using vim's `/`,
-  for instance) for the sought gist by name, description, etc.
-- The first line on the gist-listing states the number of gists listed and the
-  user whose gists are being listed.
-- The height of the gist-listing buffer is now determined in the following way.
-  If the number of gists listed equals or exceeds 10, then the height is fixed at 10. If
-  it is smaller than 10, then the height is adjusted so that there are no empty
-  lines displayed on the buffer. Note: right now this value (10) is fixed; I'm
-  going to change it to a global plugin variable that defaults to 10.
 
 ## Tips:
 
