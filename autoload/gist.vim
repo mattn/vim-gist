@@ -119,6 +119,28 @@ function! s:shellwords(str) abort
   return words
 endfunction
 
+function! s:truncate(str, num)
+  let mx_first = '^\(.\)\(.*\)$'
+  let str = a:str
+  let ret = ''
+  let width = 0
+  while 1
+    let char = substitute(str, mx_first, '\1', '')
+    let cells = strdisplaywidth(char)
+    if cells == 0 || width + cells > a:num
+      break
+    endif
+    let width = width + cells
+    let ret .= char
+    let str = substitute(str, mx_first, '\2', '')
+  endwhile
+  while width + 1 <= a:num
+    let ret .= " "
+    let width = width + 1
+  endwhile
+  return ret
+endfunction
+
 function! s:format_gist(gist) abort
   let files = sort(keys(a:gist.files))
   if empty(files)
@@ -142,12 +164,10 @@ function! s:format_gist(gist) abort
   redir =>a |exe "sil sign place buffer=".bufnr('')|redir end
   let signlist = split(a, '\n')
   let width = winwidth(0) - ((&number||&relativenumber) ? &numberwidth : 0) - &foldcolumn - (len(signlist) > 2 ? 2 : 0)
-  let s:gistlen = 33
-  if !exists("g:gist_namelength")
-      let g:gist_namelength=30
-  endif
-  let s:desclen = width-(s:gistlen+g:gist_namelength+10)
-  return printf('gist: %-*s %-*s %-*s', s:gistlen, a:gist.id, g:gist_namelength+1, strpart(name, 0, g:gist_namelength), s:desclen+1, strpart(desc, 0, s:desclen))
+  let idlen = 33
+  let namelen = get(g:, 'gist_namelength', 30)
+  let desclen = width - (idlen + namelen + 10)
+  return printf('gist: %s %s %s', s:truncate(a:gist.id, idlen), s:truncate(name, namelen), s:truncate(desc, desclen))
 endfunction
 
 " Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it.
