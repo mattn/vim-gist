@@ -137,7 +137,6 @@ function! s:format_gist(gist) abort
   let name = substitute(name, '  ', ' ', 'g')
   let desc = substitute(desc, '[\r\n\t]', ' ', 'g')
   let desc = substitute(desc, '  ', ' ', 'g')
-  " return printf('gist: %-32s %s %s%s', a:gist.id, name, desc, code)
   " Display a nice formatted (and truncated if needed) table of gists on screen
   " Calculate field lengths for gist-listing formatting on screen
   redir =>a |exe "sil sign place buffer=".bufnr('')|redir end
