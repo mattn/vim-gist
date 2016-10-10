@@ -19,7 +19,7 @@ detailed_description: |
 
     :Gist -p
       post whole text to gist with private.
-      if you got empty gist list, try :Gist --abandon 
+      if you got empty gist list, try :Gist --abandon
 
     :Gist -a
       post whole text to gist with anonymous.
@@ -261,7 +261,7 @@ versions:
    This is an upgrade for Gist.vim: support changing gist filename.
 
 - '2.0': |
-   This is an upgrade for Gist.vim: bugfix for listing gists in specified user. 
+   This is an upgrade for Gist.vim: bugfix for listing gists in specified user.
 
 - '1.9': |
    This is an upgrade for Gist.vim: added support editing the gist. and bits bug fix.

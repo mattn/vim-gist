@@ -224,14 +224,14 @@ function! s:GistList(gistls, page) abort
       let plural=''
   endif
   " $put='more...'.line('$').' gist'.plural.' shown.'
-  call append(0, '      '.a:gistls.': '.numlines.' gist'.plural) 
-  
+  call append(0, '      '.a:gistls.': '.numlines.' gist'.plural)
+
   if numlines+1 > 11
       let listheight = 11
   else
       let listheight = numlines+1
   endif
-  execute 'resize ' . listheight 
+  execute 'resize ' . listheight
 
   let b:gistls = a:gistls
   let b:page = a:page
@@ -243,12 +243,12 @@ function! s:GistList(gistls, page) abort
   syntax match Title /^gist: \S\+/hs=s+5 contains=ALL
   nnoremap <silent> <buffer> <cr> :call <SID>GistListAction(0)<cr>
   nnoremap <silent> <buffer> o :call <SID>GistListAction(0)<cr>
-  nnoremap <silent> <buffer> b :call <SID>GistListAction(1)<cr> 
+  nnoremap <silent> <buffer> b :call <SID>GistListAction(1)<cr>
   nnoremap <silent> <buffer> y :call <SID>GistListAction(2)<cr>
-  nnoremap <silent> <buffer> p :call <SID>GistListAction(3)<cr> 
+  nnoremap <silent> <buffer> p :call <SID>GistListAction(3)<cr>
   nnoremap <silent> <buffer> <esc> :bw<cr>
   " Next line (in original code) only works on GUI VIM
-  nnoremap <silent> <buffer> <s-cr> :call <SID>GistListAction(1)<cr> 
+  nnoremap <silent> <buffer> <s-cr> :call <SID>GistListAction(1)<cr>
 
   cal cursor(1+len(oldlines),1)
   nohlsearch
@@ -512,7 +512,7 @@ function! s:GistListAction(shift) abort
       wincmd w
       " bdelete
       bw
-    elseif a:shift == 2 
+    elseif a:shift == 2
       call s:GistGet(gistid, 1)
       bdelete
       bdelete

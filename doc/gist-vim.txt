@@ -1,19 +1,19 @@
 *Gist.vim* Vimscript for creating gists (http://gist.github.com)
 
-Usage                                          |gist-vim-usage| 
-Tips                                           |gist-vim-tips| 
-License                                        |gist-vim-license| 
-Install                                        |gist-vim-install| 
-Requirements                                   |gist-vim-requirements| 
-Setup                                          |gist-vim-setup| 
-FAQ                                            |gist-vim-faq| 
+Usage                                          |gist-vim-usage|
+Tips                                           |gist-vim-tips|
+License                                        |gist-vim-license|
+Install                                        |gist-vim-install|
+Requirements                                   |gist-vim-requirements|
+Setup                                          |gist-vim-setup|
+FAQ                                            |gist-vim-faq|
 
-This is a vimscript for creating gists (http://gist.github.com) 
+This is a vimscript for creating gists (http://gist.github.com)
 
 For the latest version please see https://github.com/mattn/gist-vim.
 
 ==============================================================================
-USAGE                                                 *:Gist* *gist-vim-usage* 
+USAGE                                                 *:Gist* *gist-vim-usage*
 
 - Post current buffer to gist, using default privacy option. >
 
@@ -126,7 +126,7 @@ USAGE                                                 *:Gist* *gist-vim-usage*
   - 'y' will copy the contents of the selected gist to the clipboard,
     and close the gist-vim listing split.
   - 'p' will (copy and) paste the contents of the selected gist to the
-    buffer from which gist-vim was called, and close the gist-vim 
+    buffer from which gist-vim was called, and close the gist-vim
     listing split.
   - 'Esc' will close the gist-vim listing split without performing any
     further action.
@@ -246,13 +246,13 @@ LICENSE                                                     *gist-vim-license*
 
   Copyright 2010 by Yasuhiro Matsumoto
   modification, are permitted provided that the following conditions are met:
-  
+
   1. Redistributions of source code must retain the above copyright notice,
      this list of conditions and the following disclaimer.
   2. Redistributions in binary form must reproduce the above copyright notice,
      this list of conditions and the following disclaimer in the documentation
      and/or other materials provided with the distribution.
-  
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -311,7 +311,7 @@ be kept for later use.  You can revoke the token at any time from the list of
 If you have two-factor authentication enabled on GitHub, you'll see the message
 "Must specify two-factor authentication OTP code." In this case, you need to
 create a "Personal Access Token" on GitHub's "Account Settings" page
-(https://github.com/settings/applications) and place it in a file 
+(https://github.com/settings/applications) and place it in a file
 named ~/.gist-vim like this:
 >
     token xxxxx
