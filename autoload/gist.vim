@@ -244,7 +244,7 @@ function! s:GistList(gistls, page) abort
   setlocal cursorline
   setlocal nomodified
   setlocal nomodifiable
-  syntax match SpecialKey /^gist:/he=e
+  syntax match SpecialKey /^gist:/he=e-1
   syntax match Title /^gist: \S\+/hs=s+5 contains=ALL
   nnoremap <silent> <buffer> <cr> :call <SID>GistListAction(0)<cr>
   nnoremap <silent> <buffer> o :call <SID>GistListAction(0)<cr>
