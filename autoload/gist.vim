@@ -32,17 +32,22 @@ else
   call webapi#json#true()
 endif
 
-let s:gist_token_file = expand(get(g:, 'gist_token_file', '~/.gist-vim'))
+" a profile defines: gist_api_url, github_user and the gist_token_file
+let s:gist_profiles = get(g:, 'gist_profiles', {})
 let s:system = function(get(g:, 'webapi#system_function', 'system'))
 
-if !exists('g:github_user')
-  let g:github_user = substitute(s:system('git config --get github.user'), "\n", '', '')
-  if strlen(g:github_user) == 0
-    let g:github_user = $GITHUB_USER
-  end
-endif
+function! s:set_default_github_user()
+    let g:github_user = substitute(s:system('git config --get github.user'), "\n", '', '')
+    if strlen(g:github_user) == 0
+      let g:github_user = $GITHUB_USER
+    end
+endfunction
 
-if !exists('g:gist_api_url')
+function! gist#list_profiles(arg_lead,cmdline,cursor_pos)
+  return keys(s:gist_profiles)
+endfunction
+
+function! s:set_default_api_url()
   let g:gist_api_url = substitute(s:system('git config --get github.apiurl'), "\n", '', '')
   if strlen(g:gist_api_url) == 0
     let g:gist_api_url = 'https://api.github.com/'
@@ -61,10 +66,38 @@ if !exists('g:gist_api_url')
       redraw!
     endif
   endif
-endif
-if g:gist_api_url !~# '/$'
-  let g:gist_api_url .= '/'
-endif
+endfunction
+
+function! gist#select_profile(...)
+  let profile_name = a:0 ? a:1 : ''
+  let profile = get(s:gist_profiles, profile_name, [])
+  if len(profile) == 2
+    let [g:gist_api_url, g:github_user] = profile
+    let g:gist_token_dir = expand(get(g:, 'gist_token_dir', '~/.config/gist-vim'))
+    if !isdirectory(g:gist_token_dir)
+      call mkdir(g:gist_token_dir)
+    endif
+    let g:gist_token_file = expand(simplify(g:gist_token_dir . '/' . profile_name))
+  else
+    echomsg 'gist: profile ' . profile_name . ' does not exist, fallback to default'
+    let g:gist_api_url = ''
+    let g:github_user = ''
+    let g:gist_token_file = '~/.gist-vim'
+  endif
+  if g:gist_api_url is ''
+    call s:set_default_api_url()
+  endif
+  if g:github_user is ''
+    call s:set_default_github_user()
+  endif
+  if g:gist_api_url !~# '/$'
+    let g:gist_api_url .= '/'
+  endif
+  echom 'g:gist_api_url:' . g:gist_api_url
+  echom 'g:github_user:' . g:github_user
+  echom 'g:gist_token_file:' . g:gist_token_file
+endfunction
+call gist#select_profile()
 
 if !exists('g:gist_update_on_write')
   let g:gist_update_on_write = 1
@@ -228,7 +261,7 @@ function! s:GistList(gistls, page) abort
     redraw
     echohl ErrorMsg | echomsg content.message | echohl None
     if content.message ==# 'Bad credentials'
-      call delete(s:gist_token_file)
+      call delete(g:gist_token_file)
     endif
     return
   endif
@@ -783,6 +816,11 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
     if arg =~# '^\(-h\|--help\)$\C'
       help :Gist
       return
+    elseif arg =~# '^\(--profile\|-f\)'
+      if a:0 >= 2
+          call s:select_profile(a:2)
+      endif
+      return
     elseif arg =~# '^\(-g\|--git\)$\C' && gistidbuf !=# '' && g:gist_api_url ==# 'https://api.github.com/' && has_key(b:, 'gist') && has_key(b:gist, 'id')
       echo printf('git clone git@github.com:%s', b:gist['id'])
       return
@@ -962,8 +1000,8 @@ function! s:GistGetAuthHeader() abort
     return printf('basic %s', webapi#base64#b64encode(g:github_user.':'.password))
   endif
   let auth = ''
-  if filereadable(s:gist_token_file)
-    let str = join(readfile(s:gist_token_file), '')
+  if filereadable(g:gist_token_file)
+    let str = join(readfile(g:gist_token_file), '')
     if type(str) == 1
       let auth = str
     endif
@@ -974,7 +1012,7 @@ function! s:GistGetAuthHeader() abort
 
   redraw
   echohl WarningMsg
-  echo 'Gist.vim requires authorization to use the GitHub API. These settings are stored in "~/.gist-vim". If you want to revoke, do "rm ~/.gist-vim".'
+  echo 'Gist.vim requires authorization to use the GitHub API. These settings are stored in "' . g:gist_token_file . '". If you want to revoke, do "rm ' . g:gist_token_file . '".'
   echohl None
   let password = inputsecret('GitHub Password for '.g:github_user.':')
   if len(password) == 0
@@ -1012,9 +1050,9 @@ function! s:GistGetAuthHeader() abort
   let authorization = webapi#json#decode(res.content)
   if has_key(authorization, 'token')
     let secret = printf('token %s', authorization.token)
-    call writefile([secret], s:gist_token_file)
+    call writefile([secret], g:gist_token_file)
     if !(has('win32') || has('win64'))
-      call system('chmod go= '.s:gist_token_file)
+      call system('chmod go= '.g:gist_token_file)
     endif
   elseif has_key(authorization, 'message')
     let secret = ''

@@ -19,5 +19,6 @@ function! s:CompleteArgs(arg_lead,cmdline,cursor_pos)
 endfunction
 
 command! -nargs=? -range=% -bang -complete=customlist,s:CompleteArgs Gist :call gist#Gist(<count>, "<bang>", <line1>, <line2>, <f-args>)
+command! -nargs=? -complete=customlist,gist#list_profiles GistProfile call gist#select_profile(<q-args>)
 
 " vim:set et:
