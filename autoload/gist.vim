@@ -68,8 +68,8 @@ function! s:set_default_api_url()
   endif
 endfunction
 
-function! gist#select_profile(...)
-  let profile_name = a:0 ? a:1 : ''
+function! gist#select_profile(...) abort
+  let profile_name = a:0 ? a:1 : get(g:, 'gist_default_profile', '')
   let profile = get(s:gist_profiles, profile_name, [])
   if len(profile) == 2
     let [g:gist_api_url, g:github_user] = profile
@@ -817,10 +817,7 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
       help :Gist
       return
     elseif arg =~# '^\(--profile\|-f\)'
-      if a:0 >= 2
-          call s:select_profile(a:2)
-      endif
-      return
+      call call('gist#select_profile', a:000[1:])
     elseif arg =~# '^\(-g\|--git\)$\C' && gistidbuf !=# '' && g:gist_api_url ==# 'https://api.github.com/' && has_key(b:, 'gist') && has_key(b:gist, 'id')
       echo printf('git clone git@github.com:%s', b:gist['id'])
       return
