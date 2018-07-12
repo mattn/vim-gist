@@ -1,0 +1,11 @@
+{
+  "name" : "gist-vim",
+  "version" : "7.3",
+  "author" : "Yasuhiro Matsumoto <mattn.jp@gmail.com>",
+  "maintainer" : "Yasuhiro Matsumoto <mattn.jp@gmail.com>",
+  "repository" : {"type": "git", "url": "git://github.com/mattn/gist-vim.git"},
+  "dependencies" : {
+    "WebAPI": {}
+  },
+  "description" : "vimscript for gist"
+}
