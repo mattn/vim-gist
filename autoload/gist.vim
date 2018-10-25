@@ -640,6 +640,29 @@ function! s:update_GistID(id) abort
   return ret
 endfunction
 
+" AnonymousPost function:
+"   Post new pastebin. This is a fallback because Gist no longer supports
+"   anonymous gists.
+"
+function! s:AnonymousPost(content) abort
+  let filename = s:get_current_filename(1)
+  let ext = expand('%:e')
+  redraw | echon 'Posting anonymously to ix.io... (Gist no longer supports anonymous posts)'
+  let data = {'f:1': a:content, 'name:1': filename, 'ext:1': ext}
+  let res = webapi#http#post('http://ix.io', data)
+  if res.status =~# '^2'
+    let loc = res.content
+    let loc = substitute(loc, '\n*$', '', 'g')
+    let loc = loc.'/'
+    redraw | echomsg 'Done: '.loc
+  else
+    let loc = ''
+    echohl ErrorMsg | echomsg 'Post failed: '. res | echohl None
+  endif
+  return loc
+endfunction
+
+"
 " GistPost function:
 "   Post new gist to github
 "
@@ -652,6 +675,12 @@ endfunction
 "       GistID: 123123
 "
 function! s:GistPost(content, private, desc, anonymous) abort
+  " Gist disabled anonymous gists so we are fallbacking on another anonymous
+  " pastebin service.
+  if a:anonymous
+    return s:AnonymousPost(a:content)
+  endif
+
   let gist = { "files" : {}, "description": "","public": function('webapi#json#true') }
   if a:desc !=# ' ' | let gist['description'] = a:desc | endif
   if a:private | let gist['public'] = function('webapi#json#false') | endif
@@ -659,15 +688,14 @@ function! s:GistPost(content, private, desc, anonymous) abort
   let gist.files[filename] = { "content": a:content, "filename": filename }
 
   let header = {"Content-Type": "application/json"}
-  if !a:anonymous
-    let auth = s:GistGetAuthHeader()
-    if len(auth) == 0
-      redraw
-      echohl ErrorMsg | echomsg v:errmsg | echohl None
-      return
-    endif
-    let header['Authorization'] = auth
+
+  let auth = s:GistGetAuthHeader()
+  if len(auth) == 0
+    redraw
+    echohl ErrorMsg | echomsg v:errmsg | echohl None
+    return
   endif
+  let header['Authorization'] = auth
 
   redraw | echon 'Posting it to gist... '
   let res = webapi#http#post(g:gist_api_url.'gists', webapi#json#encode(gist), header)
@@ -911,6 +939,11 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
   else
     let url = ''
     if multibuffer == 1
+      if anonymous == 1
+        let msg = 'Anonymous flag cannot be used with multiple buffers.'
+        echohl ErrorMsg | echomsg msg | echohl None
+        return 0
+      endif
       let url = s:GistPostBuffers(private, gistdesc, anonymous)
     else
       if a:count < 1
