@@ -101,7 +101,6 @@ function! s:open_browser(url) abort
   let quote = &shellxquote == '"' ?  "'" : '"'
   if cmd =~# '^!'
     let cmd = substitute(cmd, '%URL%', '\=quote.a:url.quote', 'g')
-    let g:hoge = cmd
     silent! exec cmd
   elseif cmd =~# '^:[A-Z]'
     let cmd = substitute(cmd, '%URL%', '\=a:url', 'g')
