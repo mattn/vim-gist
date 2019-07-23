@@ -15,6 +15,10 @@ For the latest version please see https://github.com/mattn/gist-vim.
 ==============================================================================
 USAGE                                                 *:Gist* *gist-vim-usage*
 
+- Select profile (see also |gist-vim-setup|) >
+
+    :Gist --profile [profilename]
+>
 - Post current buffer to gist, using default privacy option. >
 
     :Gist
@@ -293,10 +297,55 @@ REQUIREMENTS                                           *gist-vim-requirements*
   - and, if you want to use your git profile, the git command-line client.
 
 ==============================================================================
-SETUP                                                       *gist-vim-setup*
+SETUP                                                         *gist-vim-setup*
 
-This plugin uses GitHub API v3. The authentication value is stored in `~/.gist-vim`.
-gist-vim provides two ways to authenticate against the GitHub APIs.
+This plugin uses GitHub API v3. gist-vim provides two ways to authenticate
+against the GitHub APIs.
+
+                                                      *gist-vim-setup-profile*
+Method 1~
+
+You define the following variables
+>
+    let g:gist_profiles = {
+        \ 'github'     : ['', 'username'],
+        \ 'enterprise' : ['https://mycompany.com/api/v3', 'employeeid']
+    }
+
+    let g:gist_token_dir = '~/.config/gist-vim/'   (default value)
+
+    let g:gist_default_profile = 'enterprise'      (no default value)
+<
+and use
+>
+    :Gist --profile [profilename]
+<
+to select one profile. If `profilename` is not given, it fallbacks to
+`g:gist_default_profile` if it is defined. Otherwise, |gist-vim-setup-old| will
+be used. `:Gist --profile` is implicitly called when the script is autoloaded.
+
+Each profile defines the github api url and the login
+username. If the api url is `''`, it defaults to ` 'https://api.github.com/'`
+
+Then, gist.vim will ask for your password to create an authorization when you
+first use it.  The password is not stored and only the OAuth access token will
+be kept for later use. The token will be stored at
+>
+    g:gist_token_dir/profilename
+<
+You can revoke the token at any time from the list of
+"Authorized applications" on GitHub's "Account Settings" page.
+(https://github.com/settings/applications)
+
+If the profile is not correctly defined, for example, key does not exists or
+the list does not contain two elements, `:Gist --profile [profilename]` will
+fallback to the |gist-vim-setup-old| method.
+
+
+                                                      *gist-vim-setup-old*
+Method 2~
+
+This method does not allow you to have more than one profile.
 
 First, you need to set your GitHub username in global git config:
 >
@@ -304,8 +353,8 @@ First, you need to set your GitHub username in global git config:
 <
 Then, gist.vim will ask for your password to create an authorization when you
 first use it.  The password is not stored and only the OAuth access token will
-be kept for later use.  You can revoke the token at any time from the list of
-"Authorized applications" on GitHub's "Account Settings" page.
+be kept at `~/.gist-vim` for later use. You can revoke the token at any time
+from the list of "Authorized applications" on GitHub's "Account Settings" page.
 (https://github.com/settings/applications)
 
 If you have two-factor authentication enabled on GitHub, you'll see the message
