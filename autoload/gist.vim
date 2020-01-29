@@ -3,7 +3,7 @@
 " Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
 " Last Change: 10-Oct-2016.
 " Version: 7.3
-" WebPage: http://github.com/mattn/gist-vim
+" WebPage: http://github.com/mattn/vim-gist
 " License: BSD
 
 let s:save_cpo = &cpoptions
@@ -764,7 +764,7 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
   let listmx = '^\%(-l\|--list\)\s*\([^\s]\+\)\?$'
   let bufnamemx = '^' . s:bufprefix .'\(\zs[0-9a-f]\+\ze\|\zs[0-9a-f]\+\ze[/\\].*\)$'
   if strlen(g:github_user) == 0 && anonymous == 0
-    echohl ErrorMsg | echomsg 'You have not configured a Github account. Read '':help gist-vim-setup''.' | echohl None
+    echohl ErrorMsg | echomsg 'You have not configured a Github account. Read '':help gist-setup''.' | echohl None
     return
   endif
   if a:bang == '!'
