@@ -275,7 +275,7 @@ rtp:
   - autoload/gist.vim
   - plugin/gist.vim
 
-If you want to uninstall gist.vim, remember to also remove `~/.vim-gist`.
+If you want to uninstall gist.vim, remember to also remove `~/.gist-vim`.
 
 You need to install webapi-vim also:
 
@@ -295,7 +295,7 @@ REQUIREMENTS                                           *vim-gist-requirements*
 ==============================================================================
 SETUP                                                       *vim-gist-setup*
 
-This plugin uses GitHub API v3. The authentication value is stored in `~/.vim-gist`.
+This plugin uses GitHub API v3. The authentication value is stored in `~/.gist-vim`.
 vim-gist provides two ways to authenticate against the GitHub APIs.
 
 First, you need to set your GitHub username in global git config:
@@ -312,7 +312,7 @@ If you have two-factor authentication enabled on GitHub, you'll see the message
 "Must specify two-factor authentication OTP code." In this case, you need to
 create a "Personal Access Token" on GitHub's "Account Settings" page
 (https://github.com/settings/applications) and place it in a file
-named ~/.vim-gist like this:
+named ~/.gist-vim like this:
 >
     token xxxxx
 <
@@ -334,7 +334,7 @@ NOTE: the username is optional if you only send anonymous gists.
 FAQ                                                           *vim-gist-faq*
 
 Q. :Gist returns a Forbidden error
-A. Try deleting ~/.vim-gist and authenticating again.
+A. Try deleting ~/.gist-vim and authenticating again.
 
 ==============================================================================
 THANKS                                                     *vim-gist-thanks*
