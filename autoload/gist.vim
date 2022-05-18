@@ -534,6 +534,15 @@ function! s:GistListAction(mode) abort
   endif
 endfunction
 
+func s:fix_eol(content) abort
+  let s = a:content
+  let lastchar=char2nr(s[-1:])
+  if lastchar != 10
+    let s.="\n"
+  endif
+  return s
+endfunc
+
 function! s:GistUpdate(content, gistid, gistnm, desc) abort
   let gist = { 'id': a:gistid, 'files' : {}, 'description': '','public': function('webapi#json#true') }
   if exists('b:gist')
@@ -569,7 +578,8 @@ function! s:GistUpdate(content, gistid, gistnm, desc) abort
     endif
   endif
 
-  let gist.files[filename] = { 'content': a:content, 'filename': filename }
+  let content = s:fix_eol(a:content)
+  let gist.files[filename] = { 'content': content, 'filename': filename }
 
   redraw | echon 'Updating gist... '
   let res = webapi#http#post(g:gist_api_url.'gists/' . a:gistid,
@@ -663,7 +673,7 @@ function! s:GistPost(content, private, desc, anonymous) abort
   if a:desc !=# ' ' | let gist['description'] = a:desc | endif
   if a:private | let gist['public'] = function('webapi#json#false') | endif
   let filename = s:get_current_filename(1)
-  let gist.files[filename] = { 'content': a:content, 'filename': filename }
+  let gist.files[filename] = { 'content': s:fix_eol(a:content), 'filename': filename }
 
   let header = {'Content-Type': 'application/json'}
   if !a:anonymous
@@ -714,7 +724,7 @@ function! s:GistPostBuffers(private, desc, anonymous) abort
     endif
     echo 'Creating gist content'.index.'... '
     silent! exec 'buffer!' bufnr
-    let content = join(getline(1, line('$')), "\n")
+    let content = s:fix_eol(join(getline(1, line('$')), "\n"))
     let filename = s:get_current_filename(index)
     let gist.files[filename] = { 'content': content, 'filename': filename }
     let index = index + 1
