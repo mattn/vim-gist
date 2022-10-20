@@ -452,6 +452,7 @@ function! s:GistGet(gistid, clipboard) abort
             endif
           endif
           setlocal noswapfile
+          silent! exec 'bdel' s:bufprefix.a:gistid.'/'.fnameescape(filename) 
           silent exec 'noautocmd file' s:bufprefix.a:gistid.'/'.fnameescape(filename)
         endif
         set undolevels=-1
