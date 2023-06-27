@@ -544,13 +544,12 @@ func s:fix_eol(content) abort
 endfunc
 
 function! s:GistUpdate(content, gistid, gistnm, desc) abort
-  let gist = { 'id': a:gistid, 'files' : {}, 'description': '','public': function('webapi#json#true') }
+  let gist = { 'files' : {}, 'description': '' }
   if exists('b:gist')
     if has_key(b:gist, 'filename') && len(a:gistnm) > 0
       let gist.files[b:gist.filename] = { 'content': '', 'filename': b:gist.filename }
       let b:gist.filename = a:gistnm
     endif
-    if has_key(b:gist, 'private') && b:gist.private | let gist['public'] = function('webapi#json#false') | endif
     if has_key(b:gist, 'description') | let gist['description'] = b:gist.description | endif
     if has_key(b:gist, 'filename') | let filename = b:gist.filename | endif
   else
@@ -595,6 +594,9 @@ function! s:GistUpdate(content, gistid, gistnm, desc) abort
     redraw | echomsg 'Done: '.loc
   else
     let loc = ''
+    if len(res.message) == 0
+      let res.message = res.content
+    endif
     echohl ErrorMsg | echomsg 'Post failed: ' . res.message | echohl None
   endif
   return loc
