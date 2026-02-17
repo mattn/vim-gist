@@ -32,7 +32,15 @@ else
   call webapi#json#true()
 endif
 
-let s:gist_token_file = expand(get(g:, 'gist_token_file', '~/.gist-vim'))
+if exists('g:gist_token_file')
+  let s:gist_token_file = expand(g:gist_token_file)
+elseif filereadable(expand('~/.gist-vim'))
+  let s:gist_token_file = expand('~/.gist-vim')
+elseif has('win32') || has('win64')
+  let s:gist_token_file = expand('$APPDATA/vim-gist.json')
+else
+  let s:gist_token_file = expand('~/.config/vim-gist.json')
+endif
 let s:system = function(get(g:, 'webapi#system_function', 'system'))
 
 if !exists('g:github_user')
@@ -993,55 +1001,101 @@ function! s:GistGetAuthHeader() abort
     return auth
   endif
 
+  let client_id = get(g:, 'gist_oauth_client_id', '9d56c2177b50717a4727')
+
+  let github_host = matchstr(g:gist_api_url, 'https\?://\zs[^/]\+\ze')
+  if github_host ==# 'api.github.com'
+    let device_code_url = 'https://github.com/login/device/code'
+    let access_token_url = 'https://github.com/login/oauth/access_token'
+  else
+    let device_code_url = 'https://' . github_host . '/login/device/code'
+    let access_token_url = 'https://' . github_host . '/login/oauth/access_token'
+  endif
+
   redraw
   echohl WarningMsg
   echo 'Gist.vim requires authorization to use the GitHub API. These settings are stored in "~/.gist-vim". If you want to revoke, do "rm ~/.gist-vim".'
   echohl None
-  let password = inputsecret('GitHub Password for '.g:github_user.':')
-  if len(password) == 0
-    let v:errmsg = 'Canceled'
+
+  let res = webapi#http#post(device_code_url,
+              \ 'client_id=' . client_id . '&scope=gist', {
+              \  'Accept': 'application/json',
+              \})
+  let device = webapi#json#decode(res.content)
+  if !has_key(device, 'device_code') || !has_key(device, 'user_code')
+    let v:errmsg = get(device, 'error_description', 'Failed to request device code')
+    redraw
+    echohl ErrorMsg | echomsg v:errmsg | echohl None
     return ''
   endif
-  let note = 'Gist.vim on '.hostname().' '.strftime('%Y/%m/%d-%H:%M:%S')
-  let note_url = 'http://www.vim.org/scripts/script.php?script_id=2423'
-  let insecureSecret = printf('basic %s', webapi#base64#b64encode(g:github_user.':'.password))
-  let res = webapi#http#post(g:gist_api_url.'authorizations', webapi#json#encode({
-              \  'scopes'   : ['gist'],
-              \  'note'     : note,
-              \  'note_url' : note_url,
-              \}), {
-              \  'Content-Type'  : 'application/json',
-              \  'Authorization' : insecureSecret,
-              \})
-  let h = filter(res.header, 'stridx(v:val, "X-GitHub-OTP:") == 0')
-  if len(h)
-    let otp = inputsecret('OTP:')
-    if len(otp) == 0
-      let v:errmsg = 'Canceled'
+
+  let device_code = device.device_code
+  let user_code = device.user_code
+  let verification_uri = get(device, 'verification_uri', 'https://github.com/login/device')
+  let interval = get(device, 'interval', 5)
+  let expires_in = get(device, 'expires_in', 900)
+
+  call s:open_browser(verification_uri)
+  redraw
+  echohl Title
+  echo 'Open ' . verification_uri . ' and enter code: ' . user_code
+  echohl None
+
+  let elapsed = 0
+  while elapsed < expires_in
+    let sleep_cmd = 'sleep ' . interval
+    if has('win32') || has('win64')
+      let sleep_cmd = 'ping -n ' . (interval + 1) . ' 127.0.0.1 >nul'
+    endif
+    call system(sleep_cmd)
+    let elapsed += interval
+
+    let res = webapi#http#post(access_token_url,
+                \ 'client_id=' . client_id
+                \ . '&device_code=' . device_code
+                \ . '&grant_type=urn:ietf:params:oauth:grant-type:device_code', {
+                \  'Accept': 'application/json',
+                \})
+    let token_response = webapi#json#decode(res.content)
+
+    if has_key(token_response, 'access_token')
+      let secret = printf('token %s', token_response.access_token)
+      call writefile([secret], s:gist_token_file)
+      if !(has('win32') || has('win64'))
+        call system('chmod go= '.s:gist_token_file)
+      endif
+      redraw | echo 'Authorization successful!'
+      return secret
+    endif
+
+    let error = get(token_response, 'error', '')
+    if error ==# 'authorization_pending'
+      continue
+    elseif error ==# 'slow_down'
+      let interval = get(token_response, 'interval', interval + 5)
+      continue
+    elseif error ==# 'expired_token'
+      redraw
+      echohl ErrorMsg | echomsg 'Device code expired. Please try again.' | echohl None
+      let v:errmsg = 'Device code expired'
+      return ''
+    elseif error ==# 'access_denied'
+      redraw
+      echohl ErrorMsg | echomsg 'Authorization was denied by the user.' | echohl None
+      let v:errmsg = 'Authorization denied'
+      return ''
+    else
+      redraw
+      let v:errmsg = get(token_response, 'error_description', 'Authorization failed: ' . error)
+      echohl ErrorMsg | echomsg v:errmsg | echohl None
       return ''
     endif
-    let res = webapi#http#post(g:gist_api_url.'authorizations', webapi#json#encode({
-                \  'scopes'   : ['gist'],
-                \  'note'     : note,
-                \  'note_url' : note_url,
-                \}), {
-                \  'Content-Type'  : 'application/json',
-                \  'Authorization' : insecureSecret,
-                \  'X-GitHub-OTP'  : otp,
-                \})
-  endif
-  let authorization = webapi#json#decode(res.content)
-  if has_key(authorization, 'token')
-    let secret = printf('token %s', authorization.token)
-    call writefile([secret], s:gist_token_file)
-    if !(has('win32') || has('win64'))
-      call system('chmod go= '.s:gist_token_file)
-    endif
-  elseif has_key(authorization, 'message')
-    let secret = ''
-    let v:errmsg = authorization.message
-  endif
-  return secret
+  endwhile
+
+  redraw
+  echohl ErrorMsg | echomsg 'Authorization timed out. Please try again.' | echohl None
+  let v:errmsg = 'Authorization timed out'
+  return ''
 endfunction
 
 let s:extmap = extend({
