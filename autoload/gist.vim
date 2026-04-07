@@ -177,6 +177,13 @@ function! s:format_gist(gist) abort
   return printf('gist: %s %s %s', s:truncate(a:gist.id, l:idlen), s:truncate(l:name, l:namelen), s:truncate(l:desc, l:desclen))
 endfunction
 
+function! s:required_headers() abort
+  return {
+  \ 'Accept': 'application/vnd.github+json',
+  \ 'X-GitHub-Api-Version': '2026-03-10',
+  \}
+endfunction
+
 " Note: A colon in the file name has side effects on Windows due to NTFS Alternate Data Streams; avoid it.
 let s:bufprefix = 'gist' . (has('unix') ? ':' : '_')
 function! s:GistList(gistls, page, pagelimit) abort
@@ -217,14 +224,15 @@ function! s:GistList(gistls, page, pagelimit) abort
   silent %d _
 
   redraw | echon 'Listing gists... '
-  let l:auth = s:GistGetAuthHeader()
+  let l:auth = s:GistGetAuthToken()
   if len(l:auth) == 0
     bw!
     redraw
     echohl ErrorMsg | echomsg v:errmsg | echohl None
     return
   endif
-  let l:res = webapi#http#get(l:url, '', { 'Authorization': l:auth })
+  let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+  let l:res = webapi#http#get(l:url, '', l:headers)
   if v:shell_error != 0
     bw!
     redraw
@@ -280,7 +288,7 @@ function! gist#list_recursively(user, ...) abort
     let l:url = g:gist_api_url.'users/'.a:user.'/gists'
   endif
 
-  let l:auth = s:GistGetAuthHeader()
+  let l:auth = s:GistGetAuthToken()
   if len(l:auth) == 0
     " anonymous user cannot get gists to prevent infinite recursive loading
     return []
@@ -308,7 +316,8 @@ function! gist#list_recursively(user, ...) abort
   endif
 
   while l:limit == -1 || l:page <= l:limit
-    let l:res = webapi#http#get(l:url.'?page='.l:page, '', {'Authorization': l:auth})
+    let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+    let l:res = webapi#http#get(l:url.'?page='.l:page, '', l:headers)
     if l:limit == -1
       " update limit to the last page
       let l:limit = s:get_lastpage(l:res)
@@ -336,20 +345,22 @@ function! gist#list(user, ...) abort
     let l:url = g:gist_api_url.'users/'.a:user.'/gists'
   endif
 
-  let l:auth = s:GistGetAuthHeader()
+  let l:auth = s:GistGetAuthToken()
   if len(l:auth) == 0
     return []
   endif
-  let l:res = webapi#http#get(l:url, '', { 'Authorization': l:auth })
+  let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+  let l:res = webapi#http#get(l:url, '', l:headers)
   return webapi#json#decode(l:res.content)
 endfunction
 
 function! s:GistGetFileName(gistid) abort
-  let l:auth = s:GistGetAuthHeader()
+  let l:auth = s:GistGetAuthToken()
   if len(l:auth) == 0
     return ''
   endif
-  let l:res = webapi#http#get(g:gist_api_url.'gists/'.a:gistid, '', { 'Authorization': l:auth })
+  let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+  let l:res = webapi#http#get(g:gist_api_url.'gists/'.a:gistid, '', l:headers)
   let l:gist = webapi#json#decode(l:res.content)
   if has_key(l:gist, 'files')
     return sort(keys(l:gist.files))[0]
@@ -358,11 +369,12 @@ function! s:GistGetFileName(gistid) abort
 endfunction
 
 function! s:GistDetectFiletype(gistid) abort
-  let l:auth = s:GistGetAuthHeader()
+  let l:auth = s:GistGetAuthToken()
   if len(l:auth) == 0
     return ''
   endif
-  let l:res = webapi#http#get(g:gist_api_url.'gists/'.a:gistid, '', { 'Authorization': l:auth })
+  let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+  let l:res = webapi#http#get(g:gist_api_url.'gists/'.a:gistid, '', l:headers)
   let l:gist = webapi#json#decode(l:res.content)
   let l:filename = sort(keys(l:gist.files))[0]
   let l:ext = fnamemodify(l:filename, ':e')
@@ -390,7 +402,14 @@ endfunction
 
 function! s:GistGet(gistid, clipboard) abort
   redraw | echon 'Getting gist... '
-  let l:res = webapi#http#get(g:gist_api_url.'gists/'.a:gistid, '', { 'Authorization': s:GistGetAuthHeader() })
+  let l:auth = s:GistGetAuthToken()
+  if len(l:auth) == 0
+    redraw
+    echohl ErrorMsg | echomsg v:errmsg | echohl None
+    return
+  endif
+  let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+  let l:res = webapi#http#get(g:gist_api_url.'gists/'.a:gistid, '', l:headers)
   if l:res.status =~# '^2'
     try
       let l:gist = webapi#json#decode(l:res.content)
@@ -558,7 +577,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc) abort
     if len(l:filename) == 0 | let l:filename = s:get_current_filename(1) | endif
   endif
 
-  let l:auth = s:GistGetAuthHeader()
+  let l:auth = s:GistGetAuthToken()
   if len(l:auth) == 0
     redraw
     echohl ErrorMsg | echomsg v:errmsg | echohl None
@@ -570,7 +589,8 @@ function! s:GistUpdate(content, gistid, gistnm, desc) abort
   if a:desc !=# ' '
     let l:gist['description'] = a:desc
   else
-    let l:res = webapi#http#get(g:gist_api_url.'gists/'.a:gistid, '', { 'Authorization': l:auth })
+    let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+    let l:res = webapi#http#get(g:gist_api_url.'gists/'.a:gistid, '', l:headers)
     if l:res.status =~# '^2'
       let l:old_gist = webapi#json#decode(l:res.content)
       let l:gist['description'] = l:old_gist.description
@@ -580,11 +600,8 @@ function! s:GistUpdate(content, gistid, gistnm, desc) abort
   let l:gist.files[l:filename] = { 'content': a:content, 'filename': l:filename }
 
   redraw | echon 'Updating gist... '
-  let l:res = webapi#http#post(g:gist_api_url.'gists/' . a:gistid,
-  \ webapi#json#encode(l:gist), {
-  \   'Authorization': l:auth,
-  \   'Content-Type': 'application/json',
-  \})
+  let l:headers = extend(s:required_headers(), { 'Authorization': l:auth, 'Content-Type': 'application/json' })
+  let l:res = webapi#http#post(g:gist_api_url.'gists/'.a:gistid, webapi#json#encode(l:gist), l:headers, 'PATCH')
   if l:res.status =~# '^2'
     let l:obj = webapi#json#decode(l:res.content)
     let l:loc = l:obj['html_url']
@@ -599,7 +616,7 @@ function! s:GistUpdate(content, gistid, gistnm, desc) abort
 endfunction
 
 function! s:GistDelete(gistid) abort
-  let l:auth = s:GistGetAuthHeader()
+  let l:auth = s:GistGetAuthToken()
   if len(l:auth) == 0
     redraw
     echohl ErrorMsg | echomsg v:errmsg | echohl None
@@ -607,10 +624,8 @@ function! s:GistDelete(gistid) abort
   endif
 
   redraw | echon 'Deleting gist... '
-  let l:res = webapi#http#post(g:gist_api_url.'gists/'.a:gistid, '', {
-  \   'Authorization': l:auth,
-  \   'Content-Type': 'application/json',
-  \}, 'DELETE')
+  let l:headers = extend(s:required_headers(), { 'Authorization': l:auth, 'Content-Type': 'application/json' })
+  let l:res = webapi#http#post(g:gist_api_url.'gists/'.a:gistid, '', l:headers, 'DELETE')
   if l:res.status =~# '^2'
     if exists('b:gist')
       unlet b:gist
@@ -667,19 +682,19 @@ function! s:GistPost(content, private, desc, anonymous) abort
   let l:filename = s:get_current_filename(1)
   let l:gist.files[l:filename] = { 'content': a:content, 'filename': l:filename }
 
-  let l:header = {'Content-Type': 'application/json'}
+  let l:headers = extend(s:required_headers(), { 'Content-Type': 'application/json' })
   if !a:anonymous
-    let l:auth = s:GistGetAuthHeader()
+    let l:auth = s:GistGetAuthToken()
     if len(l:auth) == 0
       redraw
       echohl ErrorMsg | echomsg v:errmsg | echohl None
       return
     endif
-    let l:header['Authorization'] = l:auth
+    let l:headers['Authorization'] = l:auth
   endif
 
   redraw | echon 'Posting it to gist... '
-  let l:res = webapi#http#post(g:gist_api_url.'gists', webapi#json#encode(l:gist), l:header)
+  let l:res = webapi#http#post(g:gist_api_url.'gists', webapi#json#encode(l:gist), l:headers)
   if l:res.status =~# '^2'
     let l:obj = webapi#json#decode(l:res.content)
     let l:loc = l:obj['html_url']
@@ -723,19 +738,19 @@ function! s:GistPostBuffers(private, desc, anonymous) abort
   endfor
   silent! exec 'buffer!' l:bn
 
-  let l:header = {'Content-Type': 'application/json'}
+  let l:headers = extend(s:required_headers(), { 'Content-Type': 'application/json' })
   if !a:anonymous
-    let l:auth = s:GistGetAuthHeader()
+    let l:auth = s:GistGetAuthToken()
     if len(l:auth) == 0
       redraw
       echohl ErrorMsg | echomsg v:errmsg | echohl None
       return
     endif
-    let l:header['Authorization'] = l:auth
+    let l:headers['Authorization'] = l:auth
   endif
 
   redraw | echon 'Posting it to gist... '
-  let l:res = webapi#http#post(g:gist_api_url.'gists', webapi#json#encode(l:gist), l:header)
+  let l:res = webapi#http#post(g:gist_api_url.'gists', webapi#json#encode(l:gist), l:headers)
   if l:res.status =~# '^2'
     let l:obj = webapi#json#decode(l:res.content)
     let l:loc = l:obj['html_url']
@@ -843,12 +858,13 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
       endif
       let l:editpost = 1
     elseif l:arg =~# '^\(+1\|--star\)$\C' && l:gistidbuf !=# ''
-      let l:auth = s:GistGetAuthHeader()
+      let l:auth = s:GistGetAuthToken()
       if len(l:auth) == 0
         echohl ErrorMsg | echomsg v:errmsg | echohl None
       else
         let l:gistid = l:gistidbuf
-        let l:res = webapi#http#post(g:gist_api_url.'gists/'.l:gistid.'/star', '', { 'Authorization': l:auth }, 'PUT')
+        let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+        let l:res = webapi#http#post(g:gist_api_url.'gists/'.l:gistid.'/star', '', l:headers, 'PUT')
         if l:res.status =~# '^2'
           echomsg 'Starred' l:gistid
         else
@@ -857,12 +873,13 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
       endif
       return
     elseif l:arg =~# '^\(-1\|--unstar\)$\C' && l:gistidbuf !=# ''
-      let l:auth = s:GistGetAuthHeader()
+      let l:auth = s:GistGetAuthToken()
       if len(l:auth) == 0
         echohl ErrorMsg | echomsg v:errmsg | echohl None
       else
         let l:gistid = l:gistidbuf
-        let l:res = webapi#http#post(g:gist_api_url.'gists/'.l:gistid.'/star', '', { 'Authorization': l:auth }, 'DELETE')
+        let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+        let l:res = webapi#http#post(g:gist_api_url.'gists/'.l:gistid.'/star', '', l:headers, 'DELETE')
         if l:res.status =~# '^2'
           echomsg 'Unstarred' l:gistid
         else
@@ -871,13 +888,14 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
       endif
       return
     elseif l:arg =~# '^\(-f\|--fork\)$\C' && l:gistidbuf !=# ''
-      let l:auth = s:GistGetAuthHeader()
+      let l:auth = s:GistGetAuthToken()
       if len(l:auth) == 0
         echohl ErrorMsg | echomsg v:errmsg | echohl None
         return
       else
         let l:gistid = l:gistidbuf
-        let l:res = webapi#http#post(g:gist_api_url.'gists/'.l:gistid.'/fork', '', { 'Authorization': l:auth })
+        let l:headers = extend(s:required_headers(), { 'Authorization': l:auth })
+        let l:res = webapi#http#post(g:gist_api_url.'gists/'.l:gistid.'/fork', '', l:headers)
         if l:res.status =~# '^2'
           let l:obj = webapi#json#decode(l:res.content)
           let l:gistid = l:obj['id']
@@ -982,7 +1000,7 @@ function! gist#Gist(count, bang, line1, line2, ...) abort
   return 1
 endfunction
 
-function! s:GistGetAuthHeader() abort
+function! s:GistGetAuthToken() abort
   if get(g:, 'gist_use_password_in_gitconfig', 0) != 0
     let l:password = substitute(system('git config --get github.password'), "\n", '', '')
     if l:password =~# '^!' | let l:password = system(l:password[1:]) | endif
@@ -990,7 +1008,7 @@ function! s:GistGetAuthHeader() abort
   endif
   let l:auth = ''
   if !empty(get(g:, 'gist_token', $GITHUB_TOKEN))
-    let l:auth = 'token ' . get(g:, 'gist_token', $GITHUB_TOKEN)
+    let l:auth = 'Bearer ' . get(g:, 'gist_token', $GITHUB_TOKEN)
   elseif filereadable(s:gist_token_file)
     let l:str = join(readfile(s:gist_token_file), '')
     if type(l:str) == 1
@@ -1059,7 +1077,7 @@ function! s:GistGetAuthHeader() abort
     let l:token_response = webapi#json#decode(l:res.content)
 
     if has_key(l:token_response, 'access_token')
-      let l:secret = printf('token %s', l:token_response.access_token)
+      let l:secret = printf('Bearer %s', l:token_response.access_token)
       call writefile([l:secret], s:gist_token_file)
       if !(has('win32') || has('win64'))
         call system('chmod go= '.s:gist_token_file)
